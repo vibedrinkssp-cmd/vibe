@@ -50,10 +50,10 @@ export function FixedHeader({ searchQuery, onSearchChange, onTutorialOpen, notif
             </Link>
 
             {/* Instagram */}
-            <button onClick={() => window.open('https://www.instagram.com/_vmbrasil', '_blank', 'noopener,noreferrer')} className="flex-shrink-0 group">
-              <img 
-                src={instagramIcon} 
-                alt="Instagram VM Brasil" 
+            <button onClick={() => window.open('https://www.instagram.com/adegavibedriinks/', '_blank', 'noopener,noreferrer')} className="flex-shrink-0 group">
+              <img
+                src={instagramIcon}
+                alt="Instagram Vibe Drinks"
                 className="h-10 w-auto rounded-xl transition-all duration-300 group-hover:scale-105"
               />
             </button>
