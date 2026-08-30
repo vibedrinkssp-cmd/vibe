@@ -439,7 +439,7 @@ export default function Kitchen() {
     <div className="min-h-screen bg-background overflow-x-hidden">
       <SoundUnlockBanner />
 
-      <header className="bg-primary border-b border-primary-foreground/20 py-4 px-4 md:px-6 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-50">
+      <header className="bg-[#0A0A0A] border-b border-[#D4AF37]/30 py-4 px-4 md:px-6 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-50">
         <PanelSwitcher current="kitchen" />
         <div className="flex items-center gap-2 md:gap-4">
           {isAlertActive && (
@@ -466,7 +466,7 @@ export default function Kitchen() {
           <Button
             variant="ghost"
             size="icon"
-            className="text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10"
+            className="text-white/70 hover:text-white hover:bg-primary-foreground/10"
             onClick={handleLogout}
             data-testid="button-logout"
           >
@@ -556,7 +556,7 @@ export default function Kitchen() {
             <OrderCarousel
               title="Preparando"
               icon={<ChefHat className="h-5 w-5 text-purple-400" />}
-              accentColor="#a855f7"
+              accentColor="#D4AF37"
               emptyLabel="Nenhum pedido em preparo"
               items={preparingOrders.map(order => ({
                 id: order.id,
@@ -564,7 +564,7 @@ export default function Kitchen() {
                 node: (
                   <KitchenOrderCard
                     order={order}
-                    statusColor="#a855f7"
+                    statusColor="#D4AF37"
                     actions={renderOrderActions(order, 'preparing')}
                   />
                 ),

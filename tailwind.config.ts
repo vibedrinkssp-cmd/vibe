@@ -8,6 +8,36 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Vibe Drinks gold — overrides Tailwind's default `purple` palette so every
+        // bg-purple-*/text-purple-*/border-purple-* usage across the app renders gold
+        // without having to touch each component individually.
+        purple: {
+          50: "#FEFCE8",
+          100: "#FEF9C3",
+          200: "#FEF08A",
+          300: "#FDE047",
+          400: "#FACC15",
+          500: "#D4AF37",
+          600: "#A9791F",
+          700: "#8B6215",
+          800: "#6B4B10",
+          900: "#4A340A",
+          950: "#2E200A",
+        },
+        // Same gold override for the other purple-family Tailwind palettes
+        // (violet/indigo/fuchsia) still used directly in a handful of components.
+        violet: {
+          50: "#FEFCE8", 100: "#FEF9C3", 200: "#FEF08A", 300: "#FDE047", 400: "#FACC15",
+          500: "#D4AF37", 600: "#A9791F", 700: "#8B6215", 800: "#6B4B10", 900: "#4A340A", 950: "#2E200A",
+        },
+        indigo: {
+          50: "#FEFCE8", 100: "#FEF9C3", 200: "#FEF08A", 300: "#FDE047", 400: "#FACC15",
+          500: "#D4AF37", 600: "#A9791F", 700: "#8B6215", 800: "#6B4B10", 900: "#4A340A", 950: "#2E200A",
+        },
+        fuchsia: {
+          50: "#FEFCE8", 100: "#FEF9C3", 200: "#FEF08A", 300: "#FDE047", 400: "#FACC15",
+          500: "#D4AF37", 600: "#A9791F", 700: "#8B6215", 800: "#6B4B10", 900: "#4A340A", 950: "#2E200A",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

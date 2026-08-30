@@ -593,10 +593,10 @@ export default function MotoboyPage() {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <SoundUnlockBanner />
-      <header className="bg-primary border-b border-primary-foreground/20 py-4 px-4 md:px-6 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-50 flex-shrink-0 w-full overflow-hidden">
+      <header className="bg-[#0A0A0A] border-b border-[#D4AF37]/30 py-4 px-4 md:px-6 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-50 flex-shrink-0 w-full overflow-hidden">
         <div className="flex items-center gap-2 md:gap-3">
-          <Navigation className="h-6 w-6 md:h-8 md:w-8 text-primary-foreground" />
-          <h1 className="font-serif text-lg md:text-2xl text-primary-foreground">Entregas</h1>
+          <Navigation className="h-6 w-6 md:h-8 md:w-8 text-white" />
+          <h1 className="font-serif text-lg md:text-2xl text-white">Entregas</h1>
         </div>
         <div className="flex items-center flex-wrap gap-2 md:gap-4">
           {isAlertActive && (
@@ -642,7 +642,7 @@ export default function MotoboyPage() {
           <Button
             variant={showSummary ? "default" : "outline"}
             size="sm"
-            className={`gap-1.5 ${!showSummary ? 'border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10' : ''}`}
+            className={`gap-1.5 ${!showSummary ? 'border-primary-foreground/40 text-white hover:bg-primary-foreground/10' : ''}`}
             onClick={() => setShowSummary(!showSummary)}
           >
             <BarChart3 className="h-4 w-4" />
@@ -653,7 +653,7 @@ export default function MotoboyPage() {
           <Button
             variant="outline"
             size="sm"
-            className="gap-1.5 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10"
+            className="gap-1.5 border-primary-foreground/40 text-white hover:bg-primary-foreground/10"
             onClick={() => setShowTutorial(true)}
           >
             <HelpCircle className="h-4 w-4" />
@@ -664,7 +664,7 @@ export default function MotoboyPage() {
           <Button
             variant="ghost"
             size="icon"
-            className="text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10"
+            className="text-white/70 hover:text-white hover:bg-primary-foreground/10"
             onClick={handleLogout}
             data-testid="button-logout"
           >
@@ -676,10 +676,10 @@ export default function MotoboyPage() {
         {showSummary && currentMotoboy && (
           <div className="mt-3 pt-3 border-t border-primary-foreground/20 grid grid-cols-2 gap-3 text-sm">
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-primary-foreground/60" />
+              <Clock className="h-4 w-4 text-white/60" />
               <div>
-                <p className="text-primary-foreground/60 text-[10px]">Login</p>
-                <p className="text-primary-foreground font-medium text-xs">
+                <p className="text-white/60 text-[10px]">Login</p>
+                <p className="text-white font-medium text-xs">
                   {currentMotoboy.loggedInAt
                     ? new Date(currentMotoboy.loggedInAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
                     : '--:--'}
@@ -687,24 +687,24 @@ export default function MotoboyPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Truck className="h-4 w-4 text-primary-foreground/60" />
+              <Truck className="h-4 w-4 text-white/60" />
               <div>
-                <p className="text-primary-foreground/60 text-[10px]">Entregas {summaryLabel}</p>
-                <p className="text-primary-foreground font-medium text-xs">{todayDelivered.length}</p>
+                <p className="text-white/60 text-[10px]">Entregas {summaryLabel}</p>
+                <p className="text-white font-medium text-xs">{todayDelivered.length}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-primary-foreground/60" />
+              <DollarSign className="h-4 w-4 text-white/60" />
               <div>
-                <p className="text-primary-foreground/60 text-[10px]">Taxas Acumuladas</p>
-                <p className="text-primary-foreground font-bold text-xs">R$ {accumulatedFees.toFixed(2)}</p>
+                <p className="text-white/60 text-[10px]">Taxas Acumuladas</p>
+                <p className="text-white font-bold text-xs">R$ {accumulatedFees.toFixed(2)}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Package className="h-4 w-4 text-primary-foreground/60" />
+              <Package className="h-4 w-4 text-white/60" />
               <div>
-                <p className="text-primary-foreground/60 text-[10px]">Em Andamento</p>
-                <p className="text-primary-foreground font-medium text-xs">{dispatchedOrders.length}</p>
+                <p className="text-white/60 text-[10px]">Em Andamento</p>
+                <p className="text-white font-medium text-xs">{dispatchedOrders.length}</p>
               </div>
             </div>
           </div>
@@ -908,7 +908,7 @@ export default function MotoboyPage() {
           <OrderCarousel
             title="Minhas Entregas em Andamento"
             icon={<Truck className="h-5 w-5 text-purple-400" />}
-            accentColor="#a855f7"
+            accentColor="#D4AF37"
             emptyLabel="Sem entregas no momento"
             items={dispatchedOrders.map((order) => ({
               id: order.id,

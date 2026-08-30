@@ -309,10 +309,10 @@ export default function AdminDashboard() {
     <div className="h-screen-safe bg-background flex flex-col overflow-hidden relative">
       <SoundUnlockBanner />
       {/* Header */}
-      <header className="bg-primary border-b border-primary-foreground/20 py-3 px-3 md:px-6 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-50 flex-shrink-0 w-full overflow-hidden">
+      <header className="bg-[#0A0A0A] border-b border-[#D4AF37]/30 py-3 px-3 md:px-6 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-50 flex-shrink-0 w-full overflow-hidden">
         <div className="flex items-center gap-2 min-w-0">
-          <Package className="h-5 w-5 md:h-8 md:w-8 text-primary-foreground flex-shrink-0" />
-          <h1 className="font-serif text-base md:text-2xl text-primary-foreground truncate">Painel Admin</h1>
+          <Package className="h-5 w-5 md:h-8 md:w-8 text-white flex-shrink-0" />
+          <h1 className="font-serif text-base md:text-2xl text-white truncate">Painel Admin</h1>
         </div>
         <div className="flex items-center gap-1.5 md:gap-3 flex-wrap max-w-full overflow-hidden">
           <HeaderAlertStop isAlertActive={isAlertActive} onStop={ackAll} />
@@ -322,7 +322,7 @@ export default function AdminDashboard() {
           <Button
             variant={showVisitors ? "default" : "outline"}
             size="sm"
-            className={`gap-1.5 ${!showVisitors ? 'border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10' : ''}`}
+            className={`gap-1.5 ${!showVisitors ? 'border-primary-foreground/40 text-white hover:bg-primary-foreground/10' : ''}`}
             onClick={() => setShowVisitors((v: boolean) => !v)}
           >
             <Users className="h-4 w-4" />
@@ -331,7 +331,7 @@ export default function AdminDashboard() {
           <Button
             variant="outline"
             size="sm"
-            className="gap-1.5 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10"
+            className="gap-1.5 border-primary-foreground/40 text-white hover:bg-primary-foreground/10"
             onClick={() => setShowTutorial(true)}
           >
             <HelpCircle className="h-4 w-4" />
@@ -354,7 +354,7 @@ export default function AdminDashboard() {
           <Button
             variant="ghost"
             size="icon"
-            className="text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10"
+            className="text-white/70 hover:text-white hover:bg-primary-foreground/10"
             onClick={handleLogout}
             data-testid="button-logout"
           >

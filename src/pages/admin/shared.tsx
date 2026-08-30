@@ -85,7 +85,7 @@ export function canEditOrder(order: OrderWithDetails | Order | null | undefined)
   return true;
 }
 
-export const CHART_COLORS = ['#9b5de5', '#8b5cf6', '#a855f7', '#c084fc', '#d8b4fe'];
+export const CHART_COLORS = ['#8B6215', '#A9791F', '#D4AF37', '#EAC93C', '#FDE047'];
 
 // Cores bem distintas para gráfico de análise financeira
 export const FINANCIAL_CHART_COLORS = {
@@ -93,5 +93,5 @@ export const FINANCIAL_CHART_COLORS = {
   custo: '#EF4444',          // Vermelho
   lucroBruto: '#22C55E',     // Verde
   sangrias: '#F97316',       // Laranja
-  lucroLiquido: '#A855F7',   // Roxo
+  lucroLiquido: '#D4AF37',   // Dourado
 };

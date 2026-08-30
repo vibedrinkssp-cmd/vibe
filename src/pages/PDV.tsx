@@ -1299,17 +1299,17 @@ export default function PDV() {
 
   return (
     <div className="h-screen-safe bg-background flex flex-col overflow-hidden">
-      <header className="bg-primary border-b border-primary-foreground/20 py-3 px-3 md:px-6 flex items-center justify-between sticky top-0 z-50 flex-shrink-0">
+      <header className="bg-[#0A0A0A] border-b border-[#D4AF37]/30 py-3 px-3 md:px-6 flex items-center justify-between sticky top-0 z-50 flex-shrink-0">
         <PanelSwitcher current="pdv" />
         <div className="flex items-center gap-2 md:gap-4">
           <StoreStatusToggle />
-          <span className="text-primary-foreground/70 text-xs sm:text-sm hidden sm:inline">
+          <span className="text-white/70 text-xs sm:text-sm hidden sm:inline">
             {user?.name}
           </span>
           <Button
             variant="ghost"
             size="icon"
-            className="text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10"
+            className="text-white/70 hover:text-white hover:bg-primary-foreground/10"
             onClick={handleLogout}
             data-testid="button-logout"
           >

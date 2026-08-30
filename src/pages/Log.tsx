@@ -530,7 +530,7 @@ export default function Log() {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <SoundUnlockBanner />
-      <header className="bg-primary border-b border-primary-foreground/20 py-4 px-4 md:px-6 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-50">
+      <header className="bg-[#0A0A0A] border-b border-[#D4AF37]/30 py-4 px-4 md:px-6 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-50">
         <PanelSwitcher current="log" />
         <div className="flex items-center gap-2 md:gap-4">
           {isAlertActive && (
@@ -556,7 +556,7 @@ export default function Log() {
           <Button
             variant="ghost"
             size="icon"
-            className="text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10"
+            className="text-white/70 hover:text-white hover:bg-primary-foreground/10"
             onClick={handleLogout}
           >
             <LogOut className="h-4 w-4" />

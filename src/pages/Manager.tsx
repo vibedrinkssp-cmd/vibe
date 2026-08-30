@@ -306,18 +306,18 @@ export default function Manager() {
   return (
     <div className="h-screen-safe bg-background flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="bg-primary border-b border-primary-foreground/20 py-3 px-3 md:px-6 flex items-center justify-between gap-2 sticky top-0 z-50 flex-shrink-0 w-full max-w-full overflow-hidden">
+      <header className="bg-[#0A0A0A] border-b border-[#D4AF37]/30 py-3 px-3 md:px-6 flex items-center justify-between gap-2 sticky top-0 z-50 flex-shrink-0 w-full max-w-full overflow-hidden">
         <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-          <Briefcase className="h-5 w-5 md:h-7 md:w-7 text-primary-foreground shrink-0" />
-          <h1 className="font-serif text-base md:text-2xl text-primary-foreground truncate">Painel Gerencial</h1>
-          <Badge className="hidden sm:inline-flex bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30 text-xs shrink-0">Confidencial</Badge>
+          <Briefcase className="h-5 w-5 md:h-7 md:w-7 text-white shrink-0" />
+          <h1 className="font-serif text-base md:text-2xl text-white truncate">Painel Gerencial</h1>
+          <Badge className="hidden sm:inline-flex bg-primary-foreground/20 text-white border-primary-foreground/30 text-xs shrink-0">Confidencial</Badge>
         </div>
         <div className="flex items-center gap-1 md:gap-2 shrink-0">
           <StoreStatusToggle />
           <Button
             variant="ghost"
             size="sm"
-            className="text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10 gap-1.5 px-2"
+            className="text-white/70 hover:text-white hover:bg-primary-foreground/10 gap-1.5 px-2"
             onClick={() => {
               clearManagerSession();
               authLogout();

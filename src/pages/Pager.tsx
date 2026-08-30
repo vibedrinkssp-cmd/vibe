@@ -240,7 +240,7 @@ export default function Pager() {
 
   return (
     <div className="h-[100dvh] w-screen bg-background text-foreground flex flex-col overflow-hidden">
-      <header className="flex items-center justify-between gap-4 px-6 py-3 flex-shrink-0 bg-gradient-to-r from-[#5B21B6] to-[#7C3AED] text-white shadow-lg">
+      <header className="flex items-center justify-between gap-4 px-6 py-3 flex-shrink-0 bg-gradient-to-r from-[#141414] to-[#0A0A0A] border-b border-[#D4AF37]/30 text-white shadow-lg">
         <div className="flex items-center gap-4 min-w-0">
           <img
             src={logoVm}
@@ -266,7 +266,7 @@ export default function Pager() {
               'inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-base font-bold uppercase transition-colors',
               soundOn
                 ? 'bg-white/15 text-white'
-                : 'bg-white text-[#5B21B6] animate-pulse',
+                : 'bg-[#D4AF37] text-[#141414] animate-pulse',
             ].join(' ')}
           >
             {soundOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}

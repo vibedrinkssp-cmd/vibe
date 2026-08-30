@@ -84,7 +84,7 @@ export function SplashScreen({ duration = 3500, onComplete }: SplashScreenProps)
   return (
     <div
       className={`fixed inset-0 z-[9999] transition-all duration-700 ease-in-out ${fadeOut ? 'opacity-0 scale-105' : 'opacity-100 scale-100'}`}
-      style={{ background: '#1a0a3e' }}
+      style={{ background: '#0A0A0A' }}
     >
       {/* Background */}
       <div className="absolute inset-0 overflow-hidden">
@@ -99,7 +99,7 @@ export function SplashScreen({ duration = 3500, onComplete }: SplashScreenProps)
         <div
           className="absolute inset-0"
           style={{
-            background: 'radial-gradient(ellipse at center, transparent 30%, rgba(26,10,62,0.6) 100%)',
+            background: 'radial-gradient(ellipse at center, transparent 30%, rgba(10,10,10,0.7) 100%)',
           }}
         />
       </div>
@@ -113,7 +113,7 @@ export function SplashScreen({ duration = 3500, onComplete }: SplashScreenProps)
         <div className="relative mb-5">
           <div
             className="absolute -inset-4 rounded-3xl opacity-40 blur-2xl"
-            style={{ background: '#7c3aed' }}
+            style={{ background: '#D4AF37' }}
           />
           <div className="relative w-20 h-20 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20">
             <img src={appIcon} alt="Vibe Drinks" className="w-full h-full object-cover" />
@@ -135,9 +135,9 @@ export function SplashScreen({ duration = 3500, onComplete }: SplashScreenProps)
               className="h-full rounded-full"
               style={{
                 width: `${progress}%`,
-                background: 'linear-gradient(90deg, #7c3aed, #a78bfa, #e9d5ff)',
+                background: 'linear-gradient(90deg, #A9791F, #D4AF37, #FDE68A)',
                 transition: 'width 120ms linear',
-                boxShadow: '0 0 12px rgba(167,139,250,0.4)',
+                boxShadow: '0 0 12px rgba(212,175,55,0.4)',
               }}
             />
           </div>
