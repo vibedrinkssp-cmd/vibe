@@ -11,6 +11,7 @@ import { filterVisibleIceFlavorOptions, getIceFlavorPhotoUrl, iceAgua } from '@/
 import { nanoid } from 'nanoid';
 import type { CustomDrink } from '@/shared/schema';
 import { fetchAllowedByType, filterByAllowedProducts } from '@/lib/allowed-bottles';
+import { deductBottleDoses } from '@/lib/deduct-bottle-doses';
 import { TierBottleCarousel, type AvailableBottleWithTier, type SelectedBottleEntry } from './TierBottleCarousel';
 
 interface AvailableBottle extends AvailableBottleWithTier {}
@@ -288,10 +289,10 @@ export function CopaoModal({ open, onOpenChange, onAddCustomDrink }: CopaoModalP
   const persistAndAddToCart = async (): Promise<boolean> => {
     if (!selectedEnergetico || !selectedGelo || !hasDestilado) return false;
     if (!noAlcohol) {
-      for (const sb of selectedBottles) {
-        const { error } = await supabase.rpc('deduct_bottle_doses', { p_bottle_id: sb.bottle.bottle_id, p_doses_used: sb.doses });
-        if (error) { toast({ title: `Erro ao deduzir doses de ${sb.bottle.product_name}`, variant: 'destructive' }); return false; }
-      }
+      const ok = await deductBottleDoses(selectedBottles, (name) =>
+        toast({ title: `Erro ao deduzir doses de ${name}`, variant: 'destructive' })
+      );
+      if (!ok) return false;
     }
     // Energético em garrafa (BALY / BIG BOSS): consome 1 dose de 400ml por copão,
     // auto-abrindo nova garrafa do estoque se a atual esvaziar.

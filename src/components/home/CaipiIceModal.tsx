@@ -12,6 +12,7 @@ import { nanoid } from 'nanoid';
 import { mapProduct } from '@/lib/db-mappers';
 import { TierBottleCarousel, type AvailableBottleWithTier, type SelectedBottleEntry } from './TierBottleCarousel';
 import { fetchAllowedByType, filterByAllowedProducts } from '@/lib/allowed-bottles';
+import { deductBottleDoses } from '@/lib/deduct-bottle-doses';
 import { DrinkRecipeReview } from './DrinkRecipeReview';
 
 type AvailableBottle = AvailableBottleWithTier;
@@ -168,15 +169,10 @@ export function CaipiIceModal({ open, onOpenChange, onAddCustomDrink }: CaipiIce
     if (!selectedIce) return false;
     if (!noAlcohol && selectedBottles.length === 0) return false;
     if (!noAlcohol) {
-      for (const sb of selectedBottles) {
-        const { error } = await supabase.rpc('deduct_bottle_doses', {
-          p_bottle_id: sb.bottle.bottle_id, p_doses_used: sb.doses,
-        });
-        if (error) {
-          toast({ title: `Erro ao deduzir doses de ${sb.bottle.product_name}`, variant: 'destructive' });
-          return false;
-        }
-      }
+      const ok = await deductBottleDoses(selectedBottles, (name) =>
+        toast({ title: `Erro ao deduzir doses de ${name}`, variant: 'destructive' })
+      );
+      if (!ok) return false;
       queryClient.invalidateQueries({ queryKey: ['open-bottles-kitchen'] });
       queryClient.invalidateQueries({ queryKey: ['open-bottles-prep'] });
       queryClient.invalidateQueries({ queryKey: ['assembly-bottles'] });
