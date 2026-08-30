@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Pencil, Gift, Leaf, Cookie, Sandwich, Wine, RotateCcw } from 'lucide-react';
+import { Pencil, Gift, Wine, RotateCcw } from 'lucide-react';
 import { BannerImageUploader } from '@/components/BannerImageUploader';
 import { ensureImageUrl } from '@/lib/supabase';
 
@@ -24,27 +24,6 @@ const FEATURE_BANNERS = [
     description: '5% OFF em combos personalizados',
     icon: Gift,
     defaultImage: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=200&fit=crop&q=80',
-  },
-  {
-    id: 'natural-lunch',
-    title: 'Combo Natural',
-    description: 'Lanche + Suco por R$ 19,90',
-    icon: Leaf,
-    defaultImage: 'https://images.unsplash.com/photo-1540914124281-342587941389?w=400&h=200&fit=crop&q=80',
-  },
-  {
-    id: 'salgado-combo',
-    title: 'Salgado + Refri',
-    description: 'Combo por R$ 12,99',
-    icon: Cookie,
-    defaultImage: 'https://images.unsplash.com/photo-1604467715878-83e57e8bc129?w=400&h=200&fit=crop&q=80',
-  },
-  {
-    id: 'hamburger-combo',
-    title: 'Hambúrguer + Coca',
-    description: 'Hambúrguer + Lata de Coca',
-    icon: Sandwich,
-    defaultImage: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=200&fit=crop&q=80',
   },
 ];
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef, memo, lazy, Suspense } from 'react';
 import { normalizeSearch } from '@/lib/text-utils';
-import { ShoppingCart, Plus, Minus, Trash2, CreditCard, Banknote, QrCode, X, Search, ChevronLeft, CheckCircle2, Store, Wine, Gift, Leaf, Cookie, Sandwich, Flame, Loader2, HelpCircle, ChevronRight, Settings } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Trash2, CreditCard, Banknote, QrCode, X, Search, ChevronLeft, CheckCircle2, Store, Wine, Gift, Flame, Loader2, HelpCircle, ChevronRight, Settings } from 'lucide-react';
 import { TotemPrintTicketsModal } from '@/components/totem/TotemPrintTicketsModal';
 import totemLogo from '@/assets/logo-vibedrinks.gif';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -27,9 +27,6 @@ import { printTotemTicket } from '@/lib/totem-print-ticket';
 // This dramatically reduces the initial JS the totem must parse on boot.
 const SpecialDrinksModal  = lazy(() => import('@/components/home/SpecialDrinksModal').then(m => ({ default: m.SpecialDrinksModal })));
 const ComboModal          = lazy(() => import('@/components/home/ComboModal').then(m => ({ default: m.ComboModal })));
-const NaturalLunchModal   = lazy(() => import('@/components/home/NaturalLunchModal').then(m => ({ default: m.NaturalLunchModal })));
-const SalgadoComboModal   = lazy(() => import('@/components/home/SalgadoComboModal').then(m => ({ default: m.SalgadoComboModal })));
-const HamburgerComboModal = lazy(() => import('@/components/home/HamburgerComboModal').then(m => ({ default: m.HamburgerComboModal })));
 const CustomDrinkModal    = lazy(() => import('@/components/home/CustomDrinkModal').then(m => ({ default: m.CustomDrinkModal })));
 const CaipirinhaModal     = lazy(() => import('@/components/home/CaipirinhaModal').then(m => ({ default: m.CaipirinhaModal })));
 const CopaoModal          = lazy(() => import('@/components/home/CopaoModal').then(m => ({ default: m.CopaoModal })));
@@ -131,9 +128,6 @@ interface TotemCustomDrink extends CustomDrink {}
 const FEATURE_FALLBACK_GRADIENTS: Record<string, string> = {
   'special-drinks': 'linear-gradient(135deg, hsl(280,70%,40%), hsl(263,78%,50%))',
   'combo': 'linear-gradient(135deg, hsl(20,85%,50%), hsl(340,75%,50%))',
-  'natural-lunch': 'linear-gradient(135deg, hsl(140,60%,40%), hsl(160,55%,35%))',
-  'salgado-combo': 'linear-gradient(135deg, hsl(35,85%,55%), hsl(15,80%,50%))',
-  'hamburger-combo': 'linear-gradient(135deg, hsl(15,75%,45%), hsl(0,70%,40%))',
 };
 
 // ── Main Totem ──
@@ -173,9 +167,6 @@ function TotemKiosk() {
   // Modals (same as Home)
   const [comboModalOpen, setComboModalOpen] = useState(false);
   const [specialDrinksOpen, setSpecialDrinksOpen] = useState(false);
-  const [naturalLunchOpen, setNaturalLunchOpen] = useState(false);
-  const [salgadoComboOpen, setSalgadoComboOpen] = useState(false);
-  const [hamburgerComboOpen, setHamburgerComboOpen] = useState(false);
   const [customDrinkOpen, setCustomDrinkOpen] = useState(false);
   const [caipirinhaOpen, setCaipirinhaOpen] = useState(false);
   const [copaoOpen, setCopaoOpen] = useState(false);
@@ -218,9 +209,6 @@ function TotemKiosk() {
       setHelpStep(0);
       setComboModalOpen(false);
       setSpecialDrinksOpen(false);
-      setNaturalLunchOpen(false);
-      setSalgadoComboOpen(false);
-      setHamburgerComboOpen(false);
       setCustomDrinkOpen(false);
       setCaipirinhaOpen(false);
       setCopaoOpen(false);
@@ -449,9 +437,6 @@ function TotemKiosk() {
   const featureBanners = [
     { id: 'special-drinks', title: 'Drinks Especiais', desc: 'Drinks exclusivos da casa', icon: Wine, onClick: () => setSpecialDrinksOpen(true) },
     { id: 'combo', title: 'Monte Seu Combo', desc: '5% OFF em combos', icon: Gift, onClick: () => setComboModalOpen(true) },
-    { id: 'natural-lunch', title: 'Combo Natural', desc: 'Lanche + Suco 10% OFF', icon: Leaf, onClick: () => setNaturalLunchOpen(true) },
-    { id: 'salgado-combo', title: 'Salgado + Refri', desc: '10% OFF no combo', icon: Cookie, onClick: () => setSalgadoComboOpen(true) },
-    { id: 'hamburger-combo', title: 'Hambúrguer + Refri', desc: '10% OFF no combo', icon: Sandwich, onClick: () => setHamburgerComboOpen(true) },
   ];
 
   // ── Success Screen ──
@@ -1331,16 +1316,6 @@ function TotemKiosk() {
       <Suspense fallback={null}>
         {specialDrinksOpen && <SpecialDrinksModal open={specialDrinksOpen} onOpenChange={setSpecialDrinksOpen} onAddItem={addToCart} />}
         {comboModalOpen && <ComboModal open={comboModalOpen} onOpenChange={setComboModalOpen} onAddComboComponents={handleAddComboComponentsToTotem} />}
-        {naturalLunchOpen && <NaturalLunchModal open={naturalLunchOpen} onOpenChange={setNaturalLunchOpen} onAddItem={addToCart} />}
-        {salgadoComboOpen && (
-          <SalgadoComboModal
-            open={salgadoComboOpen}
-            onOpenChange={setSalgadoComboOpen}
-            onAddItem={addToCart}
-            onAddComboComponents={handleAddComboComponentsToTotem}
-          />
-        )}
-        {hamburgerComboOpen && <HamburgerComboModal open={hamburgerComboOpen} onOpenChange={setHamburgerComboOpen} onAddItem={addToCart} />}
         {customDrinkOpen && <CustomDrinkModal open={customDrinkOpen} onOpenChange={setCustomDrinkOpen} drinkType={selectedDrinkType} onAddCustomDrink={handleAddCustomDrink} />}
         {caipirinhaOpen && <CaipirinhaModal open={caipirinhaOpen} onOpenChange={setCaipirinhaOpen} onAddCustomDrink={handleAddCustomDrink} />}
         {copaoOpen && <CopaoModal open={copaoOpen} onOpenChange={setCopaoOpen} onAddCustomDrink={handleAddCustomDrink} />}

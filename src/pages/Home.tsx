@@ -16,9 +16,6 @@ import { PremiumDrinksModal } from '@/components/home/PremiumDrinksModal';
 import { CaipirinhaModal } from '@/components/home/CaipirinhaModal';
 import { CopaoModal } from '@/components/home/CopaoModal';
 import { CaipiIceModal } from '@/components/home/CaipiIceModal';
-import { NaturalLunchModal } from '@/components/home/NaturalLunchModal';
-import { SalgadoComboModal } from '@/components/home/SalgadoComboModal';
-import { HamburgerComboModal } from '@/components/home/HamburgerComboModal';
 import { TutorialModal } from '@/components/home/TutorialModal';
 import { useSettingsRealtime, useProductsRealtime } from '@/hooks/use-realtime-sync';
 import { useProducts, useCategories } from '@/hooks/use-supabase-data';
@@ -46,9 +43,6 @@ export default function Home() {
   const [copaoOpen, setCopaoOpen] = useState(false);
   const [caipiIceOpen, setCaipiIceOpen] = useState(false);
   const [selectedDrinkType, setSelectedDrinkType] = useState<string | null>(null);
-  const [naturalLunchOpen, setNaturalLunchOpen] = useState(false);
-  const [salgadoComboOpen, setSalgadoComboOpen] = useState(false);
-  const [hamburgerComboOpen, setHamburgerComboOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -166,11 +160,8 @@ export default function Home() {
         )}
         {/* Feature Banners */}
         <div className="mt-2 md:mt-1">
-          <FeatureBannerCarousel 
+          <FeatureBannerCarousel
             onComboOpen={() => setComboModalOpen(true)}
-            onNaturalLunchOpen={() => setNaturalLunchOpen(true)}
-            onSalgadoComboOpen={() => setSalgadoComboOpen(true)}
-            onHamburgerComboOpen={() => setHamburgerComboOpen(true)}
             onSpecialDrinksOpen={() => setSpecialDrinksOpen(true)}
           />
         </div>
@@ -256,9 +247,6 @@ export default function Home() {
       {caipirinhaOpen && <CaipirinhaModal open={caipirinhaOpen} onOpenChange={setCaipirinhaOpen} />}
       {copaoOpen && <CopaoModal open={copaoOpen} onOpenChange={setCopaoOpen} />}
       {caipiIceOpen && <CaipiIceModal open={caipiIceOpen} onOpenChange={setCaipiIceOpen} />}
-      {naturalLunchOpen && <NaturalLunchModal open={naturalLunchOpen} onOpenChange={setNaturalLunchOpen} />}
-      {salgadoComboOpen && <SalgadoComboModal open={salgadoComboOpen} onOpenChange={setSalgadoComboOpen} />}
-      {hamburgerComboOpen && <HamburgerComboModal open={hamburgerComboOpen} onOpenChange={setHamburgerComboOpen} />}
       {tutorialOpen && <TutorialModal open={tutorialOpen} onOpenChange={setTutorialOpen} />}
     </div>
   );

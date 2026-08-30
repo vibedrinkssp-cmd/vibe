@@ -13,25 +13,16 @@ interface FeatureBanner {
 
 interface FeatureBannerCarouselProps {
   onComboOpen: () => void;
-  onNaturalLunchOpen?: () => void;
-  onSalgadoComboOpen?: () => void;
-  onHamburgerComboOpen?: () => void;
   onSpecialDrinksOpen?: () => void;
 }
 
 const DEFAULT_IMAGES: Record<string, string> = {
   'special-drinks': 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&h=200&fit=crop&q=60',
   'combo': 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=200&fit=crop&q=60',
-  'natural-lunch': 'https://images.unsplash.com/photo-1540914124281-342587941389?w=400&h=200&fit=crop&q=60',
-  'salgado-combo': 'https://images.unsplash.com/photo-1604467715878-83e57e8bc129?w=400&h=200&fit=crop&q=60',
-  'hamburger-combo': 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=200&fit=crop&q=60',
 };
 
-export function FeatureBannerCarousel({ 
-  onComboOpen, 
-  onNaturalLunchOpen,
-  onSalgadoComboOpen,
-  onHamburgerComboOpen,
+export function FeatureBannerCarousel({
+  onComboOpen,
   onSpecialDrinksOpen
 }: FeatureBannerCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -112,9 +103,6 @@ export function FeatureBannerCarousel({
   const features: FeatureBanner[] = [
     { id: 'special-drinks', title: 'Drinks Especiais', onClick: () => onSpecialDrinksOpen?.() },
     { id: 'combo', title: 'Monte Seu Combo', onClick: onComboOpen },
-    { id: 'natural-lunch', title: 'Combo Natural', onClick: () => onNaturalLunchOpen?.() },
-    { id: 'salgado-combo', title: 'Salgado + Refri', onClick: () => onSalgadoComboOpen?.() },
-    { id: 'hamburger-combo', title: 'Hambúrguer + Refri', onClick: () => onHamburgerComboOpen?.() },
   ];
 
   if (imagesLoading) {

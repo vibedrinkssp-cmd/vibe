@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react';
 import { normalizeSearch } from '@/lib/text-utils';
-import { ShoppingCart, Plus, Minus, Trash2, CreditCard, Banknote, QrCode, X, Search, ChevronLeft, CheckCircle2, Store, Wine, Gift, Leaf, Cookie, Sandwich, Flame, Loader2, HelpCircle, ChevronRight, Settings } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Trash2, CreditCard, Banknote, QrCode, X, Search, ChevronLeft, CheckCircle2, Store, Wine, Gift, Flame, Loader2, HelpCircle, ChevronRight, Settings } from 'lucide-react';
 import { TotemPrintTicketsModal } from '@/components/totem/TotemPrintTicketsModal';
 import totemLogo from '@/assets/logo-vibedrinks.gif';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,9 +18,6 @@ import { ensureImageUrl } from '@/lib/supabase';
 import { SpecialDrinksModal } from '@/components/home/SpecialDrinksModal';
 import { useMercadoPago } from '@/hooks/use-mercadopago';
 import { ComboModal } from '@/components/home/ComboModal';
-import { NaturalLunchModal } from '@/components/home/NaturalLunchModal';
-import { SalgadoComboModal } from '@/components/home/SalgadoComboModal';
-import { HamburgerComboModal } from '@/components/home/HamburgerComboModal';
 import { CustomDrinkModal } from '@/components/home/CustomDrinkModal';
 import { CaipirinhaModal } from '@/components/home/CaipirinhaModal';
 import { CopaoModal } from '@/components/home/CopaoModal';
@@ -127,9 +124,6 @@ interface TotemCustomDrink extends CustomDrink {}
 const FEATURE_IMAGES: Record<string, string> = {
   'special-drinks': 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&h=200&fit=crop&q=60',
   'combo': 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=200&fit=crop&q=60',
-  'natural-lunch': 'https://images.unsplash.com/photo-1540914124281-342587941389?w=400&h=200&fit=crop&q=60',
-  'salgado-combo': 'https://images.unsplash.com/photo-1604467715878-83e57e8bc129?w=400&h=200&fit=crop&q=60',
-  'hamburger-combo': 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=200&fit=crop&q=60',
 };
 
 // ── Main Totem ──
@@ -169,9 +163,6 @@ function TotemKiosk() {
   // Modals (same as Home)
   const [comboModalOpen, setComboModalOpen] = useState(false);
   const [specialDrinksOpen, setSpecialDrinksOpen] = useState(false);
-  const [naturalLunchOpen, setNaturalLunchOpen] = useState(false);
-  const [salgadoComboOpen, setSalgadoComboOpen] = useState(false);
-  const [hamburgerComboOpen, setHamburgerComboOpen] = useState(false);
   const [customDrinkOpen, setCustomDrinkOpen] = useState(false);
   const [caipirinhaOpen, setCaipirinhaOpen] = useState(false);
   const [copaoOpen, setCopaoOpen] = useState(false);
@@ -214,9 +205,6 @@ function TotemKiosk() {
       setHelpStep(0);
       setComboModalOpen(false);
       setSpecialDrinksOpen(false);
-      setNaturalLunchOpen(false);
-      setSalgadoComboOpen(false);
-      setHamburgerComboOpen(false);
       setCustomDrinkOpen(false);
       setCaipirinhaOpen(false);
       setCopaoOpen(false);
@@ -429,9 +417,6 @@ function TotemKiosk() {
   const featureBanners = [
     { id: 'special-drinks', title: 'Drinks Especiais', desc: 'Drinks exclusivos da casa', icon: Wine, onClick: () => setSpecialDrinksOpen(true) },
     { id: 'combo', title: 'Monte Seu Combo', desc: '5% OFF em combos', icon: Gift, onClick: () => setComboModalOpen(true) },
-    { id: 'natural-lunch', title: 'Combo Natural', desc: 'Lanche + Suco 10% OFF', icon: Leaf, onClick: () => setNaturalLunchOpen(true) },
-    { id: 'salgado-combo', title: 'Salgado + Refri', desc: '10% OFF no combo', icon: Cookie, onClick: () => setSalgadoComboOpen(true) },
-    { id: 'hamburger-combo', title: 'Hambúrguer + Refri', desc: '10% OFF no combo', icon: Sandwich, onClick: () => setHamburgerComboOpen(true) },
   ];
 
   // ── Success Screen ──
@@ -1289,9 +1274,6 @@ function TotemKiosk() {
       {/* ═══ Modals (same as Home) ═══ */}
       <SpecialDrinksModal open={specialDrinksOpen} onOpenChange={setSpecialDrinksOpen} onAddItem={addToCart} />
       <ComboModal open={comboModalOpen} onOpenChange={setComboModalOpen} onAddComboComponents={handleAddComboComponentsToTotem} />
-      <NaturalLunchModal open={naturalLunchOpen} onOpenChange={setNaturalLunchOpen} onAddItem={addToCart} />
-      <SalgadoComboModal open={salgadoComboOpen} onOpenChange={setSalgadoComboOpen} onAddItem={addToCart} />
-      <HamburgerComboModal open={hamburgerComboOpen} onOpenChange={setHamburgerComboOpen} onAddItem={addToCart} />
       <CustomDrinkModal open={customDrinkOpen} onOpenChange={setCustomDrinkOpen} drinkType={selectedDrinkType} onAddCustomDrink={handleAddCustomDrink} />
       <CaipirinhaModal open={caipirinhaOpen} onOpenChange={setCaipirinhaOpen} onAddCustomDrink={handleAddCustomDrink} />
       <CopaoModal open={copaoOpen} onOpenChange={setCopaoOpen} onAddCustomDrink={handleAddCustomDrink} />

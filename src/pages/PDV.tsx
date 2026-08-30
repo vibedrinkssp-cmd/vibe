@@ -66,11 +66,8 @@ const CaipirinhaModal = lazy(() => import('@/components/home/CaipirinhaModal').t
 const CopaoModal = lazy(() => import('@/components/home/CopaoModal').then(m => ({ default: m.CopaoModal })));
 const CaipiIceModal = lazy(() => import('@/components/home/CaipiIceModal').then(m => ({ default: m.CaipiIceModal })));
 const ComboModal = lazy(() => import('@/components/home/ComboModal').then(m => ({ default: m.ComboModal })));
-const SalgadoComboModal = lazy(() => import('@/components/home/SalgadoComboModal').then(m => ({ default: m.SalgadoComboModal })));
-const NaturalLunchModal = lazy(() => import('@/components/home/NaturalLunchModal').then(m => ({ default: m.NaturalLunchModal })));
 const SpecialDrinksModal = lazy(() => import('@/components/home/SpecialDrinksModal').then(m => ({ default: m.SpecialDrinksModal })));
 const PremiumDrinksModal = lazy(() => import('@/components/home/PremiumDrinksModal').then(m => ({ default: m.PremiumDrinksModal })));
-const HamburgerComboModal = lazy(() => import('@/components/home/HamburgerComboModal').then(m => ({ default: m.HamburgerComboModal })));
 const LooseCigaretteSelector = lazy(() => import('@/components/pdv/LooseCigaretteSelector').then(m => ({ default: m.LooseCigaretteSelector })));
 const PDVCameraScanner = lazy(() => import('@/components/BarcodeScanner').then(m => ({ default: m.PDVCameraScanner })));
 import { buildLooseCigaretteItemName, parseLooseCigarettePackId, buildCustomDrinkProductName, type LooseCigaretteSelection } from '@/components/pdv/loose-cigarette-utils';
@@ -319,11 +316,8 @@ export default function PDV() {
   const [caipiIceOpen, setCaipiIceOpen] = useState(false);
   const [selectedDrinkType, setSelectedDrinkType] = useState<string | null>(null);
   const [comboOpen, setComboOpen] = useState(false);
-  const [salgadoComboOpen, setSalgadoComboOpen] = useState(false);
-  const [naturalLunchOpen, setNaturalLunchOpen] = useState(false);
   const [specialDrinksOpen, setSpecialDrinksOpen] = useState(false);
   const [premiumDrinksOpen, setPremiumDrinksOpen] = useState(false);
-  const [hamburgerComboOpen, setHamburgerComboOpen] = useState(false);
   const [showCompositePayment, setShowCompositePayment] = useState(false);
   const [compositePixAmount, setCompositePixAmount] = useState<number | null>(null);
   const [showCigaretteModal, setShowCigaretteModal] = useState(false);
@@ -1445,9 +1439,6 @@ export default function PDV() {
             {/* Banners de Funcionalidades */}
             <FeatureBannerCarousel
               onComboOpen={() => setComboOpen(true)}
-              onNaturalLunchOpen={() => setNaturalLunchOpen(true)}
-              onSalgadoComboOpen={() => setSalgadoComboOpen(true)}
-              onHamburgerComboOpen={() => setHamburgerComboOpen(true)}
               onSpecialDrinksOpen={() => setSpecialDrinksOpen(true)}
             />
           </div>
@@ -1897,25 +1888,11 @@ export default function PDV() {
             onAddComboComponents={handleAddComboComponentsToPdv}
           />
         )}
-        {salgadoComboOpen && (
-          <SalgadoComboModal
-            open={salgadoComboOpen}
-            onOpenChange={setSalgadoComboOpen}
-            onAddItem={handleAddItemToPdv}
-            onAddComboComponents={handleAddComboComponentsToPdv}
-          />
-        )}
-        {naturalLunchOpen && (
-          <NaturalLunchModal open={naturalLunchOpen} onOpenChange={setNaturalLunchOpen} onAddItem={handleAddItemToPdv} />
-        )}
         {specialDrinksOpen && (
           <SpecialDrinksModal open={specialDrinksOpen} onOpenChange={setSpecialDrinksOpen} onAddItem={handleAddItemToPdv} />
         )}
         {premiumDrinksOpen && (
           <PremiumDrinksModal open={premiumDrinksOpen} onOpenChange={setPremiumDrinksOpen} onAddItem={handleAddItemToPdv} />
-        )}
-        {hamburgerComboOpen && (
-          <HamburgerComboModal open={hamburgerComboOpen} onOpenChange={setHamburgerComboOpen} onAddItem={handleAddItemToPdv} />
         )}
         {showCompositePayment && (
           <CompositePaymentModal
