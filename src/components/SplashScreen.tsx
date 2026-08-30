@@ -116,7 +116,7 @@ export function SplashScreen({ duration = 3500, onComplete }: SplashScreenProps)
             style={{ background: '#7c3aed' }}
           />
           <div className="relative w-20 h-20 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20">
-            <img src={appIcon} alt="VM Brasil" className="w-full h-full object-cover" />
+            <img src={appIcon} alt="Vibe Drinks" className="w-full h-full object-cover" />
           </div>
         </div>
 
@@ -124,7 +124,7 @@ export function SplashScreen({ duration = 3500, onComplete }: SplashScreenProps)
           className="text-white font-bold text-xl tracking-tight mb-1"
           style={{ textShadow: '0 2px 16px rgba(0,0,0,0.5)' }}
         >
-          VM Brasil
+          Vibe Drinks
         </h1>
         <div className="mb-8" />
 

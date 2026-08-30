@@ -13,7 +13,7 @@ const DEFAULT_URL = 'https://www.lojasvm.com.br';
 export function QrCodeTab() {
   const { toast } = useToast();
   const [url, setUrl] = useState(DEFAULT_URL);
-  const [caption, setCaption] = useState('VM BRASIL CONVENIENCIA');
+  const [caption, setCaption] = useState('VIBE DRINKS');
   const [dataUrl, setDataUrl] = useState<string>('');
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -110,7 +110,7 @@ export function QrCodeTab() {
                 id="qr-caption"
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
-                placeholder="VM BRASIL CONVENIENCIA"
+                placeholder="VIBE DRINKS"
               />
             </div>
             <Button onClick={handleGenerate} className="w-full gap-2">

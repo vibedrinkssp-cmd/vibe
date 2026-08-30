@@ -526,7 +526,7 @@ export default function Orders() {
           open={showPixModal}
           onOpenChange={setShowPixModal}
           amount={Number(selectedOrderForPix.total)}
-          description={`Pedido #${selectedOrderForPix.id.slice(-6).toUpperCase()} - VM Brasil`}
+          description={`Pedido #${selectedOrderForPix.id.slice(-6).toUpperCase()} - Vibe Drinks`}
           orderId={selectedOrderForPix.id}
           onPaymentApproved={handlePixPaymentApproved}
           onPaymentCancelled={handlePixModalCancelled}

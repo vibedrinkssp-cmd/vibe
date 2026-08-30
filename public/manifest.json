@@ -1,6 +1,6 @@
 {
-  "name": "VM Brasil - Delivery de Bebidas",
-  "short_name": "VM Brasil",
+  "name": "Vibe Drinks - Delivery de Bebidas",
+  "short_name": "Vibe Drinks",
   "description": "As melhores bebidas premium com entrega rápida para você",
   "start_url": "/",
   "display": "standalone",
@@ -44,7 +44,7 @@
       "sizes": "1200x630",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "VM Brasil - Delivery de Bebidas"
+      "label": "Vibe Drinks - Delivery de Bebidas"
     }
   ]
 }

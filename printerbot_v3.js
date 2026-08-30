@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// VM BRASIL — Printer Bot v3.0 (THIN CLIENT)
+// VIBE DRINKS — Printer Bot v3.0 (THIN CLIENT)
 //
 // MUDANÇA RADICAL vs v2.5.2:
 //   • REMOVIDO ~400 linhas de regex/extração — agora rodam server-side na edge
@@ -24,7 +24,7 @@ const CONFIG = {
   platform: 'ifood',
   apiUrl:
     process.env.EXTERNAL_ORDER_URL ||
-    'https://djkonftjquielnqejwht.supabase.co/functions/v1/receive-external-order',
+    'https://msbbdwmygabidjngsanv.supabase.co/functions/v1/receive-external-order',
   apiKey: process.env.EXTERNAL_ORDER_API_KEY || 't9W3CU6J@xR4u52',
   dedupTtlMs: 30 * 60 * 1000, // 30min
 };

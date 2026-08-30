@@ -33,7 +33,7 @@ export function Header({ onCartOpen }: HeaderProps) {
           <Link to="/" className="flex items-center gap-3 group">
             <img 
               src={logoImage} 
-              alt="VM Brasil" 
+              alt="Vibe Drinks" 
               className="h-10 w-auto rounded-xl hover:opacity-80 transition-opacity"
               data-testid="img-logo"
             />
@@ -108,7 +108,7 @@ export function Header({ onCartOpen }: HeaderProps) {
                 </SheetHeader>
                 <div className="flex flex-col h-full pt-8">
                   <div className="flex items-center justify-between mb-8">
-                    <img src={logoImage} alt="VM Brasil" className="h-8 rounded-lg" />
+                    <img src={logoImage} alt="Vibe Drinks" className="h-8 rounded-lg" />
                   </div>
 
                   {isAuthenticated && (

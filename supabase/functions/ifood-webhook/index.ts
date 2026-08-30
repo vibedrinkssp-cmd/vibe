@@ -1,6 +1,6 @@
 // Edge Function: ifood-webhook
 // Recebe eventos PUSH do iFood. Grava em ifood_orders + ifood_events.
-// URL pública: https://djkonftjquielnqejwht.supabase.co/functions/v1/ifood-webhook
+// URL pública: https://msbbdwmygabidjngsanv.supabase.co/functions/v1/ifood-webhook
 // Validação HMAC SHA-256 opcional via x-ifood-signature.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';

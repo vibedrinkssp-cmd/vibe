@@ -646,7 +646,7 @@ export function ExpandableOrderCard({
                       onClick={(e) => {
                         e.stopPropagation();
                         if (canWhatsAppDisplayPhone) {
-                          openWhatsApp(displayPhone!, `Olá! Sobre o pedido #${orderId} da VM Brasil...`);
+                          openWhatsApp(displayPhone!, `Olá! Sobre o pedido #${orderId} da Vibe Drinks...`);
                         } else {
                           openPhoneCall(displayPhone!);
                         }
@@ -833,7 +833,7 @@ export function ExpandableOrderCard({
                           if (isPlatformProxyPhone(orderMeta.telefone)) {
                             openPhoneCall(orderMeta.telefone!);
                           } else {
-                            openWhatsApp(orderMeta.telefone!, `Olá! Sobre o pedido ${orderMeta.pedido || ''} da VM Brasil...`);
+                            openWhatsApp(orderMeta.telefone!, `Olá! Sobre o pedido ${orderMeta.pedido || ''} da Vibe Drinks...`);
                           }
                         }}
                       >
@@ -1215,7 +1215,7 @@ export function ExpandableOrderCard({
                           className="bg-purple-600 text-white flex-shrink-0"
                           onClick={(e) => {
                             e.stopPropagation();
-                            openWhatsApp(order.motoboy!.whatsapp, `Ola! Sobre o pedido #${orderId} da VM Brasil...`);
+                            openWhatsApp(order.motoboy!.whatsapp, `Ola! Sobre o pedido #${orderId} da Vibe Drinks...`);
                           }}
                           data-testid={`button-whatsapp-motoboy-${order.id}`}
                         >
@@ -1331,7 +1331,7 @@ export function ExpandableOrderCard({
                     size="sm"
                     className="bg-green-600 hover:bg-green-700 text-white"
                     onClick={() => canWhatsAppDisplayPhone
-                      ? openWhatsApp(displayPhone!, `Olá! Sobre o pedido #${orderId} da VM Brasil...`)
+                      ? openWhatsApp(displayPhone!, `Olá! Sobre o pedido #${orderId} da Vibe Drinks...`)
                       : openPhoneCall(displayPhone!)}
                   >
                     <MessageCircle className="h-4 w-4 mr-1" />

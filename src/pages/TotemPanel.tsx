@@ -103,11 +103,11 @@ function TotemLogin({ onLogin }: { onLogin: () => void }) {
         <div className="text-center space-y-4">
           <img
             src={totemLogo}
-            alt="VM Brasil"
+            alt="Vibe Drinks"
             className="h-28 w-auto mx-auto"
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
           />
-          <h1 className="text-white text-2xl font-black tracking-wide">VM BRASIL</h1>
+          <h1 className="text-white text-2xl font-black tracking-wide">VIBE DRINKS</h1>
           <p className="text-white/60 text-sm">Totem de Autoatendimento</p>
           <p className="text-white/60 text-sm">Acesso do operador</p>
         </div>
@@ -471,7 +471,7 @@ function TotemKiosk() {
               <p className="text-2xl font-bold uppercase">UM ATENDENTE IRÁ ENTREGAR</p>
               <p className="text-2xl font-bold uppercase">AO FINALIZAR O PREPARO</p>
             </div>
-            <p className="text-3xl font-black uppercase mt-4">VM BRASIL AGRADECE A PREFERÊNCIA!</p>
+            <p className="text-3xl font-black uppercase mt-4">VIBE DRINKS AGRADECE A PREFERÊNCIA!</p>
           </div>
         </div>
       </div>
@@ -582,7 +582,7 @@ function TotemKiosk() {
           {mp.error && (
             <div className="flex flex-col items-center gap-3 py-4">
               <p className="text-destructive font-bold">{mp.error}</p>
-              <button onClick={() => { mp.reset(); if (pixTempRef) mp.createPixPayment(cartTotal, 'Totem - Pedido VM Brasil', pixTempRef); }}
+              <button onClick={() => { mp.reset(); if (pixTempRef) mp.createPixPayment(cartTotal, 'Totem - Pedido Vibe Drinks', pixTempRef); }}
                 className="px-6 py-2 rounded-2xl bg-primary text-primary-foreground font-bold">
                 Tentar novamente
               </button>
@@ -847,7 +847,7 @@ function TotemKiosk() {
         setPixTempRef(tempRef);
         mp.reset();
         setShowPixScreen(true);
-        mp.createPixPayment(cartTotal, 'Totem - Pedido VM Brasil', tempRef);
+        mp.createPixPayment(cartTotal, 'Totem - Pedido Vibe Drinks', tempRef);
       }
       // cash/card disabled — no-op
     };

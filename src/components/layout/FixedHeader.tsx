@@ -43,7 +43,7 @@ export function FixedHeader({ searchQuery, onSearchChange, onTutorialOpen, notif
             <Link to="/" className="flex-shrink-0 group">
               <img 
                 src={logoImage} 
-                alt="VM Brasil" 
+                alt="Vibe Drinks" 
                 className="h-10 w-auto rounded-xl transition-all duration-300 group-hover:scale-105"
                 data-testid="img-logo"
               />

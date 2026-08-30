@@ -180,7 +180,7 @@ export function AdminLoginModal({ open, onOpenChange, onMotoboySelect }: AdminLo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-card border-primary/20">
         <DialogHeader className="text-center">
-          <img src={logoImage} alt="VM Brasil" className="h-14 mx-auto mb-2" />
+          <img src={logoImage} alt="Vibe Drinks" className="h-14 mx-auto mb-2" />
           <DialogTitle className="font-serif text-xl text-primary">
             Acesso Restrito
           </DialogTitle>

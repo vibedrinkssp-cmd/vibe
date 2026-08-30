@@ -159,7 +159,7 @@ describe('ticketToStructuredBody — adapter para edge function', () => {
   it('normaliza endereço sem número para S/N sem bloquear o ticket', () => {
     const raw = [
       'iFood',
-      'VM BRASIL',
+      'VIBE DRINKS',
       'EXPEDICAO',
       '----------------------------------------',
       'PEDIDO: #9999',

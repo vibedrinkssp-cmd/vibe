@@ -75,7 +75,7 @@ export function printOrderTicket(order: OrderForPrint) {
 
   // ══════ HEADER ══════
   t += `<div class="header">
-    <div class="store-name">🍺 VM BRASIL 🍺</div>
+    <div class="store-name">🍺 VIBE DRINKS 🍺</div>
     <div class="store-sub">Delivery de Bebidas</div>
   </div>`;
 
@@ -265,7 +265,7 @@ export function printOrderTicket(order: OrderForPrint) {
   t += divider('heavy');
   t += `<div class="footer">
     <div>🙏 Obrigado pela preferência!</div>
-    <div class="footer-sub">VM Brasil — ${new Date().toLocaleDateString('pt-BR')}</div>
+    <div class="footer-sub">Vibe Drinks — ${new Date().toLocaleDateString('pt-BR')}</div>
   </div>`;
 
   // ══════ PRINT WINDOW ══════

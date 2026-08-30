@@ -251,7 +251,7 @@ export default function Ponto() {
       </main>
 
       <footer className="p-3 text-center text-[10px] text-white/40">
-        VM BRASIL — Reconhecimento facial local (Human)
+        VIBE DRINKS — Reconhecimento facial local (Human)
       </footer>
     </div>
   );

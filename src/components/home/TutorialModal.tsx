@@ -21,7 +21,7 @@ interface TutorialStep {
 const tutorialSteps: TutorialStep[] = [
   {
     icon: Sparkles,
-    title: '🎉 Bem-vindo ao VM Brasil!',
+    title: '🎉 Bem-vindo ao Vibe Drinks!',
     description: 'Vamos te mostrar como usar o app para fazer seus pedidos de forma rápida e fácil. Vamos lá!',
     color: 'from-primary to-purple-600',
     tooltipPosition: 'bottom',

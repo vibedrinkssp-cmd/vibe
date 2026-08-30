@@ -1113,7 +1113,7 @@ export default function Checkout() {
         open={showPixModal}
         onOpenChange={setShowPixModal}
         amount={total}
-        description={`Pedido Delivery - VM Brasil`}
+        description={`Pedido Delivery - Vibe Drinks`}
         referenceId={pixReferenceId || ''}
         onPaymentApproved={handlePixPaymentApproved}
         onPaymentCancelled={handlePixPaymentCancelled}

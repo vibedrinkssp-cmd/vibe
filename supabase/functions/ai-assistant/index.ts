@@ -597,7 +597,7 @@ serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const today = new Date().toISOString().split('T')[0];
 
-    const systemPrompt = `Você é o assistente inteligente da VM Brasil Conveniência. Você tem acesso COMPLETO a todos os dados do sistema.
+    const systemPrompt = `Você é o assistente inteligente da Vibe Drinks. Você tem acesso COMPLETO a todos os dados do sistema.
 
 INSTRUÇÕES:
 - Responda de forma clara, objetiva e amigável em português brasileiro

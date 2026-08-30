@@ -68,7 +68,7 @@ async function postOnce(url: string, payload: unknown): Promise<boolean> {
 export async function printTotemTicket(params: PrintTicketParams): Promise<void> {
   const url = getAgentUrl();
   const payload = {
-    store: 'VM BRASIL',
+    store: 'VIBE DRINKS',
     customerName: params.customerName,
     orderCode: params.orderCode,
     items: params.items,

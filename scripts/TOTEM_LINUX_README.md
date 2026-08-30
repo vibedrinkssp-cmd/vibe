@@ -29,7 +29,7 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 `/etc/systemd/system/totem-print.service`:
 ```ini
 [Unit]
-Description=VM Brasil Totem Print Agent
+Description=Vibe Drinks Totem Print Agent
 After=network.target
 
 [Service]

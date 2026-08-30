@@ -244,14 +244,14 @@ export default function Pager() {
         <div className="flex items-center gap-4 min-w-0">
           <img
             src={logoVm}
-            alt="VM Brasil Conveniência"
+            alt="Vibe Drinks"
             width={64}
             height={64}
             className="h-14 w-14 object-contain drop-shadow"
           />
           <div className="leading-tight min-w-0">
             <h1 className="text-3xl xl:text-4xl font-black uppercase tracking-tight truncate">
-              VM BRASIL CONVENIÊNCIA
+              VIBE DRINKS
             </h1>
             <p className="text-base font-semibold uppercase text-white/80 tracking-wide">
               Painel de Retirada no Balcão

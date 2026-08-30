@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-VM BRASIL — Totem Print Agent (Linux / USB ESC/POS)
+VIBE DRINKS — Totem Print Agent (Linux / USB ESC/POS)
 ====================================================
 
 Pequeno servidor HTTP local que recebe o ticket do navegador (TotemPanelLinux)
@@ -9,7 +9,7 @@ e imprime DIRETO na impressora térmica USB usando python-escpos (libusb).
 ROTA:
   POST http://127.0.0.1:9100/print
   Body JSON: {
-    "store": "VM BRASIL",
+    "store": "VIBE DRINKS",
     "customerName": "FULANO",
     "orderCode": "ABC123",
     "items": [{"name": "COCA 350ML", "qty": 2}, ...],
@@ -80,7 +80,7 @@ def sep() -> str:
 
 
 def render_ticket(p, payload: dict) -> None:
-    store        = payload.get("store", "VM BRASIL")
+    store        = payload.get("store", "VIBE DRINKS")
     customer     = (payload.get("customerName") or "CLIENTE").upper()
     order_code   = payload.get("orderCode", "------")
     items        = payload.get("items", [])

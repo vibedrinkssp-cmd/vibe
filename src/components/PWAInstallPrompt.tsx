@@ -234,7 +234,7 @@ export function PWAInstallPrompt({ showAfterSplash = true }: PWAInstallPromptPro
         </div>
         <div className="flex items-center gap-3 bg-white/10 rounded-xl p-3">
           <Download className="w-6 h-6 shrink-0" />
-          <span>2. Clique em <strong>"Instalar VM Brasil"</strong></span>
+          <span>2. Clique em <strong>"Instalar Vibe Drinks"</strong></span>
         </div>
       </div>
     );
@@ -249,10 +249,10 @@ export function PWAInstallPrompt({ showAfterSplash = true }: PWAInstallPromptPro
         </DialogDescription>
         <div className="flex flex-col items-center text-center space-y-4">
           <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-xl border-2 border-white/20">
-            <img src={appIcon} alt="VM Brasil" className="w-full h-full object-cover" />
+            <img src={appIcon} alt="Vibe Drinks" className="w-full h-full object-cover" />
           </div>
 
-          <p className="text-lg font-semibold">Instalar VM Brasil</p>
+          <p className="text-lg font-semibold">Instalar Vibe Drinks</p>
           <p className="text-sm opacity-80">
             Acesse mais rápido direto da sua tela inicial, como um app de verdade!
           </p>

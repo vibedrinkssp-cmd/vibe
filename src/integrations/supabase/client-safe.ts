@@ -5,10 +5,9 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
 // Fallbacks must always point to the active backend for this project.
-const FALLBACK_PROJECT_ID = "djkonftjquielnqejwht";
+const FALLBACK_PROJECT_ID = "msbbdwmygabidjngsanv";
 const FALLBACK_URL = `https://${FALLBACK_PROJECT_ID}.supabase.co`;
-const FALLBACK_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqa29uZnRqcXVpZWxucWVqd2h0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NzkxMzAsImV4cCI6MjA5MjA1NTEzMH0.kvsbBMplNdwS0oWu2J0xS_Nidc8dfvdasmDpm2kOog8";
+const FALLBACK_ANON_KEY = "sb_publishable_VKMCbbyqxJsxzmd8nUM6WQ_rjgq7Qa_";
 
 const rawUrl = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_URL = (rawUrl && rawUrl.startsWith('http')) ? rawUrl : FALLBACK_URL;

@@ -332,7 +332,7 @@ export function ScheduleTab() {
   .b-high{background:#dc2626}.b-medium{background:#d97706}.b-low{background:#16a34a}.b-vlow{background:#64748b}.b-idle{background:#94a3b8}
   .sac{color:#9ca3af;font-style:italic;font-size:11px}
 </style></head><body>
-<h1>ESCALA DE TRABALHO — VM BRASIL CONVENIÊNCIA</h1>
+<h1>ESCALA DE TRABALHO — VIBE DRINKS</h1>
 <div>Gerada em ${new Date().toLocaleString('pt-BR')}</div>
 <div style="margin:6px 0 12px;font-size:12px;color:#444">
   Modo economia: <b>${economyMode ? 'ATIVO' : 'DESATIVADO'}</b> — posições marcadas como

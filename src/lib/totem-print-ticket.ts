@@ -64,7 +64,7 @@ function buildHtml({ customerName, orderCode, items }: PrintTicketParams): strin
   .row .name { flex: 1; word-break: break-word; }
   .small { font-size: 9pt; }
 </style></head><body>
-  <div class="center bold big">VM BRASIL</div>
+  <div class="center bold big">VIBE DRINKS</div>
   <div class="center small">${escapeHtml(dateStr)}</div>
   <div class="sep"></div>
   <div class="center huge">#${escapeHtml(orderCode)}</div>

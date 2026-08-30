@@ -133,7 +133,7 @@ serve(async (req: Request) => {
         payer: { 
           email: body.payer?.email || 'contato.vmbrasil@gmail.com', 
           first_name: 'Cliente', 
-          last_name: 'VM Brasil' 
+          last_name: 'Vibe Drinks' 
         },
       };
 
