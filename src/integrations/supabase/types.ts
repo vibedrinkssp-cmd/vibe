@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       addresses: {
@@ -3352,24 +3377,42 @@ export type Database = {
         }
         Returns: string
       }
-      create_delivery_order_with_items: {
-        Args: {
-          p_address_id: string
-          p_change_for?: number
-          p_client_request_id?: string
-          p_customer_name?: string
-          p_delivery_distance?: number
-          p_delivery_fee: number
-          p_discount: number
-          p_items: string
-          p_notes?: string
-          p_payment_method: Database["public"]["Enums"]["payment_method"]
-          p_subtotal: number
-          p_total: number
-          p_user_id: string
-        }
-        Returns: string
-      }
+      create_delivery_order_with_items:
+        | {
+            Args: {
+              p_address_id: string
+              p_change_for?: number
+              p_client_request_id?: string
+              p_delivery_distance?: number
+              p_delivery_fee: number
+              p_discount: number
+              p_items: string
+              p_notes?: string
+              p_payment_method: Database["public"]["Enums"]["payment_method"]
+              p_subtotal: number
+              p_total: number
+              p_user_id: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_address_id: string
+              p_change_for?: number
+              p_client_request_id?: string
+              p_customer_name?: string
+              p_delivery_distance?: number
+              p_delivery_fee: number
+              p_discount: number
+              p_items: string
+              p_notes?: string
+              p_payment_method: Database["public"]["Enums"]["payment_method"]
+              p_subtotal: number
+              p_total: number
+              p_user_id: string
+            }
+            Returns: string
+          }
       create_drink_fruit: {
         Args: { p_name: string; p_price?: number; p_sort_order?: number }
         Returns: string
@@ -5639,6 +5682,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       app_role: ["admin", "kitchen", "pdv", "motoboy", "customer", "log"],

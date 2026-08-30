@@ -94,7 +94,7 @@ function useRecipeCatalog(open: boolean) {
     if (!open) return;
     (async () => {
       try {
-        const { data: b } = await (supabase.rpc as Function)('get_available_bottles_for_assembly');
+        const { data: b } = await supabase.rpc('get_available_bottles_for_assembly');
         const rawBottles = (b || []) as any[];
         const productIds = [...new Set(rawBottles.map(x => x.product_id))];
         let typeMap = new Map<string, string>();

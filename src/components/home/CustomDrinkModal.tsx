@@ -191,7 +191,7 @@ export function CustomDrinkModal({ open, onOpenChange, drinkType, onAddCustomDri
           });
         }
 
-        const { data: b } = await (supabase.rpc as Function)('get_available_bottles_for_assembly');
+        const { data: b } = await supabase.rpc('get_available_bottles_for_assembly');
         if (b) {
           const allBottles = ((b || []) as AssemblyBottle[]).map(x => ({
             id: x.bottle_id, product_id: x.product_id, product_name: x.product_name,

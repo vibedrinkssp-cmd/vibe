@@ -143,7 +143,7 @@ export function CaixaTab() {
               onClick={async () => {
                 if (!confirm("Reabrir o último caixa fechado? O fechamento associado será removido e os indicadores do dia voltam a aparecer.")) return;
                 try {
-                  const { data, error } = await (supabase.rpc as any)('reopen_last_session', { p_responsible: 'Admin' });
+                  const { data, error } = await supabase.rpc('reopen_last_session', { p_responsible: 'Admin' });
                   if (error) throw error;
                   toast({ title: "Caixa reaberto", description: "Indicadores restaurados." });
                   await refetch();

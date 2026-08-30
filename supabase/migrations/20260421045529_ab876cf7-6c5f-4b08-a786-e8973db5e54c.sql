@@ -26,10 +26,11 @@ WHERE ob.product_id = p.id
 -- 5) Abrir BALY 2L TRADICIONAL (5 doses de 400ml, dose grátis) se ainda não aberta
 INSERT INTO public.open_bottles (product_id, product_name, total_ml, ml_per_dose, total_doses, remaining_doses, dose_price, opened_by, notes)
 SELECT 'e8aec179-8f60-4eca-a3e8-1de9e6935f05', 'BALY 2 LITROS TRADICIONAL', 2000, 400, 5, 5, 0, 'sistema', 'Abertura automática para Copão'
-WHERE NOT EXISTS (
-  SELECT 1 FROM public.open_bottles
-  WHERE product_id = 'e8aec179-8f60-4eca-a3e8-1de9e6935f05' AND is_empty = false
-);
+WHERE EXISTS (SELECT 1 FROM public.products WHERE id = 'e8aec179-8f60-4eca-a3e8-1de9e6935f05')
+  AND NOT EXISTS (
+    SELECT 1 FROM public.open_bottles
+    WHERE product_id = 'e8aec179-8f60-4eca-a3e8-1de9e6935f05' AND is_empty = false
+  );
 
 -- 6) Trigger: garante que toda garrafa aberta de energético tenha dose_price = 0
 CREATE OR REPLACE FUNCTION public.enforce_energy_drink_free_dose()

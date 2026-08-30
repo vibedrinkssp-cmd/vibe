@@ -339,7 +339,7 @@ export function ExpandableOrderCard({
     let cancelled = false;
     (async () => {
       try {
-        const { data } = await (supabase.rpc as any)('get_order_payment_proof', {
+        const { data } = await supabase.rpc('get_order_payment_proof', {
           p_order_id: order.id,
         });
         if (!cancelled) {

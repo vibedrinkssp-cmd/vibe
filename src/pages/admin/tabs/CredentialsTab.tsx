@@ -80,7 +80,7 @@ export function CredentialsTab() {
 
     updatePin(pinId, { loading: true });
     try {
-      const { data, error } = await (supabase.rpc as any)('change_operation_pin_v2', {
+      const { data, error } = await supabase.rpc('change_operation_pin_v2', {
         p_operation: pinId,
         p_old: current,
         p_new: next,
@@ -129,7 +129,7 @@ export function CredentialsTab() {
 
     update(panelId, { loading: true });
     try {
-      const { data, error } = await (supabase.rpc as any)('change_panel_password_v2', {
+      const { data, error } = await supabase.rpc('change_panel_password_v2', {
         p_panel: panelId,
         p_old: current,
         p_new: next,

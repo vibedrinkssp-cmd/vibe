@@ -82,20 +82,20 @@ export function TimeClockTab() {
       if (!name) throw new Error('Nome é obrigatório');
       const whatsapp = formWhatsapp.trim() || null;
       if (editingEmployee) {
-        const { error } = await (supabase.rpc as any)('update_employee', {
+        const { error } = await supabase.rpc('update_employee', {
           p_id: editingEmployee.id,
           p_name: name,
           p_whatsapp: whatsapp,
           p_is_active: formActive,
-        });
+        } as any);
         if (error) throw error;
         return editingEmployee.id;
       }
-      const { data, error } = await (supabase.rpc as any)('create_employee', {
+      const { data, error } = await supabase.rpc('create_employee', {
         p_name: name,
         p_whatsapp: whatsapp,
         p_is_active: formActive,
-      });
+      } as any);
       if (error) throw error;
       return data as string;
     },
@@ -113,7 +113,7 @@ export function TimeClockTab() {
 
   const deleteEmployee = async (id: string, name: string) => {
     if (!confirm(`Remover ${name}?`)) return;
-    const { error } = await (supabase.rpc as any)('delete_employee', { p_id: id });
+    const { error } = await supabase.rpc('delete_employee', { p_id: id });
     if (error) { toast.error(error.message); return; }
     toast.success('Funcionário removido');
     qc.invalidateQueries({ queryKey: ['employees'] });

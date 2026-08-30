@@ -311,7 +311,7 @@ function OpenBottleKitchenDialog({ compact = false }: { compact?: boolean } = {}
       if (error) throw error;
       const price = parseFloat(dosePrice) || 0;
       if (price > 0 && bottleId) {
-        await (supabase.rpc as any)('update_bottle_dose_price', {
+        await supabase.rpc('update_bottle_dose_price', {
           p_bottle_id: bottleId,
           p_dose_price: price,
         });

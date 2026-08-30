@@ -100,7 +100,7 @@ export function MotoboyClosureTab() {
   const { data: paymentOrders = [], refetch: refetchPaymentOrders } = useQuery({
     queryKey: ['motoboy-payment-orders'],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('list_motoboy_payment_orders' as any, {
+      const { data, error } = await supabase.rpc('list_motoboy_payment_orders', {
         p_motoboy_id: null, p_status: null, p_start: null, p_end: null,
       } as any);
       if (error) { console.error('[MPO] list error', error.message); throw error; }
@@ -146,7 +146,7 @@ export function MotoboyClosureTab() {
   const { data: manualExtras = [], refetch: refetchExtras } = useQuery<ManualExtra[]>({
     queryKey: ['motoboy-manual-extras'],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('list_motoboy_manual_extras' as any, {
+      const { data, error } = await supabase.rpc('list_motoboy_manual_extras', {
         p_motoboy_id: null, p_start: null, p_end: null, p_only_unpaid: false,
       } as any);
       if (error) { console.error('[MME] list', error.message); throw error; }
@@ -176,7 +176,7 @@ export function MotoboyClosureTab() {
     if (!desc) { toast({ title: 'Descreva o motivo', variant: 'destructive' }); return; }
     if (!Number.isFinite(amt) || amt <= 0) { toast({ title: 'Valor inválido', variant: 'destructive' }); return; }
     setExtraModal(m => m ? { ...m, submitting: true } : m);
-    const { error } = await supabase.rpc('add_motoboy_manual_extra' as any, {
+    const { error } = await supabase.rpc('add_motoboy_manual_extra', {
       p_motoboy_id: extraModal.motoboyId,
       p_description: desc,
       p_amount: amt,
@@ -194,7 +194,7 @@ export function MotoboyClosureTab() {
 
   const deleteManualExtra = useCallback(async (id: string) => {
     if (!confirm('Excluir esta corrida lançada?')) return;
-    const { error } = await supabase.rpc('delete_motoboy_manual_extra' as any, { p_id: id } as any);
+    const { error } = await supabase.rpc('delete_motoboy_manual_extra', { p_id: id } as any);
     if (error) { toast({ title: 'Erro ao excluir', description: error.message, variant: 'destructive' }); return; }
     toast({ title: '🗑️ Corrida removida' });
     refetchExtras();
@@ -239,7 +239,7 @@ export function MotoboyClosureTab() {
     }
     // accumulated: fetch all delivered orders for this motoboy minus already-paid
     setMpoModal(m => m ? { ...m, mode, loadingAcc: true } : m);
-    const { data: paidRows } = await supabase.rpc('list_motoboy_paid_order_ids' as any, {
+    const { data: paidRows } = await supabase.rpc('list_motoboy_paid_order_ids', {
       p_motoboy_id: stat.motoboy.id,
     } as any);
     const paidSet = new Set(((paidRows as any[]) || []).map(r => r.order_id));
@@ -275,7 +275,7 @@ export function MotoboyClosureTab() {
     }
     setMpoModal(m => m ? { ...m, submitting: true } : m);
     const dr = dateRangeRef.current;
-    const { error } = await supabase.rpc('create_motoboy_payment_order' as any, {
+    const { error } = await supabase.rpc('create_motoboy_payment_order', {
       p_motoboy_id: mpoModal.motoboyId,
       p_delivery_fees: fees,
       p_extra_amount: extra,
@@ -304,7 +304,7 @@ export function MotoboyClosureTab() {
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
-      await supabase.rpc('mark_motoboy_extras_paid' as any, {
+      await supabase.rpc('mark_motoboy_extras_paid', {
         p_ids: mpoModal.extraIds,
         p_payment_order_id: latest?.id || null,
       } as any);
@@ -322,7 +322,7 @@ export function MotoboyClosureTab() {
 
   const handlePayPaymentOrder = useCallback(async (orderId: string) => {
     if (!confirm('Marcar esta ordem como PAGA?')) return;
-    const { error } = await supabase.rpc('pay_motoboy_payment_order' as any, {
+    const { error } = await supabase.rpc('pay_motoboy_payment_order', {
       p_order_id: orderId, p_paid_by: 'Admin',
     } as any);
     if (error) { toast({ title: 'Erro ao pagar', description: error.message, variant: 'destructive' }); return; }
@@ -333,7 +333,7 @@ export function MotoboyClosureTab() {
   const handleCancelPaymentOrder = useCallback(async (orderId: string) => {
     const reason = prompt('Motivo do cancelamento?') || '';
     if (reason === null) return;
-    const { error } = await supabase.rpc('cancel_motoboy_payment_order' as any, {
+    const { error } = await supabase.rpc('cancel_motoboy_payment_order', {
       p_order_id: orderId, p_reason: reason || null,
     } as any);
     if (error) { toast({ title: 'Erro ao cancelar', description: error.message, variant: 'destructive' }); return; }

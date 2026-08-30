@@ -17,8 +17,9 @@ const rawKey =
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
   import.meta.env.VITE_SUPABASE_ANON_KEY ||
   '';
-// A valid Supabase anon key is always a JWT (starts with "ey")
-const SUPABASE_KEY = (rawKey && rawKey.startsWith('ey')) ? rawKey : FALLBACK_ANON_KEY;
+// A valid Supabase key is either a legacy anon JWT ("ey...") or the newer
+// publishable key format ("sb_publishable_...").
+const SUPABASE_KEY = (rawKey && (rawKey.startsWith('ey') || rawKey.startsWith('sb_publishable_'))) ? rawKey : FALLBACK_ANON_KEY;
 
 if (!import.meta.env.VITE_SUPABASE_URL || (!import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY && !import.meta.env.VITE_SUPABASE_ANON_KEY)) {
   console.warn("[supabase] Missing Vite env vars, using fallback client");

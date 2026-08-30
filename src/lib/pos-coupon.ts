@@ -31,7 +31,7 @@ export async function validatePosCoupon(code: string): Promise<PosCouponValidati
   const clean = (code || '').trim();
   if (!clean) return { valid: false, reason: 'Digite um código' };
 
-  const { data, error } = await supabase.rpc('validate_pos_coupon' as any, { p_code: clean });
+  const { data, error } = await supabase.rpc('validate_pos_coupon', { p_code: clean });
   if (error) {
     return { valid: false, reason: error.message || 'Erro ao validar cupom' };
   }
@@ -86,6 +86,6 @@ export function calcPosCouponDiscount(
  * Consome um uso do cupom de forma atômica. Lança erro se não puder redimir.
  */
 export async function redeemPosCoupon(couponId: string): Promise<void> {
-  const { error } = await supabase.rpc('redeem_pos_coupon' as any, { p_coupon_id: couponId });
+  const { error } = await supabase.rpc('redeem_pos_coupon', { p_coupon_id: couponId });
   if (error) throw error;
 }

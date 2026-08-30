@@ -7,18 +7,20 @@
  * as HTTP errors (e.g. PostgREST parse errors, connection resets).
  */
 import { supabase } from '@/integrations/supabase/client-safe';
+import type { Database } from '@/integrations/supabase/types';
 
 const MAX_RPC_RETRIES = 2;
 const RETRY_DELAY_MS = 500;
 
 type RpcResult<T> = { data: T | null; error: any };
+type RpcFnName = keyof Database['public']['Functions'];
 
 /**
  * Call a Supabase RPC function with automatic retry on transient errors.
  * Drop-in replacement for `supabase.rpc(fn, params)`.
  */
 export async function resilientRpc<T = any>(
-  fnName: string,
+  fnName: RpcFnName,
   params?: Record<string, unknown>
 ): Promise<RpcResult<T>> {
   let lastError: any = null;
@@ -27,7 +29,7 @@ export async function resilientRpc<T = any>(
     try {
       const result = params
         ? await (supabase.rpc as any)(fnName, params)
-        : await (supabase.rpc as any)(fnName);
+        : await supabase.rpc(fnName);
 
       const { data, error } = result as any;
 

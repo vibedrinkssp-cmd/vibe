@@ -69,13 +69,13 @@ export function SaqDepModal({ open, onOpenChange }: SaqDepModalProps) {
   const canSubmit = isCashOpen && isValidAmount && hasEnoughCash;
 
   const registerTransaction = async () => {
-    const { error } = await (supabase.rpc as any)('create_cash_transaction', {
+    const { error } = await supabase.rpc('create_cash_transaction', {
       p_type: 'saque',
       p_amount: amount,
       p_payment_method: paymentMethod,
       p_responsible: 'PDV',
       p_notes: notes || null,
-    });
+    } as any);
     if (error) throw error;
   };
 

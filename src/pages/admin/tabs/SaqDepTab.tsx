@@ -80,7 +80,7 @@ export function SaqDepTab() {
       const end = isToday
         ? new Date(Date.now() + 60_000).toISOString()
         : endOfDay(parseLocalDate(endDate)).toISOString();
-      const { data, error } = await (supabase.rpc as any)('get_cash_transactions', {
+      const { data, error } = await supabase.rpc('get_cash_transactions', {
         p_start_date: start,
         p_end_date: end,
         p_type: 'saque',

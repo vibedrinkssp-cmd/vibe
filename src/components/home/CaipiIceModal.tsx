@@ -88,7 +88,7 @@ export function CaipiIceModal({ open, onOpenChange, onAddCustomDrink }: CaipiIce
       setLoading(true);
       try {
         const [bottlesRes, icesRes, longneckRes, configRes] = await Promise.all([
-          (supabase.rpc as Function)('get_available_bottles_for_assembly'),
+          supabase.rpc('get_available_bottles_for_assembly'),
           supabase.from('products').select('*').eq('category_id', ICES_CATEGORY_ID).eq('is_active', true).order('name'),
           supabase.from('products').select('*').eq('category_id', CERVEJAS_CATEGORY_ID).eq('is_active', true).ilike('name', '%longneck%'),
           supabase.from('special_drink_configs').select('base_price, no_alcohol_price, allow_no_alcohol').eq('slug', 'caipi-ice').maybeSingle(),

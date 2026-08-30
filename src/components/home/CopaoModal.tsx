@@ -137,7 +137,7 @@ export function CopaoModal({ open, onOpenChange, onAddCustomDrink }: CopaoModalP
       setLoading(true);
       try {
         const [{ data: bottlesData }, { data: configData }] = await Promise.all([
-          (supabase.rpc as Function)('get_available_bottles_for_assembly'),
+          supabase.rpc('get_available_bottles_for_assembly'),
           supabase.from('special_drink_configs').select('no_alcohol_price, allow_no_alcohol').eq('slug', 'copao').maybeSingle(),
         ]);
         if (configData) {

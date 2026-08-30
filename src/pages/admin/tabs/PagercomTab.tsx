@@ -45,7 +45,7 @@ export function PagercomTab() {
     try {
       const compressed = await compressFullscreenAd(file);
       const { path } = await uploadImage(compressed.file, 'pager-ads');
-      const { error } = await supabase.rpc('create_pager_ad' as any, {
+      const { error } = await supabase.rpc('create_pager_ad', {
         p_image_url: path,
         p_sort_order: ads.length,
       });
@@ -67,7 +67,7 @@ export function PagercomTab() {
 
   const toggleMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      const { error } = await supabase.rpc('update_pager_ad' as any, { p_id: id, p_is_active: isActive });
+      const { error } = await supabase.rpc('update_pager_ad', { p_id: id, p_is_active: isActive });
       if (error) throw error;
     },
     onSuccess: refresh,
@@ -76,7 +76,7 @@ export function PagercomTab() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.rpc('delete_pager_ad' as any, { p_id: id });
+      const { error } = await supabase.rpc('delete_pager_ad', { p_id: id });
       if (error) throw error;
     },
     onSuccess: () => {

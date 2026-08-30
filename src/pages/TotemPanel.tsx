@@ -394,7 +394,9 @@ function TotemKiosk() {
 
       // RPC ATÔMICA: pedido + itens em transação única (idempotente via client_request_id)
       const clientRequestId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
-      const { data: orderId, error: orderError } = await supabase.rpc('create_totem_order_with_items' as any, {
+      // Explicit `null` for optional args (required by PostgREST overload resolution — see
+      // Checkout.tsx), which the generated RPC arg types don't allow — hence the cast.
+      const { data: orderId, error: orderError } = await supabase.rpc('create_totem_order_with_items', {
         p_subtotal: cartTotal,
         p_delivery_fee: 0,
         p_discount: 0,
@@ -405,7 +407,7 @@ function TotemKiosk() {
         p_notes: null,
         p_customer_name: customerName || 'Totem',
         p_client_request_id: clientRequestId,
-      });
+      } as any);
       if (orderError) {
         console.error('[Totem] RPC create_totem_order_with_items error', orderError);
         throw orderError;

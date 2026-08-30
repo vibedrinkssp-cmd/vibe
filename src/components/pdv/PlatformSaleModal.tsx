@@ -86,12 +86,12 @@ export function PlatformSaleModal({ open, onOpenChange, products }: PlatformSale
           total_price: unitPrice * item.quantity,
         };
       });
-      const { error } = await (supabase.rpc as any)('create_platform_sales_batch', {
+      const { error } = await supabase.rpc('create_platform_sales_batch', {
         p_platform: platform,
         p_items: itemsPayload,
         p_notes: notes || null,
         p_salesperson: null,
-      });
+      } as any);
       if (error) throw error;
     },
     onSuccess: () => {

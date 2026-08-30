@@ -28,7 +28,7 @@ export function usePagerOrders() {
   return useQuery<PagerOrder[]>({
     queryKey: PAGER_QUERY_KEY,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_pager_orders' as any);
+      const { data, error } = await supabase.rpc('get_pager_orders');
       if (error) {
         console.warn('[usePagerOrders] RPC error:', error.message);
         return [];

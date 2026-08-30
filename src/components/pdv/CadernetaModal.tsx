@@ -64,7 +64,7 @@ export function CadernetaModal({ open, onOpenChange, cart, customDrinks = [], to
     queryFn: async (): Promise<CadernetaCustomer[]> => {
       // Primary: SECURITY DEFINER RPC (bypasses RLS, works even with flaky auth)
       try {
-        const { data, error } = await supabase.rpc('list_caderneta_customers_staff' as any, {
+        const { data, error } = await supabase.rpc('list_caderneta_customers_staff', {
           p_active_only: true,
         });
         if (!error && data) {
@@ -111,17 +111,17 @@ export function CadernetaModal({ open, onOpenChange, cart, customDrinks = [], to
           notes: item.notes || null,
         };
       });
-      const { error } = await (supabase.rpc as any)('create_caderneta_entries_batch', {
+      const { error } = await supabase.rpc('create_caderneta_entries_batch', {
         p_customer_id: selectedCustomer,
         p_items: itemsPayload,
         p_salesperson: null,
-      });
+      } as any);
       if (error) throw new Error(error.message);
 
       // Decrement open_packs for each loose cigarette item (no order_id in caderneta flow)
       for (const lc of looseCigConsumptions) {
         try {
-          const { error: rpcErr } = await supabase.rpc('sell_loose_cigarette' as any, {
+          const { error: rpcErr } = await supabase.rpc('sell_loose_cigarette', {
             p_pack_id: lc.packId,
             p_quantity: lc.quantity,
           });

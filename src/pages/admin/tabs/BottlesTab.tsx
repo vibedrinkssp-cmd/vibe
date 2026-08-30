@@ -72,7 +72,7 @@ function useOpenBottle() {
 
       // 2. Aplica o preço da dose imediatamente no ID retornado (sem race condition)
       if (params.dosePrice > 0) {
-        const { error: priceError } = await (supabase.rpc as Function)('update_bottle_dose_price', {
+        const { error: priceError } = await supabase.rpc('update_bottle_dose_price', {
           p_bottle_id: bottleId,
           p_dose_price: params.dosePrice,
         });
@@ -105,7 +105,7 @@ function useUpdateDosePrice() {
 
   return useMutation({
     mutationFn: async (params: { bottleId: string; price: number }) => {
-      const { error } = await (supabase.rpc as Function)('update_bottle_dose_price', {
+      const { error } = await supabase.rpc('update_bottle_dose_price', {
         p_bottle_id: params.bottleId,
         p_dose_price: params.price,
       });

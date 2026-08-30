@@ -169,7 +169,7 @@ export default function AdminDashboard() {
   const { data: alertPollOrders } = useQuery({
     queryKey: ['admin-alert-poll'],
     queryFn: async () => {
-      const { data, error } = await (supabase.rpc as any)('get_admin_orders_complete');
+      const { data, error } = await supabase.rpc('get_admin_orders_complete');
       if (error) return [];
       return ((data || []) as Array<{ id: string; status: string; order_type: string; accepted_at: string | null; created_at: string }>)
         .filter((o) => o.order_type === 'delivery' && (o.status === 'pending' || o.status === 'accepted'))

@@ -107,19 +107,19 @@ export function useOrders(options: { enabled?: boolean; userId?: string; refetch
     queryKey: ['orders', { userId, useRpc, useAdminRpc, useKitchenRpc, useLogRpc }],
     queryFn: async () => {
       if (useLogRpc) {
-        const { data, error } = await (supabase.rpc as any)('get_log_orders_complete');
+        const { data, error } = await supabase.rpc('get_log_orders_complete');
         if (error) { console.error('[useOrders] Log RPC error:', error.message); throw error; }
         return (data || []).map(mapAdminOrder);
       }
       if (useKitchenRpc) {
-        let { data, error } = await (supabase.rpc as any)('get_kitchen_orders_with_items');
+        let { data, error } = await supabase.rpc('get_kitchen_orders_with_items');
         // Session may have silently expired → RPC raises "Acesso negado".
         // Try to refresh the auth session once and retry before giving up,
         // so the panel never goes blank from a stale token.
         if (error) {
           console.warn('[useOrders] Kitchen RPC error, refreshing session:', error.message);
           try { await supabase.auth.refreshSession(); } catch { /* ignore */ }
-          const retry = await (supabase.rpc as any)('get_kitchen_orders_with_items');
+          const retry = await supabase.rpc('get_kitchen_orders_with_items');
           data = retry.data; error = retry.error;
         }
         if (error) {

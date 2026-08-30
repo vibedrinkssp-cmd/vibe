@@ -453,7 +453,9 @@ export default function PDV() {
 
       // RPC SECURITY DEFINER cria pedido + itens em transação atômica.
       // client_request_id no payload garante idempotência: retries de rede não duplicam.
-      const { data: orderId, error: orderError } = await supabase.rpc('create_counter_order_with_items' as any, rpcPayload);
+      // rpcPayload sends explicit `null` for optional args (required by PostgREST overload
+      // resolution — see Checkout.tsx), which the generated RPC arg types don't allow.
+      const { data: orderId, error: orderError } = await supabase.rpc('create_counter_order_with_items', rpcPayload as any);
 
       if (orderError || !orderId) {
         console.error('[PDV] RPC create_counter_order_with_items failed:', orderError);
@@ -883,7 +885,7 @@ export default function PDV() {
     const failures: string[] = [];
     for (const it of looseItems) {
       try {
-        const { error } = await supabase.rpc('sell_loose_cigarette' as any, {
+        const { error } = await supabase.rpc('sell_loose_cigarette', {
           p_pack_id: it.packId,
           p_quantity: it.quantity,
         });
@@ -1138,7 +1140,9 @@ export default function PDV() {
       };
       const rpcPayload = buildCounterOrderRpcPayload(normalizedOrder, items);
 
-      const { data: orderId, error: orderError } = await supabase.rpc('create_counter_order_with_items' as any, rpcPayload);
+      // rpcPayload sends explicit `null` for optional args (required by PostgREST overload
+      // resolution — see Checkout.tsx), which the generated RPC arg types don't allow.
+      const { data: orderId, error: orderError } = await supabase.rpc('create_counter_order_with_items', rpcPayload as any);
 
       if (orderError || !orderId) {
         console.error('[PDV PIX] RPC failed after PIX approved:', orderError);

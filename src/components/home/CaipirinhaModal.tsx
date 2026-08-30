@@ -88,7 +88,7 @@ export function CaipirinhaModal({ open, onOpenChange, onAddCustomDrink }: Caipir
       try {
         // Load bottles and config in parallel
         const [bottlesRes, configRes] = await Promise.all([
-          (supabase.rpc as Function)('get_available_bottles_for_assembly'),
+          supabase.rpc('get_available_bottles_for_assembly'),
           supabase.from('special_drink_configs').select('base_price, no_alcohol_price, allow_no_alcohol').eq('slug', 'caipirinha').single(),
         ]);
         if (bottlesRes.data) {

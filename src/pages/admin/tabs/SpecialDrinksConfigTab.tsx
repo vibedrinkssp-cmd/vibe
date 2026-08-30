@@ -160,7 +160,7 @@ function AllowedBottlesSelector({ configId, openBottles, sessionToken }: { confi
     try {
       const enable = !allowedSet.has(productId);
       
-      const { data, error } = await (supabase.rpc as any)('toggle_allowed_bottle', {
+      const { data, error } = await supabase.rpc('toggle_allowed_bottle', {
         p_session_token: sessionToken,
         p_config_id: configId,
         p_product_id: productId,

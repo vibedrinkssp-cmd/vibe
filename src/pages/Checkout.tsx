@@ -350,7 +350,10 @@ export default function Checkout() {
     // RPC SECURITY DEFINER cria pedido + itens em transação atômica e bypassa RLS para
     // clientes autenticados via login custom (CPF/whatsapp), que não possuem auth.uid().
     // Em retry de rede, a mesma client_request_id retorna o pedido existente sem duplicar.
-    const { data: rpcResult, error: orderError } = await supabase.rpc('create_delivery_order_with_items' as any, rpcPayload);
+    // rpcPayload deliberately sends explicit `null` (not `undefined`) for optional args —
+    // see comment above. The generated RPC arg types only allow `undefined`, so this needs
+    // a cast; the function name itself stays type-checked.
+    const { data: rpcResult, error: orderError } = await supabase.rpc('create_delivery_order_with_items', rpcPayload as any);
 
     if (orderError || !rpcResult) {
       console.error('[Checkout] RPC create_delivery_order_with_items failed:', orderError);
@@ -364,7 +367,7 @@ export default function Checkout() {
     // O trigger trg_auto_accept_on_pix_confirm move pending → accepted automaticamente,
     // garantindo que o pedido apareça no LOG/Cozinha.
     if (mpPaymentId) {
-      const { error: confirmErr } = await supabase.rpc('confirm_pix_payment_for_order' as any, {
+      const { error: confirmErr } = await supabase.rpc('confirm_pix_payment_for_order', {
         p_order_id: orderId,
         p_mp_payment_id: mpPaymentId,
         p_user_id: user.id,
@@ -495,7 +498,7 @@ export default function Checkout() {
       if (!orderId) throw new Error('Referência do pedido perdida.');
 
       if (mpPaymentId && user?.id) {
-        const { error: confirmErr } = await supabase.rpc('confirm_pix_payment_for_order' as any, {
+        const { error: confirmErr } = await supabase.rpc('confirm_pix_payment_for_order', {
           p_order_id: orderId,
           p_mp_payment_id: mpPaymentId,
           p_user_id: user.id,
