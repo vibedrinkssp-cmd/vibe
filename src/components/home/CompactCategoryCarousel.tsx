@@ -43,7 +43,7 @@ export function CompactCategoryCarousel({
         className={`relative flex flex-col items-center justify-center gap-1 min-w-[72px] w-[72px] h-[72px] rounded-2xl transition-colors duration-200 flex-shrink-0 overflow-hidden ${
           isSelected
             ? 'bg-primary text-primary-foreground shadow-md border border-primary/50'
-            : 'bg-white/70 border border-primary/20 text-foreground'
+            : 'bg-card border border-primary/20 text-foreground shadow-sm'
         }`}
         data-testid={testId}
       >

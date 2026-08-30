@@ -399,6 +399,55 @@
     color: hsl(30 20% 38%);
   }
 
+  /* Dark mode overrides for the two glass surfaces above — the light-mode
+     versions hardcode a white/cream background, which stayed white even
+     with .dark on <html>, making every Card and Dialog look washed-out
+     against the black page. */
+  .dark .glass-card {
+    background: var(--glass-bg-solid);
+    border-color: rgba(212, 160, 23, 0.22);
+    box-shadow:
+      0 4px 20px rgba(0, 0, 0, 0.35),
+      0 1px 4px rgba(212, 160, 23, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .dark .glass-card:hover {
+    background: rgba(16, 16, 16, 0.88);
+    border-color: rgba(212, 160, 23, 0.40);
+    box-shadow:
+      0 8px 28px rgba(0, 0, 0, 0.45),
+      0 2px 8px rgba(212, 160, 23, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .dark .glass-panel {
+    background: linear-gradient(
+      180deg,
+      hsl(0 0% 10% / 0.95) 0%,
+      hsl(0 0% 6% / 0.92) 100%
+    );
+    border: 1px solid hsl(43 45% 35% / 0.35);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 8px 36px rgba(0, 0, 0, 0.5);
+    color: hsl(0 0% 95%);
+  }
+
+  .dark .glass-panel h1,
+  .dark .glass-panel h2,
+  .dark .glass-panel h3,
+  .dark .glass-panel h4,
+  .dark .glass-panel p,
+  .dark .glass-panel span,
+  .dark .glass-panel label {
+    color: hsl(0 0% 95%);
+  }
+
+  .dark .glass-panel .text-muted-foreground {
+    color: hsl(40 12% 65%);
+  }
+
   /* Inner glow - Subtle depth */
   .inner-glow {
     box-shadow:

@@ -76,7 +76,7 @@ export function ScrollableProductGrid({
           {Array.from({ length: 6 }).map((_, i) => (
             <div 
               key={i} 
-              className="rounded-xl overflow-hidden border border-primary/10 bg-white/30"
+              className="rounded-xl overflow-hidden border border-primary/10 bg-card"
             >
               <div className="aspect-square bg-gradient-to-br from-primary/5 to-primary/10 animate-pulse" />
               <div className="p-3 space-y-2">
