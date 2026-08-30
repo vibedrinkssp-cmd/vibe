@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, HelpCircle, Bell, Settings, Download } from 'lucide-react';
+import { Search, HelpCircle, Bell, Settings, Download, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/lib/auth';
+import { useTheme } from '@/lib/theme';
 import { AdminLoginModal } from '@/components/auth/AdminLoginModal';
 import { MotoboySelectModal } from '@/components/auth/MotoboySelectModal';
 import logoImage from '@/assets/logo-vibedrinks.gif';
@@ -22,6 +23,7 @@ interface FixedHeaderProps {
 export function FixedHeader({ searchQuery, onSearchChange, onTutorialOpen, notificationCount = 0, onSearchFocus }: FixedHeaderProps) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [showMotoboyModal, setShowMotoboyModal] = useState(false);
 
@@ -92,6 +94,16 @@ export function FixedHeader({ searchQuery, onSearchChange, onTutorialOpen, notif
                   </Badge>
                 )}
               </Link>
+
+              {/* Theme toggle */}
+              <button
+                onClick={toggleTheme}
+                className="text-white/70 hover:text-white transition-colors p-1.5"
+                title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
+                data-testid="button-theme-toggle"
+              >
+                {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </button>
 
               {/* Install App */}
               <button

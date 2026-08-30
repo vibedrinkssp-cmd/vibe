@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/lib/auth";
+import { ThemeProvider } from "@/lib/theme";
 import { CartProvider } from "@/lib/cart";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SplashScreen } from "@/components/SplashScreen";
@@ -120,29 +121,31 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <AuthProvider>
-            {showSplash && (
-              <SplashScreen
-                onComplete={() => {
-                  safeSessionStorageSetItem(SPLASH_SESSION_KEY, '1');
-                  setShowSplash(false);
-                }}
-                duration={3500}
-              />
-            )}
-            {!showSplash && (
-              <BrowserRouter>
-                <RouteProviderShell />
-              </BrowserRouter>
-            )}
-            <Toaster />
-            <SonnerToaster position="top-center" richColors duration={4000} />
-            <PWAInstallPrompt showAfterSplash={!showSplash} />
-          </AuthProvider>
-        </TooltipProvider>
-      </QueryClientProvider>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <AuthProvider>
+              {showSplash && (
+                <SplashScreen
+                  onComplete={() => {
+                    safeSessionStorageSetItem(SPLASH_SESSION_KEY, '1');
+                    setShowSplash(false);
+                  }}
+                  duration={3500}
+                />
+              )}
+              {!showSplash && (
+                <BrowserRouter>
+                  <RouteProviderShell />
+                </BrowserRouter>
+              )}
+              <Toaster />
+              <SonnerToaster position="top-center" richColors duration={4000} />
+              <PWAInstallPrompt showAfterSplash={!showSplash} />
+            </AuthProvider>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
