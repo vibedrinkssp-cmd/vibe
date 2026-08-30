@@ -1,0 +1,25 @@
+
+UPDATE categories SET icon_url = 'glass-water' WHERE name = 'Água' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'martini' WHERE name = 'Cachaças' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'beer' WHERE name = 'Cervejas' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'martini' WHERE name = 'Corotes Drinks' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'sparkles' WHERE name = 'Diversos' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'candy' WHERE name = 'Doces' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'star' WHERE name = 'DRINKS ESPECIAIS' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'zap' WHERE name = 'Energéticos' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'snowflake' WHERE name = 'Gelos' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'martini' WHERE name = 'Gins' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'sandwich' WHERE name = 'HAMBÚRGUERES' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'snowflake' WHERE name = 'Ices' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'sandwich' WHERE name = 'Lanches' AND (icon_url IS NULL OR icon_url = '🍔');
+UPDATE categories SET icon_url = 'wine' WHERE name = 'Licores' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'droplets' WHERE name ILIKE 'Refrigerantes' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'droplets' WHERE name = 'REFRIGERANTES' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'cookie' WHERE name = 'Salgadinhos' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'pizza' WHERE name = 'SALGADOS' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'citrus' WHERE name = 'Sucos' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'leaf' WHERE name = 'SUCOS NATURAIS' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'flame' WHERE name = 'Tabacaria e Cigarros' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'wine' WHERE name = 'Vinhos' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'martini' WHERE name = 'Vodkas' AND (icon_url IS NULL OR icon_url = '');
+UPDATE categories SET icon_url = 'martini' WHERE name = 'Whiskys' AND (icon_url IS NULL OR icon_url = '');

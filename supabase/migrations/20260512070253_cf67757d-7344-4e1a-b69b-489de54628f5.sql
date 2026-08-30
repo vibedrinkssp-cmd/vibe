@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.change_operation_pin_v2(text, text, text, text) TO authenticated;

@@ -1,0 +1,1 @@
+UPDATE special_drink_configs SET base_price = 15 WHERE slug = 'caipi-ice';

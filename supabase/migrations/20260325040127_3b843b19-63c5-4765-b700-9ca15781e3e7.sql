@@ -1,0 +1,1 @@
+ALTER PUBLICATION supabase_realtime ADD TABLE public.products, public.categories, public.orders, public.order_items, public.settings, public.banners, public.motoboys, public.motoboy_locations, public.cash_register_sessions, public.cash_register_closures, public.sangrias, public.users, public.addresses;

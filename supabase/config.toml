@@ -1,0 +1,10 @@
+project_id = "djkonftjquielnqejwht"
+
+[functions.verify-discount-pin]
+verify_jwt = false
+
+[functions.ifood-webhook]
+verify_jwt = false
+
+[functions.mp-webhook]
+verify_jwt = false

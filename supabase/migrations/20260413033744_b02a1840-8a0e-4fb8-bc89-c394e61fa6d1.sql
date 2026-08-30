@@ -1,0 +1,1 @@
+UPDATE public.special_drink_configs SET base_price = 15 WHERE slug = 'batida';

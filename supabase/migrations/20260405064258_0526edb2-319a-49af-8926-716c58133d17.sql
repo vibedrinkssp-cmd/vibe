@@ -1,0 +1,1 @@
+UPDATE special_drink_configs SET step_gelo = false WHERE slug = 'drink-43';

@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.confirm_cash_received(uuid, text);

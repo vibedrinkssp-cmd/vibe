@@ -1,0 +1,1 @@
+DELETE FROM open_bottles WHERE id = 'cb5dd078-6365-4d1d-a0d1-4a0363c87160';

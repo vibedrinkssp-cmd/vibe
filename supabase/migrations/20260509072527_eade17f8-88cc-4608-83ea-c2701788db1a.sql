@@ -1,0 +1,1 @@
+UPDATE public.settings SET delivery_rate_per_km = 1.50, min_delivery_fee = 3.00;

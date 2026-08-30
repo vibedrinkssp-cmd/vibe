@@ -1,0 +1,1 @@
+UPDATE public.special_drink_configs SET label = 'Drinks de Licor' WHERE slug = 'drink-43';

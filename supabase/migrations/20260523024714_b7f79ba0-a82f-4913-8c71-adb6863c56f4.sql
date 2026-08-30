@@ -1,0 +1,1 @@
+UPDATE public.special_drink_configs SET allow_no_alcohol = true WHERE slug = 'drink-43';

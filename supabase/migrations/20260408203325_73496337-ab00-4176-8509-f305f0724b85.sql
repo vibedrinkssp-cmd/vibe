@@ -1,0 +1,1 @@
+UPDATE users SET password = hash_password('totem93') WHERE lower(name) = 'totem01';

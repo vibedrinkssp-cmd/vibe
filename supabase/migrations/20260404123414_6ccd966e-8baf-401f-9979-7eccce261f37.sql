@@ -1,0 +1,1 @@
+UPDATE public.users SET name = 'totem01' WHERE whatsapp = 'totem01';

@@ -1,0 +1,535 @@
+Desenvolva um aplicativo completo de delivery de bebidas chamado Vibe Drinks, com identidade visual premium (preto, dourado, amarelo, branco).
+O sistema deve ser construído em um único projeto fullstack usando:
+
+Frontend: React (com componentes organizados por páginas e módulos)
+
+Backend: API Routes internas
+
+Banco de dados: Supabase (PostgreSQL + Realtime)
+
+Storage: Supabase Storage (imagens, ícones, banners, vídeos)
+
+Cache/Tempo real: Redis (para cache, filas e otimização)
+
+Sincronização instantânea: Supabase Realtime (para atualização automática de pedidos, produtos, estoque e admin)
+
+Toda a arquitetura, código, telas, rotas, componentes e lógica devem ser gerados pela IA do Replit.
+
+🎨 1. Identidade visual
+
+Paleta:
+
+Preto (#000000)
+
+Dourado (#FFD700)
+
+Amarelo (#FFC400)
+
+Branco (#FFFFFF)
+
+Estética: premium, moderna, minimalista.
+
+Ícones: estilo 3D/Creughar para categorias.
+
+Hero deve ter vídeo de background (arquivo carregado para Supabase Storage).
+
+Layout da Home inspirado na organização do iFood.
+
+🏠 2. Estrutura da Home – organizada como iFood
+2.1 HERO COM VÍDEO
+
+Vídeo em loop do Supabase Storage.
+
+Overlay escura para contraste.
+
+Título e subtítulo.
+
+2.2 CARROSSEL DE BANNERS PROMOCIONAIS
+
+Banners horizontais.
+
+Gerenciáveis no painel admin (criar, editar, ativar, ordenar).
+
+Banner do combo deve ter destaque.
+
+2.3 CARROSSEL DE CATEGORIAS COM ÍCONES
+
+Ícones 3D estilo Creughar.
+
+Scroll horizontal fluido.
+
+Categorias clicáveis → levam à listagem da categoria.
+
+Admin pode criar/editar/ordenar/ativar/desativar categorias.
+
+2.4 LISTA DE PRODUTOS
+
+Cards contendo imagem, nome, preço e botão “Adicionar ao carrinho”.
+
+Imagens vêm do Supabase Storage.
+
+Botão “Ver mais” para ver lista geral da categoria.
+
+2.5 BUSCA
+
+Busca de produtos por nome com sugestões em tempo real.
+
+👤 3. Login e cadastro
+3.1 CLIENTE
+
+Login apenas por número de WhatsApp (sem API externa).
+
+No primeiro login solicitar:
+
+Nome
+
+WhatsApp
+
+Endereço completo
+
+Observações de entrega
+
+Próximos logins → apenas informar o número.
+
+3.2 ADMIN
+
+Acesso por ícone discreto (engrenagem).
+
+Login:
+
+Usuário: Admin
+
+Senha: 939393
+
+3.3 COZINHA (KDE)
+
+Login:
+
+Usuário: cozinha
+
+Senha: 939393
+
+3.4 MOTOBOY
+
+Login por WhatsApp, desde que esteja cadastrado no painel admin.
+
+🛒 4. Fluxo de pedidos e carrinho
+
+Carrinho com:
+
+Lista de itens
+
+Subtotal
+
+Taxa de entrega dinâmica por km (ver seção específica)
+
+Total final
+
+Confirmação do endereço
+
+Seleção da forma de pagamento
+
+Finalização do pedido → envia para admin.
+
+💰 5. Pagamentos
+5.1 DINHEIRO
+
+Perguntar “Precisa de troco?”
+
+Se sim → perguntar “Troco para quanto?”
+
+Exibir troco no pedido.
+
+5.2 PIX PARA DELIVERY
+
+QR code estático
+
+Chave PIX
+
+Botão “copiar chave”
+
+5.3 POS NA ENTREGA
+
+Pagar cartão no local (crédito/débito).
+
+Motoboy marca “Pagamento recebido”.
+
+5.4 PIX NO BALCÃO (OPCIONAL MERCADO PAGO)
+
+Caso administrador configure, permitir QR dinâmico do Mercado Pago.
+
+🚚 6. Taxa de entrega dinâmica por geolocalização
+
+A taxa de entrega deve ser calculada automaticamente:
+
+taxa = distância (km) × R$ 1,25
+
+Implementação:
+
+O endereço da loja deve ser configurável no painel admin.
+
+Usar API pública de geolocalização / rotas (Google Distance Matrix, Mapbox, OpenRouteService ou similar).
+
+Buscar a distância entre:
+
+Loja → Cliente
+
+Armazenar:
+
+distância
+
+taxa de entrega
+
+Exibir:
+
+No carrinho
+
+No resumo do pedido
+
+No admin
+
+No motoboy
+
+Painel admin deve permitir configurar:
+
+taxa por km
+
+taxa mínima
+
+distância máxima de entrega
+
+Cachear resultados de distância no Redis.
+
+📦 7. Painel administrativo (Dashboard completo)
+
+Criar um dashboard com abas:
+
+7.1 PEDIDOS
+
+Exibir pedidos em cards com:
+
+Cliente, endereço, WhatsApp
+
+Forma de pagamento
+
+Troco
+
+Taxa de entrega
+
+Itens
+
+Horário
+
+Status atual
+
+Botões para mudar status:
+
+Aguardando aprovação
+
+Aceito
+
+Em produção
+
+Pronto
+
+Despachado
+
+Entregue
+
+Atualização em tempo real via Supabase Realtime.
+
+7.2 DELIVERY
+
+Lista de pedidos “Pronto”.
+
+Lista de motoboys.
+
+Atribuir pedido a motoboy.
+
+Ao despachar → pedido aparece na tela do motoboy.
+
+7.3 FINANCEIRO
+
+Total por período.
+
+Total por forma de pagamento.
+
+Total arrecadado de taxas de entrega.
+
+Exportar relatório CSV.
+
+7.4 CLIENTES
+
+Tabela com:
+
+Nome
+
+WhatsApp
+
+Endereço resumido
+
+Nº de pedidos
+
+Data de cadastro
+
+Busca e paginação.
+
+Tela de detalhes:
+
+Histórico de pedidos
+
+Dados completos
+
+Bloquear/desbloquear cliente
+
+7.5 PRODUTOS / ESTOQUE
+
+Fluxo super simplificado:
+
+Tela pergunta: Selecione categoria
+
+Em seguida solicitar:
+
+Nome do produto
+
+Valor de compra
+
+Lucro desejado (%)
+
+Estoque inicial
+
+Upload ou foto tirada na hora
+
+Sistema deve calcular:
+
+preço sugerido = custo + (custo × lucro%)
+
+lucro líquido (valor)
+
+Preço pode ser ajustado manualmente, recalculando lucro automaticamente.
+
+Edição de produtos:
+
+Mudar nome, preço, custo, lucro %, estoque, imagem, categoria, status.
+
+Listagem:
+
+Foto, nome, preço, estoque, categoria, status
+
+Paginação e filtros
+
+7.6 CATEGORIAS
+
+Criar, renomear, ordenar, ativar/desativar.
+
+Upload de ícone (3D/Creughar) salvo no Supabase Storage.
+
+7.7 BANNERS
+
+Criar banners com imagem, título, link, descrição.
+
+Ordenar e ativar/desativar.
+
+7.8 MOTOBOYS
+
+Cadastro com:
+
+Nome
+
+WhatsApp
+
+Foto
+
+Status ativo/inativo
+
+7.9 CONFIGURAÇÕES GERAIS
+
+Endereço da loja
+
+Taxa por km
+
+Distância máxima
+
+Horário de funcionamento
+
+Chave PIX
+
+Configuração Mercado Pago opcional
+
+🍳 8. Tela KDE (cozinha)
+
+Mostra pedidos:
+
+Aceito
+
+Em produção
+
+Cards exibem:
+
+Itens
+
+Quantidades
+
+Observações
+
+Tempo desde entrada
+
+Botões:
+
+“Iniciar produção”
+
+“Pedido pronto”
+
+Pedido pronto → enviado ao Delivery.
+
+Atualização: em tempo real via Supabase Realtime.
+
+🏍 9. Tela do Motoboy
+
+Login via WhatsApp.
+
+Exibe pedidos atribuídos ao motoboy.
+
+Card com endereço, observações, taxa de entrega, pagamento.
+
+Botão:
+
+“Pedido entregue”
+
+🧮 10. Sistema de Combos (desconto automático)
+
+Combo é composto por:
+
+1 destilado
+
+5 gelos
+
+1 energético (lata ou 2L)
+
+Ao detectar essa composição no carrinho:
+
+Identificar automaticamente um Combo Vibe
+
+Aplicar desconto de 15% sobre itens do combo
+
+Exibir valor bruto, desconto e total final
+
+🗄 11. Banco de Dados – Supabase
+
+Criar tabelas completas (padrão sugerido):
+
+users
+
+addresses
+
+categories
+
+products
+
+product_images
+
+orders
+
+order_items
+
+payments
+
+banners
+
+motoboys
+
+stock_logs
+
+settings
+
+Chaves estrangeiras e relacionamentos adequados.
+
+⚡ 12. Redis — Cache e Tempo Real
+
+Integrar Redis para:
+
+12.1 Cache de leitura rápida
+
+produtos
+
+categorias
+
+banners
+
+estoque
+
+configurações
+
+TTL: 30–60s (ajustável).
+
+12.2 Cache de distância para taxa de entrega
+
+Chave:
+
+delivery_distance:{cep}
+
+TTL: 2–4h.
+
+12.3 Carrinho do cliente
+
+Chave:
+
+cart:{user_id}
+
+TTL: 2h.
+
+12.4 Status do pedido
+
+Chave:
+
+order_status:{order_id}
+
+Atualizar imediatamente ao mudar status.
+
+12.5 Estratégia Redis ↔ Supabase
+
+Primeiro ler Redis
+
+Se não tiver → ler Supabase e gravar no Redis
+
+Ao alterar Supabase → invalidar cache Redis
+
+Sincronização em tempo real via Supabase Realtime.
+
+🔄 13. Realtime (Supabase)
+
+Usar Supabase Realtime para atualizar automaticamente:
+
+Pedidos
+
+Estoque
+
+Produtos
+
+Motoboys
+
+Categorias
+
+Banners
+
+Sem recarregar página.
+
+🧱 14. Arquitetura final esperada
+
+Gerar:
+
+Projeto React completo
+
+Backend com API Routes
+
+Integração Supabase (DB + Storage + Realtime)
+
+Integração Redis (JS client)
+
+Componentes reutilizáveis
+
+Design premium
+
+Sistema completo do início ao fim
+
+O app deve ser totalmente funcional, escalável, rápido, otimizado e profissional.

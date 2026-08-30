@@ -1,0 +1,1 @@
+UPDATE public.products SET name = REGEXP_REPLACE(name, '(\d)\s+(ML|ml|Ml|mL)', '\1ML', 'g') WHERE name ~* '\d\s+ml';

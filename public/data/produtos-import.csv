@@ -1,0 +1,289 @@
+﻿ID;Nome do Produto;Descrição;Preço (R$);Custo (R$);Margem (%);Categoria;Estoque;Estoque Mínimo;Unidade;Status
+1003;"51 ice 0% ALCOOL  ";"Produto de qualidade";12,00;7,20;66,7;"Ices";0;0;un;Ativo
+853;"51 Ice Kiwi";"Produto de qualidade";12,00;7,20;66,7;"Ices";0;0;un;Ativo
+852;"51 Ice Limão";"Produto de qualidade";12,00;7,20;66,7;"Ices";0;0;un;Ativo
+854;"51 Ice Maracujá";"Produto de qualidade";12,00;7,20;66,7;"Ices";0;0;un;Ativo
+855;"51 Ice Morango";"Produto de qualidade";12,00;7,20;66,7;"Ices";0;0;un;Ativo
+866;"Água 1,5L";"Produto de qualidade";6,50;4,55;42,9;"Água";0;0;un;Ativo
+865;"Água 500ml";"Produto de qualidade";3,50;2,45;42,9;"Água";0;0;un;Ativo
+867;"Água com Gás";"Produto de qualidade";4,50;3,15;42,9;"Água";0;0;un;Ativo
+943;"Água de Coco 1L";"Produto de qualidade";14,50;8,70;66,7;"Sucos";0;0;un;Ativo
+708;"Amstel 269ml";"Produto de qualidade";5,00;2,40;108,3;"Cervejas";0;0;un;Ativo
+767;"Baly 2 Litros";"Produto de qualidade";16,00;9,60;66,7;"Energéticos";0;0;un;Ativo
+769;"Big Boss 2 Litros";"Produto de qualidade";10,00;7,00;42,9;"Energéticos";0;0;un;Ativo
+945;"Bis Branco";"Produto de qualidade";10,00;7,00;42,9;"Doces";0;0;un;Ativo
+946;"Bis Preto";"Produto de qualidade";10,00;7,00;42,9;"Doces";0;0;un;Ativo
+998;"Cachaça 51 1L";"Produto de qualidade";24,50;14,70;66,7;"Cachaças";0;0;un;Ativo
+1025;"Caip ice Limão ";"Produto de qualidade";35,00;19,25;81,8;"Caipi Ice";0;0;un;Ativo
+994;"Camisinha";"Produto de qualidade";12,00;7,20;66,7;"Diversos";0;0;un;Ativo
+722;"Cantinho do Vale 2L";"Produto de qualidade";12,00;7,20;66,7;"Vinhos";0;0;un;Ativo
+721;"Cantinho do Vale 880ml";"Produto de qualidade";7,00;4,90;42,9;"Vinhos";0;0;un;Ativo
+996;"Canudo Rosa ou Preto";"Produto de qualidade";2,50;1,75;42,9;"Diversos";0;0;un;Ativo
+997;"Carvão de Churrasco 2kg";"Produto de qualidade";14,50;8,70;66,7;"Diversos";0;0;un;Ativo
+1015;"Chevette - Corote limão, gelo de coco e suco baunilha";"Produto de qualidade";10,00;7,00;42,9;"Corotes Drinks";0;0;un;Ativo
+727;"Chopp de Vinho Draft 600ml";"Produto de qualidade";17,00;10,20;66,7;"Vinhos";0;0;un;Ativo
+731;"Coca-Cola 1L";"Produto de qualidade";10,00;7,00;42,9;"Refrigerantes";0;0;un;Ativo
+736;"Coca-Cola 200ml";"Produto de qualidade";3,50;2,45;42,9;"Refrigerantes";0;0;un;Ativo
+729;"Coca-Cola 2L";"Produto de qualidade";14,50;8,70;66,7;"Refrigerantes";0;0;un;Ativo
+741;"Coca-Cola 600ml";"Produto de qualidade";8,00;5,60;42,9;"Refrigerantes";0;0;un;Ativo
+739;"Coca-Cola Lata 350ml";"Produto de qualidade";6,00;4,20;42,9;"Refrigerantes";0;0;un;Ativo
+732;"Coca-Cola Zero 1L";"Produto de qualidade";10,00;7,00;42,9;"Refrigerantes";0;0;un;Pausado
+740;"Coca-Cola Zero 200ml";"Produto de qualidade";3,50;2,45;42,9;"Refrigerantes";0;0;un;Ativo
+730;"Coca-Cola Zero 2L";"Produto de qualidade";14,50;8,70;66,7;"Refrigerantes";0;0;un;Ativo
+742;"Coca-Cola Zero 600ml";"Produto de qualidade";8,00;5,60;42,9;"Refrigerantes";0;0;un;Pausado
+995;"Copo 700ml";"Produto de qualidade";2,50;1,75;42,9;"Diversos";0;0;un;Ativo
+1013;"CupNoodles Carne";"Produto de qualidade";13,50;8,10;66,7;"Diversos";0;0;un;Ativo
+1014;"CupNoodles Galinha";"Produto de qualidade";13,50;8,10;66,7;"Diversos";0;0;un;Ativo
+720;"Dani 700ml";"Produto de qualidade";27,00;16,20;66,7;"Vinhos";0;0;un;Ativo
+723;"Dom Nogueira 900ml";"Produto de qualidade";22,00;13,20;66,7;"Vinhos";0;0;un;Ativo
+970;"Eight";"Produto de qualidade";6,50;4,55;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+733;"Fanta Laranja 2L";"Produto de qualidade";14,50;8,70;66,7;"Refrigerantes";0;0;un;Ativo
+1011;"Fofura Cebola";"Produto de qualidade";6,00;4,20;42,9;"Salgadinhos";0;0;un;Ativo
+1009;"Fofura Churrasco";"Produto de qualidade";6,00;4,20;42,9;"Salgadinhos";0;0;un;Ativo
+1008;"Fofura Presunto";"Produto de qualidade";6,00;4,20;42,9;"Salgadinhos";0;0;un;Ativo
+1010;"Fofura Queijo";"Produto de qualidade";6,00;4,20;42,9;"Salgadinhos";0;0;un;Ativo
+1012;"Fofura Requeijão";"Produto de qualidade";6,00;4,20;42,9;"Salgadinhos";0;0;un;Pausado
+768;"Fusion 2 Litros";"Produto de qualidade";24,50;14,70;66,7;"Energéticos";0;0;un;Ativo
+864;"Gelo Comum 5kg";"Produto de qualidade";25,00;9,00;177,8;"Gelos";0;0;un;Ativo
+868;"Gin Bulldog";"Produto de qualidade";158,50;79,25;100,0;"Gins";0;0;un;Pausado
+870;"Gin Gordons Rosa";"Produto de qualidade";95,00;47,50;100,0;"Gins";0;0;un;Ativo
+869;"Gin Gordons Tradicional";"Produto de qualidade";95,00;47,50;100,0;"Gins";0;0;un;Ativo
+874;"Gin Intencion Rosa";"Produto de qualidade";27,00;16,20;66,7;"Gins";0;0;un;Ativo
+873;"Gin Intencion Tradicional";"Produto de qualidade";27,00;16,20;66,7;"Gins";0;0;un;Ativo
+876;"Gin Ópera Melancia";"Produto de qualidade";25,00;15,00;66,7;"Gins";0;0;un;Ativo
+875;"Gin Ópera Rosa";"Produto de qualidade";25,00;15,00;66,7;"Gins";0;0;un;Ativo
+872;"Gin Rocks Rosa";"Produto de qualidade";38,00;20,90;81,8;"Gins";0;0;un;Ativo
+871;"Gin Rocks Seco";"Produto de qualidade";38,00;20,90;81,8;"Gins";0;0;un;Ativo
+738;"Guaraná Antarctica 600ml";"Produto de qualidade";7,50;5,25;42,9;"Refrigerantes";0;0;un;Pausado
+734;"Guaraná Antatica 2L";"Produto de qualidade";14,50;8,70;66,7;"Refrigerantes";0;0;un;Ativo
+748;"Guaranita 600ml";"Produto de qualidade";7,50;5,25;42,9;"Refrigerantes";0;0;un;Ativo
+948;"Halls Melancia";"Produto de qualidade";4,00;2,80;42,9;"Doces";0;0;un;Ativo
+950;"Halls Menta";"Produto de qualidade";4,00;2,80;42,9;"Doces";0;0;un;Ativo
+947;"Halls Morango";"Produto de qualidade";4,00;2,80;42,9;"Doces";0;0;un;Ativo
+949;"Halls Preto";"Produto de qualidade";4,00;2,80;42,9;"Doces";0;0;un;Ativo
+857;"Keep Cooler";"Produto de qualidade";13,50;8,10;66,7;"Ices";0;0;un;Ativo
+928;"Licor 43 Baristo";"Produto de qualidade";215,00;107,50;100,0;"Licores";0;0;un;Ativo
+927;"Licor 43 Chocolate";"Produto de qualidade";215,00;107,50;100,0;"Licores";0;0;un;Ativo
+929;"Licor 43 Creme Brulé";"Produto de qualidade";215,00;107,50;100,0;"Licores";0;0;un;Ativo
+926;"Licor 43 Tradicional";"Produto de qualidade";175,00;87,50;100,0;"Licores";0;0;un;Ativo
+933;"Licor Amarula Chocolate Raspberry";"Produto de qualidade";149,00;74,50;100,0;"Licores";0;0;un;Ativo
+934;"Licor Amarula Ethiopian Coffee";"Produto de qualidade";230,50;115,25;100,0;"Licores";0;0;un;Pausado
+931;"Licor Amarula Raspberry";"Produto de qualidade";230,50;115,25;100,0;"Licores";0;0;un;Pausado
+930;"Licor Amarula Tradicional";"Produto de qualidade";145,00;72,50;100,0;"Licores";0;0;un;Ativo
+932;"Licor Amarula Vanilla Spice";"Produto de qualidade";149,00;74,50;100,0;"Licores";0;0;un;Pausado
+925;"Licor Dolce di Latte";"Produto de qualidade";69,00;34,50;100,0;"Licores";0;0;un;Ativo
+762;"Monster Manga 500ml";"Produto de qualidade";13,00;7,80;66,7;"Energéticos";0;0;un;Ativo
+763;"Monster Melancia 500ml";"Produto de qualidade";13,00;7,80;66,7;"Energéticos";0;0;un;Ativo
+761;"Monster Tradicional 500ml";"Produto de qualidade";13,00;7,80;66,7;"Energéticos";0;0;un;Ativo
+959;"Oreo/Negresco";"Produto de qualidade";4,00;2,80;42,9;"Doces";0;0;un;Ativo
+958;"Passatempo Chocolate";"Produto de qualidade";4,50;3,15;42,9;"Doces";0;0;un;Ativo
+747;"Pepsi 600ml";"Produto de qualidade";7,50;5,25;42,9;"Refrigerantes";0;0;un;Pausado
+726;"Pergola 1L";"Produto de qualidade";32,00;17,60;81,8;"Vinhos";0;0;un;Ativo
+858;"Pina Colada";"Produto de qualidade";13,50;8,10;66,7;"Ices";0;0;un;Ativo
+944;"Pirulito";"Produto de qualidade";1,00;0,70;42,9;"Doces";0;0;un;Ativo
+753;"Red Bull Açaí 250ml";"Produto de qualidade";12,00;7,20;66,7;"Energéticos";0;0;un;Ativo
+758;"Red Bull Cereja 250ml";"Produto de qualidade";12,00;7,20;66,7;"Energéticos";0;0;un;Ativo
+751;"Red Bull Coco com Açaí 250ml";"Produto de qualidade";12,00;7,20;66,7;"Energéticos";0;0;un;Ativo
+754;"Red Bull Figo com Maçã 250ml";"Produto de qualidade";12,00;7,20;66,7;"Energéticos";0;0;un;Ativo
+752;"Red Bull Frutas Vermelhas 250ml";"Produto de qualidade";12,00;7,20;66,7;"Energéticos";0;0;un;Ativo
+756;"Red Bull Melancia 250ml";"Produto de qualidade";12,00;7,20;66,7;"Energéticos";0;0;un;Ativo
+759;"Red Bull Melão e Maracujá 250ml";"Produto de qualidade";12,00;7,20;66,7;"Energéticos";0;0;un;Ativo
+760;"Red Bull Pera e Canela 250ml";"Produto de qualidade";12,00;7,20;66,7;"Energéticos";0;0;un;Ativo
+749;"Red Bull Tradicional 250ml";"Produto de qualidade";12,00;7,20;66,7;"Energéticos";0;0;un;Ativo
+757;"Red Bull Tropical 250ml";"Produto de qualidade";12,00;7,20;66,7;"Energéticos";0;0;un;Ativo
+750;"Red Bull Zero Açúcar 250ml";"Produto de qualidade";12,00;7,20;66,7;"Energéticos";0;0;un;Ativo
+725;"Sangue de Boi Seco 1L";"Produto de qualidade";24,50;14,70;66,7;"Vinhos";0;0;un;Ativo
+724;"Sangue de Boi Suave 1L";"Produto de qualidade";24,50;14,70;66,7;"Vinhos";0;0;un;Ativo
+744;"Schweppes 1,5L";"Produto de qualidade";14,50;8,70;66,7;"Refrigerantes";0;0;un;Pausado
+745;"Schweppes Cítrus 350ml";"Produto de qualidade";6,00;4,20;42,9;"Refrigerantes";0;0;un;Ativo
+746;"Schweppes Tônica 350ml";"Produto de qualidade";14,50;8,70;66,7;"Refrigerantes";0;0;un;Ativo
+856;"Smirnoff Ice";"Produto de qualidade";14,50;8,70;66,7;"Ices";0;0;un;Ativo
+743;"Sprite 2L";"Produto de qualidade";14,50;8,70;66,7;"Refrigerantes";0;0;un;Ativo
+941;"Suco Goiaba 1L";"Produto de qualidade";14,50;8,70;66,7;"Sucos";0;0;un;Ativo
+937;"Suco Laranja 1L";"Produto de qualidade";14,50;8,70;66,7;"Sucos";0;0;un;Ativo
+942;"Suco Manga 1L";"Produto de qualidade";14,50;8,70;66,7;"Sucos";0;0;un;Ativo
+940;"Suco Maracujá 1L";"Produto de qualidade";14,50;8,70;66,7;"Sucos";0;0;un;Ativo
+938;"Suco Pêssego 1L";"Produto de qualidade";14,50;8,70;66,7;"Sucos";0;0;un;Ativo
+939;"Suco Uva 1L";"Produto de qualidade";14,50;8,70;66,7;"Sucos";0;0;un;Ativo
+735;"TISS Sabores 2L";"Produto de qualidade";7,50;5,25;42,9;"Refrigerantes";0;0;un;Ativo
+1004;"Torcida Bacon";"Produto de qualidade";5,00;3,50;42,9;"Salgadinhos";0;0;un;Ativo
+1005;"Torcida Cebola";"Produto de qualidade";6,00;4,20;42,9;"Salgadinhos";0;0;un;Pausado
+1006;"Torcida Churrasco";"Produto de qualidade";5,00;3,50;42,9;"Salgadinhos";0;0;un;Ativo
+1007;"Torcida Pimenta";"Produto de qualidade";5,00;3,50;42,9;"Salgadinhos";0;0;un;Ativo
+957;"Trakinas Chocolate";"Produto de qualidade";4,50;3,15;42,9;"Doces";0;0;un;Ativo
+956;"Trakinas Limão";"Produto de qualidade";4,50;3,15;42,9;"Doces";0;0;un;Ativo
+955;"Trakinas Morango";"Produto de qualidade";4,50;3,15;42,9;"Doces";0;0;un;Ativo
+951;"Trident Hortelã";"Produto de qualidade";5,50;3,85;42,9;"Doces";0;0;un;Ativo
+952;"Trident Menta";"Produto de qualidade";5,50;3,85;42,9;"Doces";0;0;un;Ativo
+954;"Trident Morango";"Produto de qualidade";5,50;3,85;42,9;"Doces";0;0;un;Ativo
+953;"Trident Tutti Fruti";"Produto de qualidade";5,50;3,85;42,9;"Doces";0;0;un;Ativo
+877;"Vodka Master Black";"Produto de qualidade";13,00;7,80;66,7;"Vodkas";0;0;un;Ativo
+915;"Whisky Ballantine's 12 anos";"Produto de qualidade";171,00;85,50;100,0;"Whiskys";0;0;un;Pausado
+916;"Whisky Ballantine's Bourbon";"Produto de qualidade";116,00;58,00;100,0;"Whiskys";0;0;un;Pausado
+914;"Whisky Ballantine's Finest";"Produto de qualidade";89,00;44,50;100,0;"Whiskys";0;0;un;Ativo
+912;"Whisky Buchanan’s 12 anos";"Produto de qualidade";195,00;97,50;100,0;"Whiskys";0;0;un;Ativo
+913;"Whisky Buchanan’s 18 anos";"Produto de qualidade";789,00;394,50;100,0;"Whiskys";0;0;un;Pausado
+919;"Whisky Bullet Bourbon";"Produto de qualidade";110,00;55,00;100,0;"Whiskys";0;0;un;Ativo
+921;"Whisky Cardhu";"Produto de qualidade";158,50;79,25;100,0;"Whiskys";0;0;un;Ativo
+909;"Whisky Chivas Regal 12 anos";"Produto de qualidade";179,00;89,50;100,0;"Whiskys";0;0;un;Ativo
+910;"Whisky Chivas Regal 15 anos";"Produto de qualidade";476,00;238,00;100,0;"Whiskys";0;0;un;Ativo
+911;"Whisky Chivas Regal 18 anos";"Produto de qualidade";671,00;335,50;100,0;"Whiskys";0;0;un;Ativo
+907;"Whisky Jack Canela";"Produto de qualidade";179,00;89,50;100,0;"Whiskys";0;0;un;Ativo
+899;"Whisky Jack Daniel's Tradicional";"Produto de qualidade";179,00;89,50;100,0;"Whiskys";0;0;un;Ativo
+902;"Whisky Jack Edição Limitada";"Produto de qualidade";402,50;201,25;100,0;"Whiskys";0;0;un;Pausado
+906;"Whisky Jack Maçã";"Produto de qualidade";195,00;97,50;100,0;"Whiskys";0;0;un;Ativo
+903;"Whisky Jack Master Distiller";"Produto de qualidade";402,50;201,25;100,0;"Whiskys";0;0;un;Pausado
+908;"Whisky Jack Mel";"Produto de qualidade";189,00;94,50;100,0;"Whiskys";0;0;un;Ativo
+904;"Whisky Jack Rye";"Produto de qualidade";402,50;201,25;100,0;"Whiskys";0;0;un;Pausado
+900;"Whisky Jack Sinatra";"Produto de qualidade";1150,00;575,00;100,0;"Whiskys";0;0;un;Ativo
+901;"Whisky Jack Single Barrel";"Produto de qualidade";315,00;157,50;100,0;"Whiskys";0;0;un;Ativo
+905;"Whisky Jack White Rabbit";"Produto de qualidade";402,50;201,25;100,0;"Whiskys";0;0;un;Pausado
+924;"Whisky Master Gold";"Produto de qualidade";19,00;11,40;66,7;"Whiskys";0;0;un;Ativo
+917;"Whisky Old Parr 12 anos";"Produto de qualidade";189,00;94,50;100,0;"Whiskys";0;0;un;Ativo
+918;"Whisky Old Parr 18 anos";"Produto de qualidade";599,00;299,50;100,0;"Whiskys";0;0;un;Ativo
+923;"Whisky Passport Mel";"Produto de qualidade";49,00;26,95;81,8;"Whiskys";0;0;un;Ativo
+922;"Whisky Passport Tradicional";"Produto de qualidade";49,00;26,95;81,8;"Whiskys";0;0;un;Ativo
+920;"Whisky Woodford Reserve";"Produto de qualidade";279,00;139,50;100,0;"Whiskys";0;0;un;Ativo
+709;"Amstel 350ml";"Produto de qualidade";6,00;4,20;42,9;"Cervejas";0;0;un;Ativo
+1019;"Caip Ice de limao 0% ";"Produto de qualidade";33,00;18,15;81,8;"Caipi Ice";0;0;un;Ativo
+1001;"Canelinha 275ml ";"Produto de qualidade";7,50;5,25;42,9;"Cachaças";0;0;un;Ativo
+964;"Carlton";"Produto de qualidade";16,50;9,90;66,7;"Tabacaria e Cigarros";0;0;un;Ativo
+1038;"Cheetos Elma Chips ";"Produto de qualidade";13,00;7,80;66,7;"Salgadinhos";0;0;un;Ativo
+859;"Gelo de Coco Cx";"Produto de qualidade";5,00;3,50;42,9;"Gelos";0;0;un;Ativo
+1047;"Gin Beffeater London 750ml";"Produto de qualidade";125,00;62,50;100,0;"Gins";0;0;un;Ativo
+1096;"Licor Balena Morango ";"Produto de qualidade";185,00;92,50;100,0;"Licores";0;0;un;Ativo
+1016;"Opala -  Corote blueberry, gelo de coco e suco baunilha";"Produto de qualidade";10,00;7,00;42,9;"Corotes Drinks";0;0;un;Ativo
+1099;"Sprite Lata 350 ml";"Produto de qualidade";6,00;4,20;42,9;"Refrigerantes";0;0;un;Ativo
+880;"Vodka Askov Blueberry";"Produto de qualidade";22,00;13,20;66,7;"Vodkas";0;0;un;Ativo
+698;"Brahma 350ml";"Produto de qualidade";5,50;3,85;42,9;"Cervejas";0;0;un;Ativo
+1020;"Caip ice Morango 0%";"Produto de qualidade";33,00;18,15;81,8;"Caipi Ice";0;0;un;Ativo
+773;"Corote Blueberry";"Produto de qualidade";6,00;4,20;42,9;"Cachaças";0;0;un;Ativo
+1039;"Doritos Elma Chips 125g ";"Produto de qualidade";17,00;10,20;66,7;"Salgadinhos";0;0;un;Ativo
+1017;"Fusca -  Corote morango, gelo de coco e suco baunilha";"Produto de qualidade";10,00;7,00;42,9;"Corotes Drinks";0;0;un;Ativo
+1036;"Gelo de coco ";"Produto de qualidade";3,00;2,10;42,9;"Gelos";0;0;un;Ativo
+1048;"Gin Beeffeater Pink London 750ml ";"Produto de qualidade";139,00;69,50;100,0;"Gins";0;0;un;Pausado
+1097;"Licor Balena Chocolate ";"Produto de qualidade";185,00;92,50;100,0;"Licores";0;0;un;Ativo
+968;"Marlboro Melancia";"Produto de qualidade";16,50;9,90;66,7;"Tabacaria e Cigarros";0;0;un;Ativo
+882;"Vodka Askov Frutas Vermelhas";"Produto de qualidade";22,00;13,20;66,7;"Vodkas";0;0;un;Ativo
+1040;"Batata Lay’s ";"Produto de qualidade";12,00;7,20;66,7;"Salgadinhos";0;0;un;Ativo
+1018;"Brasilia -  Corote maracuja, gelo de coco e suco baunilha";"Produto de qualidade";10,00;7,00;42,9;"Corotes Drinks";0;0;un;Ativo
+1026;"Caip ice Morango ";"Produto de qualidade";35,00;19,25;81,8;"Caipi Ice";0;0;un;Ativo
+771;"Corote Limão";"Produto de qualidade";6,00;4,20;42,9;"Cachaças";0;0;un;Ativo
+862;"Gelo de Maçã Verde ";"Produto de qualidade";3,00;2,10;42,9;"Gelos";0;0;un;Ativo
+1049;"Gin Beefeater BlackBerry 750ml ";"Produto de qualidade";139,00;69,50;100,0;"Gins";0;0;un;Pausado
+700;"Heineken 350ml";"Produto de qualidade";7,00;4,90;42,9;"Cervejas";0;0;un;Ativo
+1098;"Licor Balena Coco ";"Produto de qualidade";185,00;92,50;100,0;"Licores";0;0;un;Ativo
+966;"Marlboro Vermelho";"Produto de qualidade";16,50;9,90;66,7;"Tabacaria e Cigarros";0;0;un;Ativo
+881;"Vodka Askov Maracujá";"Produto de qualidade";22,00;13,20;66,7;"Vodkas";0;0;un;Ativo
+1027;"Caip ice Kiwi ";"Produto de qualidade";35,00;19,25;81,8;"Caipi Ice";0;0;un;Ativo
+770;"Corote Puro";"Produto de qualidade";5,00;4,20;19,0;"Cachaças";0;0;un;Ativo
+860;"Gelo de Maracujá Cx";"Produto de qualidade";5,00;3,50;42,9;"Gelos";0;0;un;Ativo
+1050;"Gin Tanqueray 750 ml ";"Produto de qualidade";140,00;70,00;100,0;"Gins";0;0;un;Ativo
+701;"Heineken Zero 350ml";"Produto de qualidade";7,00;4,90;42,9;"Cervejas";0;0;un;Ativo
+962;"Rothmans Vermelho";"Produto de qualidade";10,00;7,00;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+1041;"Ruffles Elma Chips ";"Produto de qualidade";17,00;10,20;66,7;"Salgadinhos";0;0;un;Pausado
+879;"Vodka Askov Limão";"Produto de qualidade";22,00;13,20;66,7;"Vodkas";0;0;un;Ativo
+699;"Brahma Duplo Malte 350ml";"Produto de qualidade";5,50;3,85;42,9;"Cervejas";0;0;un;Ativo
+1021;"Caip ice Kiwi 0% ";"Produto de qualidade";33,00;18,15;81,8;"Caipi Ice";0;0;un;Ativo
+772;"Corote Maracuja";"Produto de qualidade";6,00;4,20;42,9;"Cachaças";0;0;un;Ativo
+1042;"Fandangos Elma Chips ";"Produto de qualidade";11,00;6,60;66,7;"Salgadinhos";0;0;un;Ativo
+1037;"Gelo Maracujá ";"Produto de qualidade";3,00;2,10;42,9;"Gelos";0;0;un;Ativo
+1051;"Gin Tanqueray Royale 750 ml ";"Produto de qualidade";145,00;72,50;100,0;"Gins";0;0;un;Pausado
+960;"Rothmans Branco";"Produto de qualidade";10,00;7,00;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+878;"Vodka Askov Tradicional";"Produto de qualidade";20,00;12,00;66,7;"Vodkas";0;0;un;Ativo
+1043;"Amendoim Crocante Fritz ";"Produto de qualidade";5,50;3,85;42,9;"Salgadinhos";0;0;un;Ativo
+704;"Budweiser 269ml ";"Produto de qualidade";5,00;3,50;42,9;"Cervejas";0;0;un;Ativo
+1028;"Caip ice Maracujá ";"Produto de qualidade";35,00;19,25;81,8;"Caipi Ice";0;0;un;Ativo
+775;"Corote Morango";"Produto de qualidade";6,50;4,55;42,9;"Cachaças";0;0;un;Ativo
+863;"Gelo de Melancia";"Produto de qualidade";3,00;2,10;42,9;"Gelos";0;0;un;Ativo
+1052;"Gin Tanqueray Sevilla 750 ml ";"Produto de qualidade";145,00;72,50;100,0;"Gins";0;0;un;Pausado
+978;"Gudang Garand";"Produto de qualidade";35,00;19,25;81,8;"Tabacaria e Cigarros";0;0;un;Ativo
+1057;"Vodka Smirnoff 1L";"Produto de qualidade";49,00;26,95;81,8;"Vodkas";0;0;un;Ativo
+1022;"Caip ice de Maracuja 0%";"Produto de qualidade";33,00;18,15;81,8;"Caipi Ice";0;0;un;Ativo
+702;"Eisenbahn Amarela";"Produto de qualidade";6,50;4,55;42,9;"Cervejas";0;0;un;Ativo
+861;"Gelo de Morango";"Produto de qualidade";3,00;2,10;42,9;"Gelos";0;0;un;Ativo
+1053;"Gin Tanqueray Bossa Nova 750 ml ";"Produto de qualidade";149,00;74,50;100,0;"Gins";0;0;un;Pausado
+972;"Palheiro Menta";"Produto de qualidade";12,00;7,20;66,7;"Tabacaria e Cigarros";0;0;un;Ativo
+1044;"Queijinho Fritz ";"Produto de qualidade";7,50;5,25;42,9;"Salgadinhos";0;0;un;Ativo
+1000;"São Francisco 1L";"Produto de qualidade";33,00;18,15;81,8;"Cachaças";0;0;un;Ativo
+1058;"Vodka Smirnoff Melancia 1L";"Produto de qualidade";69,00;34,50;100,0;"Vodkas";0;0;un;Ativo
+1045;"Amendoim Sem Pele Fritz ";"Produto de qualidade";5,50;3,85;42,9;"Salgadinhos";0;0;un;Ativo
+1029;"Caip ice uva ";"Produto de qualidade";35,00;19,25;81,8;"Caipi Ice";0;0;un;Ativo
+703;"Eisenbahn Verde";"Produto de qualidade";6,50;4,55;42,9;"Cervejas";0;0;un;Ativo
+1054;"Gin Bombay Sapphire Dry 750ml";"Produto de qualidade";139,00;69,50;100,0;"Gins";0;0;un;Pausado
+976;"Palheiro Tradicional";"Produto de qualidade";12,00;7,20;66,7;"Tabacaria e Cigarros";0;0;un;Ativo
+999;"Velho Barreiro 1L";"Produto de qualidade";24,50;14,70;66,7;"Cachaças";0;0;un;Ativo
+891;"Vodka Absolut Tradicional";"Produto de qualidade";115,00;57,50;100,0;"Vodkas";0;0;un;Ativo
+1046;"Amendoim Salgado Fritz ";"Produto de qualidade";5,50;3,85;42,9;"Salgadinhos";0;0;un;Ativo
+1023;"Caip ice de uva 0% ";"Produto de qualidade";33,00;18,15;81,8;"Caipi Ice";0;0;un;Ativo
+1034;"Da Roça Amarelinha 1L";"Produto de qualidade";20,00;12,00;66,7;"Cachaças";0;0;un;Ativo
+1055;"Gin Bombay Bramble  Dry 750ml";"Produto de qualidade";145,00;72,50;100,0;"Gins";0;0;un;Pausado
+706;"Império 269ml";"Produto de qualidade";4,00;2,80;42,9;"Cervejas";0;0;un;Ativo
+974;"Palheiro Uva";"Produto de qualidade";12,00;7,20;66,7;"Tabacaria e Cigarros";0;0;un;Ativo
+898;"Vodka Absolut Citron";"Produto de qualidade";129,00;64,50;100,0;"Vodkas";0;0;un;Ativo
+1024;"Caip ice abacaxi 0%";"Produto de qualidade";33,00;18,15;81,8;"Caipi Ice";0;0;un;Ativo
+1035;"Canelinha da Rocha 1L";"Produto de qualidade";20,00;12,00;66,7;"Cachaças";0;0;un;Pausado
+981;"Carvão";"Produto de qualidade";4,00;2,80;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+1056;"Gin Bombay Sapphire Dry 1,750ml ";"Produto de qualidade";289,90;144,95;100,0;"Gins";0;0;un;Ativo
+707;"Império 350ml";"Produto de qualidade";5,00;3,50;42,9;"Cervejas";0;0;un;Ativo
+895;"Vodka Absolut Elyx";"Produto de qualidade";129,00;64,50;100,0;"Vodkas";0;0;un;Ativo
+1030;"Caip ice Abacaxi ";"Produto de qualidade";35,00;19,25;81,8;"Caipi Ice";0;0;un;Ativo
+694;"Itaipava 269ml";"Produto de qualidade";3,50;2,45;42,9;"Cervejas";0;0;un;Pausado
+894;"Vodka Absolut Extrakt";"Produto de qualidade";134,00;67,00;100,0;"Vodkas";0;0;un;Ativo
+982;"Alumínio";"Produto de qualidade";3,50;2,45;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+1031;"Caip GT Maracujá ";"Produto de qualidade";39,00;21,45;81,8;"Caipi Ice";0;0;un;Ativo
+695;"Itaipava 350ml";"Produto de qualidade";4,00;2,80;42,9;"Cervejas";0;0;un;Ativo
+893;"Vodka Absolut Melancia";"Produto de qualidade";139,50;69,75;100,0;"Vodkas";0;0;un;Ativo
+1032;"Caip Beats limão ";"Produto de qualidade";39,00;21,45;81,8;"Caipi Ice";0;0;un;Ativo
+971;"Eight Solto";"Produto de qualidade";0,50;0,35;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+713;"Longneck Budweiser";"Produto de qualidade";8,00;5,60;42,9;"Cervejas";0;0;un;Ativo
+897;"Vodka Absolut Raspberry";"Produto de qualidade";139,00;69,50;100,0;"Vodkas";0;0;un;Ativo
+965;"Carlton Solto";"Produto de qualidade";1,50;1,05;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+714;"Longneck Corona";"Produto de qualidade";10,00;7,00;42,9;"Cervejas";0;0;un;Ativo
+892;"Vodka Absolut Peppar";"Produto de qualidade";139,00;69,50;100,0;"Vodkas";0;0;un;Ativo
+715;"Longneck Heineken";"Produto de qualidade";10,00;7,00;42,9;"Cervejas";0;0;un;Ativo
+963;"Rothmans Vermelho Solto";"Produto de qualidade";1,00;0,70;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+896;"Vodka Absolut Vanilla";"Produto de qualidade";139,00;69,50;100,0;"Vodkas";0;0;un;Ativo
+716;"Longneck Heineken 0%";"Produto de qualidade";10,00;7,00;42,9;"Cervejas";0;0;un;Ativo
+961;"Rothmans Branco Solto";"Produto de qualidade";1,00;0,70;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+1059;"Vodka Smirnoff Gold Apple 1L";"Produto de qualidade";389,00;194,50;100,0;"Vodkas";0;0;un;Ativo
+719;"Longneck Skol Beats GT";"Produto de qualidade";12,00;7,20;66,7;"Cervejas";0;0;un;Ativo
+969;"Marlboro Melancia Solto";"Produto de qualidade";1,50;1,05;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+888;"Vodka Ciroc Abacaxi";"Produto de qualidade";289,90;144,95;100,0;"Vodkas";0;0;un;Ativo
+979;"Gudang Garand Solto";"Produto de qualidade";3,00;2,10;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+718;"Longneck Skol Beats Senses";"Produto de qualidade";12,00;7,20;66,7;"Cervejas";0;0;un;Ativo
+887;"Vodka Ciroc Black Raspberry";"Produto de qualidade";289,00;144,50;100,0;"Vodkas";0;0;un;Ativo
+717;"Longneck Stella";"Produto de qualidade";8,00;5,60;42,9;"Cervejas";0;0;un;Ativo
+967;"Marlboro Vermelho Solto";"Produto de qualidade";1,50;1,05;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+889;"Vodka Ciroc Coconut";"Produto de qualidade";289,00;144,50;100,0;"Vodkas";0;0;un;Ativo
+696;"Original 269ml";"Produto de qualidade";5,00;3,50;42,9;"Cervejas";0;0;un;Ativo
+977;"Palheiro Tradicional Solto";"Produto de qualidade";2,00;1,40;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+886;"Vodka Ciroc Maçã Verde";"Produto de qualidade";295,00;147,50;100,0;"Vodkas";0;0;un;Ativo
+697;"Original 350ml";"Produto de qualidade";6,00;4,20;42,9;"Cervejas";0;0;un;Ativo
+973;"Palheiro Menta Solto";"Produto de qualidade";2,00;1,40;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+884;"Vodka Ciroc Melancia";"Produto de qualidade";295,00;147,50;100,0;"Vodkas";0;0;un;Ativo
+975;"Palheiro Uva Solto";"Produto de qualidade";2,00;1,40;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+705;"Petra 350ml";"Produto de qualidade";5,50;3,85;42,9;"Cervejas";0;0;un;Ativo
+890;"Vodka Ciroc Pêssego";"Produto de qualidade";249,00;124,50;100,0;"Vodkas";0;0;un;Ativo
+980;"Essências Sabores";"Produto de qualidade";18,00;10,80;66,7;"Tabacaria e Cigarros";0;0;un;Ativo
+692;"Skol 269ml";"Produto de qualidade";4,50;3,15;42,9;"Cervejas";0;0;un;Ativo
+885;"Vodka Ciroc Moschino";"Produto de qualidade";289,00;144,50;100,0;"Vodkas";0;0;un;Ativo
+989;"Gás para Isqueiro";"Produto de qualidade";20,00;12,00;66,7;"Tabacaria e Cigarros";0;0;un;Ativo
+693;"Skol 350ml";"Produto de qualidade";5,00;3,50;42,9;"Cervejas";0;0;un;Ativo
+883;"Vodka Ciroc Tradicional";"Produto de qualidade";210,00;105,00;100,0;"Vodkas";0;0;un;Ativo
+992;"Isqueiro BIC G";"Produto de qualidade";7,50;5,25;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+712;"Skol Beats GT";"Produto de qualidade";8,00;5,60;42,9;"Cervejas";0;0;un;Ativo
+1095;"Vodka Ciroc Red Berry ";"Produto de qualidade";210,00;105,00;100,0;"Vodkas";0;0;un;Ativo
+991;"Isqueiro BIC P";"Produto de qualidade";6,50;4,55;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+711;"Skol Beats Senses";"Produto de qualidade";8,00;5,60;42,9;"Cervejas";0;0;un;Ativo
+1060;"Vodka Grey Goose Orange 750ml";"Produto de qualidade";195,00;97,50;100,0;"Vodkas";0;0;un;Ativo
+993;"Isqueiro Paraguai";"Produto de qualidade";5,00;3,50;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+710;"Spaten 350ml";"Produto de qualidade";7,00;4,90;42,9;"Cervejas";0;0;un;Ativo
+1061;"Vodka Grey Goose Melancia 750 ml ";"Produto de qualidade";198,00;99,00;100,0;"Vodkas";0;0;un;Ativo
+986;"Piteira Papel";"Produto de qualidade";12,00;7,20;66,7;"Tabacaria e Cigarros";0;0;un;Ativo
+1062;"Vodka Grey Goose Pera 750 ml";"Produto de qualidade";189,00;94,50;100,0;"Vodkas";0;0;un;Ativo
+985;"Piteira Vidro";"Produto de qualidade";3,50;2,45;42,9;"Tabacaria e Cigarros";0;0;un;Pausado
+988;"Recipiente OCB Pratinho";"Produto de qualidade";67,00;33,50;100,0;"Tabacaria e Cigarros";0;0;un;Ativo
+984;"Seda Vidro";"Produto de qualidade";12,00;7,20;66,7;"Tabacaria e Cigarros";0;0;un;Pausado
+983;"Seda ZOMO";"Produto de qualidade";5,00;3,50;42,9;"Tabacaria e Cigarros";0;0;un;Ativo
+990;"Tabaco";"Produto de qualidade";24,00;14,40;66,7;"Tabacaria e Cigarros";0;0;un;Ativo
