@@ -103,7 +103,7 @@ export function MotoboyClosureTab() {
       const { data, error } = await supabase.rpc('list_motoboy_payment_orders' as any, {
         p_motoboy_id: null, p_status: null, p_start: null, p_end: null,
       } as any);
-      if (error) { console.warn('[MPO] list error', error.message); return []; }
+      if (error) { console.error('[MPO] list error', error.message); throw error; }
       return (data as any[]) || [];
     },
     refetchInterval: 30000,
@@ -149,7 +149,7 @@ export function MotoboyClosureTab() {
       const { data, error } = await supabase.rpc('list_motoboy_manual_extras' as any, {
         p_motoboy_id: null, p_start: null, p_end: null, p_only_unpaid: false,
       } as any);
-      if (error) { console.warn('[MME] list', error.message); return []; }
+      if (error) { console.error('[MME] list', error.message); throw error; }
       return (data as ManualExtra[]) || [];
     },
     refetchInterval: 30000,

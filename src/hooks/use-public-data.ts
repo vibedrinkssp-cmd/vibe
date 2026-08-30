@@ -144,7 +144,7 @@ export function usePublicBanners(options: { enabled?: boolean } = {}) {
         .eq('is_active', true)
         .order('sort_order', { ascending: true });
       
-      if (error) { console.warn('[usePublicBanners] query error:', error.message); return []; }
+      if (error) { console.error('[usePublicBanners] query error:', error.message); throw error; }
       return (data || []).map(mapPublicBanner);
     },
     enabled,

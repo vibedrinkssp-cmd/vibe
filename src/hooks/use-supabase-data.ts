@@ -60,8 +60,8 @@ export function useProducts(options: { enabled?: boolean; activeOnly?: boolean }
       if (activeOnly) query = query.eq('is_active', true);
       const { data, error } = await query;
       if (error) {
-        console.warn('[useProducts] query error, returning empty:', error.message);
-        return [];
+        console.error('[useProducts] query error:', error.message);
+        throw error;
       }
       return (data || []).map(mapProduct);
     },
@@ -85,8 +85,8 @@ export function useCategories(options: { enabled?: boolean; activeOnly?: boolean
       if (activeOnly) query = query.eq('is_active', true);
       const { data, error } = await query;
       if (error) {
-        console.warn('[useCategories] query error, returning empty:', error.message);
-        return [];
+        console.error('[useCategories] query error:', error.message);
+        throw error;
       }
       return (data || []).map(mapCategory);
     },
@@ -108,7 +108,7 @@ export function useOrders(options: { enabled?: boolean; userId?: string; refetch
     queryFn: async () => {
       if (useLogRpc) {
         const { data, error } = await (supabase.rpc as any)('get_log_orders_complete');
-        if (error) { console.warn('[useOrders] Log RPC error:', error.message); return []; }
+        if (error) { console.error('[useOrders] Log RPC error:', error.message); throw error; }
         return (data || []).map(mapAdminOrder);
       }
       if (useKitchenRpc) {
@@ -123,25 +123,25 @@ export function useOrders(options: { enabled?: boolean; userId?: string; refetch
           data = retry.data; error = retry.error;
         }
         if (error) {
-          console.warn('[useOrders] Kitchen RPC failed after retry:', error.message);
+          console.error('[useOrders] Kitchen RPC failed after retry:', error.message);
           throw error;
         }
         return (data || []).map(mapKitchenOrderWithItems);
       }
       if (useAdminRpc) {
         const { data, error } = await supabase.rpc('get_admin_orders_complete');
-        if (error) { console.warn('[useOrders] RPC error:', error.message); return []; }
+        if (error) { console.error('[useOrders] RPC error:', error.message); throw error; }
         return (data || []).map(mapAdminOrder);
       }
       if (useRpc && userId) {
         const { data, error } = await supabase.rpc('get_user_orders', { p_user_id: userId });
-        if (error) { console.warn('[useOrders] RPC error:', error.message); return []; }
+        if (error) { console.error('[useOrders] RPC error:', error.message); throw error; }
         return (data || []).map(mapOrder);
       }
       let query = supabase.from('orders').select(ORDER_COLUMNS).order('created_at', { ascending: false });
       if (userId) query = query.eq('user_id', userId);
       const { data, error } = await query;
-      if (error) { console.warn('[useOrders] query error:', error.message); return []; }
+      if (error) { console.error('[useOrders] query error:', error.message); throw error; }
       return (data || []).map(mapOrder);
     },
     enabled,
@@ -177,11 +177,11 @@ export function useUsers(options: { enabled?: boolean; useAdminRpc?: boolean } =
     queryFn: async () => {
       if (useAdminRpc) {
         const { data, error } = await supabase.rpc('get_all_users');
-        if (error) { console.warn('[useUsers] RPC error:', error.message); return []; }
+        if (error) { console.error('[useUsers] RPC error:', error.message); throw error; }
         return (data || []).map(mapUser);
       }
       const { data, error } = await supabase.from('users').select(USER_COLUMNS);
-      if (error) { console.warn('[useUsers] query error:', error.message); return []; }
+      if (error) { console.error('[useUsers] query error:', error.message); throw error; }
       return (data || []).map(mapUser);
     },
     enabled,
@@ -199,13 +199,13 @@ export function useMotoboys(options: { enabled?: boolean; activeOnly?: boolean; 
     queryFn: async () => {
       if (useAdminRpc) {
         const { data, error } = await supabase.rpc('get_all_motoboys');
-        if (error) { console.warn('[useMotoboys] RPC error:', error.message); return []; }
+        if (error) { console.error('[useMotoboys] RPC error:', error.message); throw error; }
         return (data || []).map(mapMotoboy);
       }
       let query = supabase.from('motoboys').select(MOTOBOY_COLUMNS).order('slot_number', { ascending: true, nullsFirst: false });
       if (activeOnly) query = query.eq('is_active', true);
       const { data, error } = await query;
-      if (error) { console.warn('[useMotoboys] query error:', error.message); return []; }
+      if (error) { console.error('[useMotoboys] query error:', error.message); throw error; }
       return (data || []).map(mapMotoboy);
     },
     enabled,
@@ -224,7 +224,7 @@ export function useBanners(options: { enabled?: boolean; activeOnly?: boolean } 
       let query = supabase.from('banners').select(BANNER_COLUMNS).order('sort_order', { ascending: true });
       if (activeOnly) query = query.eq('is_active', true);
       const { data, error } = await query;
-      if (error) { console.warn('[useBanners] query error:', error.message); return []; }
+      if (error) { console.error('[useBanners] query error:', error.message); throw error; }
       return (data || []).map(mapBanner);
     },
     enabled,
@@ -242,7 +242,7 @@ export function useSettings(options: { enabled?: boolean } = {}) {
     queryKey: ['settings'],
     queryFn: async () => {
       const { data, error } = await supabase.from('settings').select('*').limit(1).maybeSingle();
-      if (error) { console.warn('[useSettings] query error:', error.message); return null; }
+      if (error) { console.error('[useSettings] query error:', error.message); throw error; }
       return data ? mapSettings(data) : null;
     },
     enabled,
@@ -260,11 +260,11 @@ export function useAddresses(userId: string, options: { enabled?: boolean; useAd
     queryFn: async () => {
       if (useAdminRpc) {
         const { data, error } = await supabase.rpc('get_all_addresses');
-        if (error) { console.warn('[useAddresses] RPC error:', error.message); return []; }
+        if (error) { console.error('[useAddresses] RPC error:', error.message); throw error; }
         return (data || []).map(mapAddress);
       }
       const { data, error } = await supabase.rpc('get_user_addresses', { p_user_id: userId });
-      if (error) { console.warn('[useAddresses] RPC error:', error.message); return []; }
+      if (error) { console.error('[useAddresses] RPC error:', error.message); throw error; }
       return (data || []).map(mapAddress);
     },
     enabled: enabled && !!userId,
