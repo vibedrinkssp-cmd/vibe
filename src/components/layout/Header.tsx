@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/co
 import { useCart } from '@/lib/cart';
 import { useAuth } from '@/lib/auth';
 import { motion, AnimatePresence } from 'framer-motion';
-import logoImage from '@/assets/logo-vm.jpg';
+import logoImage from '@/assets/logo-vibedrinks.gif';
 
 interface HeaderProps {
   onCartOpen: () => void;

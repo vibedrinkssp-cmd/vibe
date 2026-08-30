@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import splashBg from '@/assets/splash-bg.png';
-import appIcon from '@/assets/app-icon.jpg';
+import appIcon from '@/assets/logo-vibedrinks.gif';
 
 const PHRASES = [
   'Preparando sua experiência...',

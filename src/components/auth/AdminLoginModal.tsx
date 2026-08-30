@@ -15,7 +15,7 @@ import { useAuth } from '@/lib/auth';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client-safe';
 
-import logoImage from '@/assets/logo-vm.jpg';
+import logoImage from '@/assets/logo-vibedrinks.gif';
 
 type RoleType = 'admin' | 'pdv' | 'kitchen' | 'log';
 

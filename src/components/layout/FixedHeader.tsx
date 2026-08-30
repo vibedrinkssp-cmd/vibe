@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/lib/auth';
 import { AdminLoginModal } from '@/components/auth/AdminLoginModal';
 import { MotoboySelectModal } from '@/components/auth/MotoboySelectModal';
-import logoImage from '@/assets/logo-vm.jpg';
+import logoImage from '@/assets/logo-vibedrinks.gif';
 import instagramIcon from '@/assets/instagram-icon.jpg';
 import { triggerPWAInstallPrompt, directInstallPWA } from '@/components/PWAInstallPrompt';
 

@@ -4,7 +4,7 @@ import { usePagerOrders, type PagerOrder } from '@/hooks/use-pager-orders';
 import { usePagerAds } from '@/hooks/use-pager-ads';
 import { ensureImageUrl } from '@/lib/supabase';
 import type { OrderType } from '@/shared/schema';
-import logoVm from '@/assets/logo-vm-brasil.png';
+import logoVm from '@/assets/logo-vibedrinks.gif';
 
 // Continuous alternation: orders panel for a while, then ONE ad, then orders
 // again, then the NEXT ad — never ads-only, never stuck in standby.

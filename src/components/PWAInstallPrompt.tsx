@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Share, Plus, MoreVertical, Download, Smartphone } from 'lucide-react';
-import appIcon from '@/assets/app-icon.jpg';
+import appIcon from '@/assets/logo-vibedrinks.gif';
 import {
   safeLocalStorageGetItem,
   safeLocalStorageSetItem,

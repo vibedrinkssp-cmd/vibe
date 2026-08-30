@@ -1,6 +1,6 @@
 import iconPdv from '@/assets/icon-pdv.png';
 import iconTotem from '@/assets/icon-totem.png';
-import iconVm from '@/assets/icon-vm.jpg';
+import iconVm from '@/assets/logo-vibedrinks.gif';
 import iconIfood from '@/assets/icon-ifood.jpg';
 import icon99food from '@/assets/icon-99food.jpg';
 import iconIfoodTest from '@/assets/icon-ifood-test.png';

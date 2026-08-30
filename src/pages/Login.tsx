@@ -18,7 +18,7 @@ import { z } from 'zod';
 import { AddressAutocomplete } from '@/components/location/AddressAutocomplete';
 import { InteractiveAddressMap } from '@/components/location/InteractiveAddressMap';
 import { useGoogleMaps, type AddressComponents } from '@/hooks/use-google-maps';
-import logoImage from '@/assets/logo-vm.jpg';
+import logoImage from '@/assets/logo-vibedrinks.gif';
 import { supabase } from '@/integrations/supabase/client-safe';
 
 // Validation schemas

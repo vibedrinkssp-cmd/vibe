@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react';
 import { normalizeSearch } from '@/lib/text-utils';
 import { ShoppingCart, Plus, Minus, Trash2, CreditCard, Banknote, QrCode, X, Search, ChevronLeft, CheckCircle2, Store, Wine, Gift, Leaf, Cookie, Sandwich, Flame, Loader2, HelpCircle, ChevronRight, Settings } from 'lucide-react';
 import { TotemPrintTicketsModal } from '@/components/totem/TotemPrintTicketsModal';
-import totemLogo from '@/assets/totem-logo.gif';
+import totemLogo from '@/assets/logo-vibedrinks.gif';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Disable framer-motion layout animations globally for totem performance

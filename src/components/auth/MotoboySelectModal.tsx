@@ -17,7 +17,7 @@ import { resilientRpc } from '@/lib/resilient-rpc';
 import { supabase } from '@/integrations/supabase/client-safe';
 import { formatCPF, validateCPF, cleanCPF } from '@/lib/cpf-utils';
 
-import logoImage from '@/assets/logo-vm.jpg';
+import logoImage from '@/assets/logo-vibedrinks.gif';
 
 type MotoboyView = 'main' | 'login' | 'register';
 
