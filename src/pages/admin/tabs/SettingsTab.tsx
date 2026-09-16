@@ -30,7 +30,6 @@ const SOUND_TYPES: { id: NotificationSoundType; label: string; emoji: string }[]
   { id: 'generic', label: 'Genérico', emoji: '🔔' },
   { id: 'ifood', label: 'iFood', emoji: '🟥' },
   { id: 'delivery', label: 'Delivery', emoji: '🛵' },
-  { id: 'totem', label: 'Totem', emoji: '🖥️' },
   { id: 'pdv', label: 'PDV', emoji: '🏪' },
   { id: 'kitchen', label: 'Cozinha', emoji: '👨‍🍳' },
   { id: 'logistics', label: 'Logística', emoji: '📦' },

@@ -34,7 +34,7 @@ const POSITIONS: { key: Position; label: string; icon: any; color: string }[] = 
   { key: 'logistica', label: 'LOGÍSTICA', icon: Truck, color: 'bg-blue-500' },
   { key: 'cozinha', label: 'COZINHA', icon: ChefHat, color: 'bg-orange-500' },
   { key: 'caixa', label: 'CAIXA', icon: Wallet, color: 'bg-green-600' },
-  { key: 'pdv', label: 'PDV / TOTEM', icon: Smartphone, color: 'bg-purple-600' },
+  { key: 'pdv', label: 'PDV', icon: Smartphone, color: 'bg-purple-600' },
 ];
 
 interface ScheduleEmployee {
@@ -92,7 +92,7 @@ function positionsNeeded(intensity: Intensity): Position[] {
   // Hierarquia de importância (ordem de preenchimento):
   // 1º COZINHA (essencial — produção)
   // 2º CAIXA (pode acumular PDV se necessário)
-  // 3º PDV (atendimento/totem)
+  // 3º PDV (atendimento)
   // 4º LOGÍSTICA (menos crítico — pode ser absorvido)
   switch (intensity) {
     case 'idle': return [];

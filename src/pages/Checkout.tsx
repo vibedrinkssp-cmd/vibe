@@ -288,7 +288,7 @@ export default function Checkout() {
   const promotionDiscount = promotionResult.total;
   const total = cartTotal + deliveryFee - couponDiscount;
 
-  // Pedido mínimo de R$20 (exceto PDV e Totem)
+  // Pedido mínimo de R$20 (exceto PDV)
   const MIN_ORDER_VALUE = 20;
   const isBelowMinimum = cartTotal < MIN_ORDER_VALUE;
 

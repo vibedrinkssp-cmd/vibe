@@ -28,7 +28,6 @@ export type NotificationSoundType =
   | ScreenSoundId
   | 'ifood'
   | 'delivery'
-  | 'totem'
   | 'cancelled'
   | 'status_update'
   | 'arrived';

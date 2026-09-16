@@ -30,8 +30,6 @@ const PDV = lazy(() => import("@/pages/PDV"));
 const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
 const Profile = lazy(() => import("@/pages/Profile"));
 const Financeiro = lazy(() => import("@/pages/Financeiro"));
-const TotemPanel = lazy(() => import("@/pages/TotemPanel"));
-const TotemPanelLinux = lazy(() => import("@/pages/TotemPanelLinux"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const Arckane = lazy(() => import("@/pages/Arckane"));
 const Manager = lazy(() => import("@/pages/Manager"));
@@ -47,7 +45,7 @@ const shouldShowSplashOnLoad = () => {
   if (safeSessionStorageGetItem(SPLASH_SESSION_KEY)) return false;
   if (window.location.pathname !== '/' && window.location.pathname !== '') return false;
   // Staff pages never show splash
-  const staffPaths = ['/admin', '/pdv', '/cozinha', '/log', '/motoboy', '/manager', '/totempanel', '/totempanel-linux', '/financeiro', '/pager', '/ponto'];
+  const staffPaths = ['/admin', '/pdv', '/cozinha', '/log', '/motoboy', '/manager', '/financeiro', '/pager', '/ponto'];
   if (staffPaths.some(p => window.location.pathname.startsWith(p))) return false;
   return true;
 };
@@ -79,8 +77,6 @@ function AppRoutes() {
         <Route path="/pdv" element={<PDV />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/financeiro" element={<Financeiro />} />
-        <Route path="/totempanel" element={<TotemPanel />} />
-        <Route path="/totempanel-linux" element={<TotemPanelLinux />} />
         <Route path="/arckane" element={<Arckane />} />
         <Route path="/manager" element={<Manager />} />
         <Route path="/log" element={<Log />} />

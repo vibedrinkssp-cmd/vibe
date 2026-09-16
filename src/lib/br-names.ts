@@ -1,4 +1,4 @@
-// AUTO-GENERATED. Lista de nomes brasileiros para autocomplete do totem.
+// AUTO-GENERATED. Lista de nomes brasileiros para autocomplete de cliente.
 // Combinação primeiro-nome + sobrenome no autocomplete gera milhares de variações.
 
 export const BR_FIRST_NAMES: readonly string[] = [

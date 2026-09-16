@@ -277,14 +277,13 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
 };
 
 // Order type
-export type OrderType = 'delivery' | 'pickup' | 'local' | 'counter' | 'totem';
+export type OrderType = 'delivery' | 'pickup' | 'local' | 'counter';
 
 export const ORDER_TYPE_LABELS: Record<OrderType, string> = {
   delivery: 'Delivery',
   pickup: 'Retirada',
   local: 'Local',
   counter: 'Balcão',
-  totem: 'Totem',
 };
 
 // Salesperson - now uses dynamic employee names from the database

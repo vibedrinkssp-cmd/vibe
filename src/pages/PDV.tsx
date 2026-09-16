@@ -174,7 +174,7 @@ export default function PDV() {
   const { user, role, logout, isHydrated } = useAuth();
   const categoryScrollRef = useRef<HTMLDivElement>(null);
 
-  // Cupom geral aplicado (PDV/Totem) — nível componente, limpo ao trocar de rascunho/concluir venda
+  // Cupom geral aplicado (PDV) — nível componente, limpo ao trocar de rascunho/concluir venda
   const [appliedCoupon, setAppliedCoupon] = useState<PosCoupon | null>(null);
   
   // --- Draft tabs state (hidratado do localStorage para sobreviver a refresh/ErrorBoundary) ---
@@ -772,7 +772,7 @@ export default function PDV() {
   const surchargeValue = parseFloat(manualSurcharge) || 0;
   const orderSubtotal = subtotal + customDrinksTotal + surchargeValue;
 
-  // Desconto de cupom geral (PDV/Totem) aplicado sobre categorias elegíveis
+  // Desconto de cupom geral (PDV) aplicado sobre categorias elegíveis
   const couponDiscount = useMemo(() => {
     if (!appliedCoupon) return 0;
     const regularItems = cart.map(i => ({

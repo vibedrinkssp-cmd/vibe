@@ -4,7 +4,7 @@ import type { OrderStatus } from '@/shared/schema';
 
 interface OrderTrackingTimelineProps {
   status: OrderStatus;
-  orderType: 'delivery' | 'pickup' | 'local' | 'counter' | 'totem';
+  orderType: 'delivery' | 'pickup' | 'local' | 'counter';
   timestamps?: {
     createdAt?: string | null;
     acceptedAt?: string | null;

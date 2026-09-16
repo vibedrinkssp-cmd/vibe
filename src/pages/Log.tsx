@@ -176,7 +176,7 @@ export default function Log() {
   };
 
   // LOG (Logística/Separação) recebe TODO pedido novo de QUALQUER origem:
-  // PDV/Balcão, Delivery, Totem, iFood/Rappi/99food. Não precisa aprovação manual —
+  // PDV/Balcão, Delivery, iFood/Rappi/99food. Não precisa aprovação manual —
   // os pedidos já entram aceitos automaticamente pela trigger trg_auto_accept_order.
   //
   // REGRA DE SEGURANÇA (REDE ANTI-PEDIDO PERDIDO):
@@ -203,7 +203,6 @@ export default function Log() {
     switch (originFilter) {
       case 'vm_delivery': return !external && (order.orderType === 'delivery' || order.orderType === 'pickup');
       case 'pdv': return !external && order.orderType === 'counter';
-      case 'totem': return !external && order.orderType === 'totem';
       case 'ifood': return order.salesperson?.toLowerCase() === 'ifood' && order.externalOrigin !== 'ifood_test';
       case '99food': return order.salesperson?.toLowerCase() === '99food';
       case 'ifood_test': return order.externalOrigin === 'ifood_test';
@@ -215,7 +214,6 @@ export default function Log() {
     all: logOrders.length,
     vm_delivery: logOrders.filter(o => !isExternalOrder(o) && (o.orderType === 'delivery' || o.orderType === 'pickup')).length,
     pdv: logOrders.filter(o => !isExternalOrder(o) && o.orderType === 'counter').length,
-    totem: logOrders.filter(o => !isExternalOrder(o) && o.orderType === 'totem').length,
     ifood: logOrders.filter(o => o.salesperson?.toLowerCase() === 'ifood' && o.externalOrigin !== 'ifood_test').length,
     '99food': logOrders.filter(o => o.salesperson?.toLowerCase() === '99food').length,
     ifood_test: logOrders.filter(o => o.externalOrigin === 'ifood_test').length,
@@ -423,7 +421,7 @@ export default function Log() {
       );
     }
     
-    // Pedidos sem entrega (counter/totem/pickup): etapa de PREPARAÇÃO na logística.
+    // Pedidos sem entrega (counter/pickup): etapa de PREPARAÇÃO na logística.
     // Antes de ficar pronto -> "Marcar Preparado" (ready) -> aparece no PAGER para o cliente.
     // Já pronto -> "Retirado pelo Cliente" (delivered, opcional; o cron conclui em 5 min).
     if (order.status === 'ready') {

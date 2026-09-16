@@ -1,5 +1,5 @@
 /**
- * Cupons gerais (não atribuídos a clientes) para uso no PDV e Totem.
+ * Cupons gerais (não atribuídos a clientes) para uso no PDV.
  * Validação e redenção via RPCs atômicas (validate_pos_coupon / redeem_pos_coupon).
  */
 import { supabase } from '@/integrations/supabase/client';

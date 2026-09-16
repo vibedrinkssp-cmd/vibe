@@ -1,4 +1,4 @@
-// Aba de cupons do PDV — cadastrados via wizard, não atribuídos a clientes (Totem não usa)
+// Aba de cupons do PDV — cadastrados via wizard, não atribuídos a clientes
 import { useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -197,7 +197,7 @@ export function PosCouponsTab() {
           <h2 className="text-xl font-bold flex items-center gap-2">
             <Ticket className="w-5 h-5 text-primary" /> Cupons do PDV
           </h2>
-          <p className="text-sm text-muted-foreground">Cupons gerais usados pelo operador no PDV (não disponíveis no Totem). Validade por data/hora, percentual e categorias.</p>
+          <p className="text-sm text-muted-foreground">Cupons gerais usados pelo operador no PDV. Validade por data/hora, percentual e categorias.</p>
         </div>
         <Button onClick={openCreate} className="gap-2">
           <Plus className="w-4 h-4" /> Novo cupom

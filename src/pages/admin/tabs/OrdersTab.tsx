@@ -1,4 +1,4 @@
-// Orders Tab Component with sub-tabs: VM Delivery, PDV, Totem, iFood
+// Orders Tab Component with sub-tabs: VM Delivery, PDV, iFood
 import { useState } from 'react';
 import { normalizeSearch } from '@/lib/text-utils';
 import { Check, X, Trash2, ChevronLeft, ChevronRight, Search, Wifi, WifiOff, CheckCircle2, Package, Store, Eye, RefreshCw, Edit2, PackageCheck } from 'lucide-react';
@@ -223,8 +223,6 @@ export function OrdersTab() {
         return !external && (order.orderType === 'delivery' || order.orderType === 'pickup');
       case 'pdv':
         return !external && order.orderType === 'counter';
-      case 'totem':
-        return !external && order.orderType === 'totem';
       case 'ifood':
         return order.salesperson?.toLowerCase() === 'ifood' && order.externalOrigin !== 'ifood_test';
       case '99food':
@@ -241,7 +239,6 @@ export function OrdersTab() {
     all: allOrdersWithDetails.filter(o => o.status === 'pending').length,
     vm_delivery: allOrdersWithDetails.filter(o => !isExternalOrder(o) && (o.orderType === 'delivery' || o.orderType === 'pickup') && o.status === 'pending').length,
     pdv: allOrdersWithDetails.filter(o => !isExternalOrder(o) && o.orderType === 'counter' && o.status === 'pending').length,
-    totem: allOrdersWithDetails.filter(o => !isExternalOrder(o) && o.orderType === 'totem' && o.status === 'pending').length,
     ifood: allOrdersWithDetails.filter(o => o.salesperson?.toLowerCase() === 'ifood' && o.externalOrigin !== 'ifood_test' && o.status === 'pending').length,
     '99food': allOrdersWithDetails.filter(o => o.salesperson?.toLowerCase() === '99food' && o.status === 'pending').length,
     ifood_test: allOrdersWithDetails.filter(o => o.externalOrigin === 'ifood_test' && o.status === 'pending').length,
@@ -251,7 +248,6 @@ export function OrdersTab() {
     all: allOrdersWithDetails.filter(o => !['delivered', 'cancelled'].includes(o.status)).length,
     vm_delivery: allOrdersWithDetails.filter(o => !isExternalOrder(o) && (o.orderType === 'delivery' || o.orderType === 'pickup') && !['delivered', 'cancelled'].includes(o.status)).length,
     pdv: allOrdersWithDetails.filter(o => !isExternalOrder(o) && o.orderType === 'counter' && !['delivered', 'cancelled'].includes(o.status)).length,
-    totem: allOrdersWithDetails.filter(o => !isExternalOrder(o) && o.orderType === 'totem' && !['delivered', 'cancelled'].includes(o.status)).length,
     ifood: allOrdersWithDetails.filter(o => o.salesperson?.toLowerCase() === 'ifood' && o.externalOrigin !== 'ifood_test' && !['delivered', 'cancelled'].includes(o.status)).length,
     '99food': allOrdersWithDetails.filter(o => o.salesperson?.toLowerCase() === '99food' && !['delivered', 'cancelled'].includes(o.status)).length,
     ifood_test: allOrdersWithDetails.filter(o => o.externalOrigin === 'ifood_test' && !['delivered', 'cancelled'].includes(o.status)).length,

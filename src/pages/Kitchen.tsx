@@ -195,7 +195,6 @@ export default function Kitchen() {
     switch (originFilter) {
       case 'vm_delivery': return !external && (order.orderType === 'delivery' || order.orderType === 'pickup');
       case 'pdv': return !external && order.orderType === 'counter';
-      case 'totem': return !external && order.orderType === 'totem';
       case 'ifood': return order.salesperson?.toLowerCase() === 'ifood' && order.externalOrigin !== 'ifood_test';
       case '99food': return order.salesperson?.toLowerCase() === '99food';
       case 'ifood_test': return order.externalOrigin === 'ifood_test';
@@ -212,7 +211,6 @@ export default function Kitchen() {
     all: kitchenBase.length,
     vm_delivery: kitchenBase.filter(o => o.orderType === 'delivery' || o.orderType === 'pickup').length,
     pdv: kitchenBase.filter(o => o.orderType === 'counter').length,
-    totem: kitchenBase.filter(o => o.orderType === 'totem').length,
     ifood: 0,
     '99food': 0,
     ifood_test: 0,
@@ -405,7 +403,7 @@ export default function Kitchen() {
           {editBtn}
         </div>
       );
-      // Counter/totem/pickup: order is on the pager "Pronto p/ Retirada".
+      // Counter/pickup: order is on the pager "Pronto p/ Retirada".
       // Mark delivered when the customer collects it at the counter.
       return (
         <Button

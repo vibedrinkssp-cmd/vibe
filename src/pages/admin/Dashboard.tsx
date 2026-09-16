@@ -213,7 +213,6 @@ export default function AdminDashboard() {
           const orderType = event.payload?.order_type;
           const notes = event.payload?.notes || '';
           const isIfood = notes.toLowerCase().includes('ifood') || notes.toLowerCase().includes('plataforma:');
-          const isTotem = orderType === 'pickup' && notes.toLowerCase().includes('totem');
           const isPdv = orderType === 'counter';
           const isDelivery = orderType === 'delivery';
 
@@ -229,8 +228,6 @@ export default function AdminDashboard() {
 
           if (isIfood) {
             toast({ title: '🟥 Pedido iFood recebido!' });
-          } else if (isTotem) {
-            toast({ title: '🖥️ Pedido do Totem!' });
           } else if (isPdv) {
             toast({ title: '🏪 Pedido PDV registrado!' });
           } else if (isDelivery) {

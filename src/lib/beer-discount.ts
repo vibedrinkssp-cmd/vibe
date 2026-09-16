@@ -1,5 +1,5 @@
 /**
- * Unified beer discount system — same rules for PDV, delivery, and totem.
+ * Unified beer discount system — same rules for PDV and delivery.
  *
  * Rules:
  * - Original 269ml / Budweiser: fardo = 8 units, 15% discount (per product)
@@ -58,7 +58,7 @@ export interface BeerCartItem {
 }
 
 /**
- * Calculate beer discounts for any cart (PDV, delivery, totem).
+ * Calculate beer discounts for any cart (PDV, delivery).
  * - Original 269ml / Budweiser: 8+ units per product → 15%
  * - All other cervejas: 12+ total regular beer units → 20%
  */

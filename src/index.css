@@ -943,9 +943,3 @@
     padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
   }
 }
-
-/* ── Totem Panel: wider modals ── */
-.totem-panel [role="dialog"] {
-  width: min(600px, 95vw) !important;
-  max-width: min(600px, 95vw) !important;
-}

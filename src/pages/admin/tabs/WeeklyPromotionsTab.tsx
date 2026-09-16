@@ -158,7 +158,7 @@ export function WeeklyPromotionsTab() {
             Promoções Semanais
           </h2>
           <p className="text-sm text-muted-foreground">
-            Cadastre descontos que se repetem em determinado dia da semana. Aplicados automaticamente no PDV, Totem e Home.
+            Cadastre descontos que se repetem em determinado dia da semana. Aplicados automaticamente no PDV e Home.
           </p>
         </div>
         <Button onClick={openNew} className="gap-2">

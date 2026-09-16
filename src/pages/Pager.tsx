@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { Store, Tablet, ShoppingBag, Volume2, VolumeX, Maximize } from 'lucide-react';
+import { Store, ShoppingBag, Volume2, VolumeX, Maximize } from 'lucide-react';
 import { usePagerOrders, type PagerOrder } from '@/hooks/use-pager-orders';
 import { usePagerAds } from '@/hooks/use-pager-ads';
 import { ensureImageUrl } from '@/lib/supabase';
@@ -15,7 +15,6 @@ const AD_INTERVAL_MS = 12_000;
 
 const ORIGIN_META: Record<string, { label: string; Icon: typeof Store }> = {
   counter: { label: 'BALCÃO', Icon: Store },
-  totem: { label: 'TOTEM', Icon: Tablet },
   pickup: { label: 'RETIRADA', Icon: ShoppingBag },
 };
 
