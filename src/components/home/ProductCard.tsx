@@ -40,7 +40,7 @@ export function ProductCard({ product, categoryName }: ProductCardProps) {
         data-testid={`card-product-${product.id}`}
         onClick={() => setShowDetail(true)}
       >
-        <div className="aspect-[3/1] relative overflow-hidden bg-gradient-to-br from-secondary/60 to-secondary/40">
+        <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-secondary/60 to-secondary/40">
           {product.imageUrl ? (
             <SmartImage
               path={product.imageUrl}

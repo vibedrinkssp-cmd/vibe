@@ -375,32 +375,31 @@ export default function AdminDashboard() {
         </>
       )}
 
-      {/* Tabs Navigation */}
-      <div className="border-b border-primary/20 bg-card/50 flex-shrink-0">
-        <ScrollArea className="w-full">
-          <div className="flex p-2 gap-1 min-w-max">
+      <div className="flex-1 flex min-h-0 overflow-hidden">
+        {/* Sidebar Navigation (desktop) */}
+        <aside className="hidden md:flex md:flex-col w-56 flex-shrink-0 border-r border-primary/20 bg-card/50 overflow-y-auto">
+          <div className="flex flex-col p-2 gap-1">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               const showBadge = tab.id === 'macos' && emptyPacksCount > 0;
-              const labelClass = (tab as any).alwaysShowLabel ? 'inline' : 'hidden sm:inline';
               return (
                 <Button
                   key={tab.id}
                   variant={isActive ? "default" : "ghost"}
                   size="sm"
-                  className={`flex items-center gap-2 whitespace-nowrap ${
-                    isActive 
-                      ? "bg-primary text-primary-foreground" 
+                  className={`flex items-center justify-start gap-2 whitespace-nowrap ${
+                    isActive
+                      ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                   onClick={() => setActiveTab(tab.id)}
                   data-testid={`tab-${tab.id}`}
                 >
-                  <Icon className="h-4 w-4" />
-                  <span className={labelClass}>{tab.label}</span>
+                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">{tab.label}</span>
                   {showBadge && (
-                    <Badge variant="destructive" className="ml-1 h-4 px-1 text-[10px]">
+                    <Badge variant="destructive" className="ml-auto h-4 px-1 text-[10px]">
                       {emptyPacksCount}
                     </Badge>
                   )}
@@ -408,19 +407,57 @@ export default function AdminDashboard() {
               );
             })}
           </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
-      </div>
+        </aside>
 
-      {/* Tab Content */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="p-4 md:p-6 max-w-7xl mx-auto pb-20">
-          {/* Auto-unlock substitui o prompt de áudio — primeira interação libera */}
-          <Suspense fallback={<TabSkeleton />}>
-            {renderTabContent()}
-          </Suspense>
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          {/* Tabs Navigation (mobile) */}
+          <div className="md:hidden border-b border-primary/20 bg-card/50 flex-shrink-0">
+            <ScrollArea className="w-full">
+              <div className="flex p-2 gap-1 min-w-max">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
+                  const showBadge = tab.id === 'macos' && emptyPacksCount > 0;
+                  const labelClass = (tab as any).alwaysShowLabel ? 'inline' : 'hidden sm:inline';
+                  return (
+                    <Button
+                      key={tab.id}
+                      variant={isActive ? "default" : "ghost"}
+                      size="sm"
+                      className={`flex items-center gap-2 whitespace-nowrap ${
+                        isActive
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                      onClick={() => setActiveTab(tab.id)}
+                      data-testid={`tab-mobile-${tab.id}`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span className={labelClass}>{tab.label}</span>
+                      {showBadge && (
+                        <Badge variant="destructive" className="ml-1 h-4 px-1 text-[10px]">
+                          {emptyPacksCount}
+                        </Badge>
+                      )}
+                    </Button>
+                  );
+                })}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+
+          {/* Tab Content */}
+          <main className="flex-1 overflow-y-auto">
+            <div className="p-4 md:p-6 max-w-7xl mx-auto pb-20">
+              {/* Auto-unlock substitui o prompt de áudio — primeira interação libera */}
+              <Suspense fallback={<TabSkeleton />}>
+                {renderTabContent()}
+              </Suspense>
+            </div>
+          </main>
         </div>
-      </main>
+      </div>
       <AdminTutorialModal
         open={showTutorial}
         onOpenChange={setShowTutorial}
