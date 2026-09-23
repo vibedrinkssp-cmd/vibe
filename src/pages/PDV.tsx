@@ -75,6 +75,7 @@ import { explodeCopaoToOrderItems, isRecipeDrink } from '@/lib/copao-recipe';
 import { calculatePdvBeerDiscount } from '@/lib/beer-discount';
 import { calcPosCouponDiscount, redeemPosCoupon, validatePosCoupon, type PosCoupon } from '@/lib/pos-coupon';
 import { computeCartPromoDiscount, inferCustomDrinkTypeKey, useActivePromotions } from '@/lib/weekly-promotions';
+import { returnBottleDoses, returnManyBottleDoses } from '@/lib/deduct-bottle-doses';
 import { PanelSwitcher } from '@/components/admin/PanelSwitcher';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useVisualViewportHeight } from '@/hooks/use-visual-viewport-height';
@@ -253,6 +254,10 @@ export default function PDV() {
   }, []);
 
   const handleRemoveDraft = useCallback((id: string) => {
+    // Doses já debitadas pros drinks desse rascunho nunca são vendidas se o
+    // rascunho é descartado — estorna antes de apagar (best-effort).
+    const removedDrinks = drafts[id]?.pdvCustomDrinks;
+    if (removedDrinks?.length) void returnManyBottleDoses(removedDrinks);
     setDraftOrder(prev => {
       const next = prev.filter(d => d !== id);
       if (next.length === 0) {
@@ -272,7 +277,7 @@ export default function PDV() {
       });
       return next;
     });
-  }, [activeDraftId]);
+  }, [activeDraftId, drafts]);
 
   const draftTabs: DraftTab[] = draftOrder.map((id, i) => ({
     id,
@@ -839,7 +844,11 @@ export default function PDV() {
   }, [toast, setPdvCustomDrinks]);
 
   const handleRemoveCustomDrink = useCallback((drinkId: string) => {
-    setPdvCustomDrinks(prev => prev.filter(d => d.id !== drinkId));
+    setPdvCustomDrinks(prev => {
+      const removed = prev.find(d => d.id === drinkId);
+      if (removed) void returnBottleDoses(removed);
+      return prev.filter(d => d.id !== drinkId);
+    });
   }, [setPdvCustomDrinks]);
 
   const handleAddLooseCigarettes = useCallback((items: LooseCigaretteSelection[]) => {

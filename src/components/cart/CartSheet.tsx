@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ensureImageUrl } from '@/lib/supabase';
 import { hasRealEnergetico } from '@/lib/copao-recipe';
+import { returnManyBottleDoses } from '@/lib/deduct-bottle-doses';
 
 interface CartSheetProps {
   open: boolean;
@@ -36,6 +37,14 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
     } else {
       navigate('/login?redirect=/checkout');
     }
+  };
+
+  // Esvaziar o carrinho aqui é desistência do cliente (diferente do clearCart
+  // pós-compra no Checkout) — precisa estornar as doses já debitadas ao montar
+  // os drinks, senão o controle de garrafa fica descontado sem venda nenhuma.
+  const handleClearCart = () => {
+    if (customDrinks.length > 0) void returnManyBottleDoses(customDrinks);
+    clearCart();
   };
 
   const regularItems = items.filter(item => !item.isComboItem);
@@ -373,7 +382,7 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
                 <Button
                   variant="outline"
                   className="border-border text-foreground hover:bg-muted/60 hover:text-foreground min-h-[48px]"
-                  onClick={clearCart}
+                  onClick={handleClearCart}
                   data-testid="button-clear-cart"
                 >
                   <Trash2 className="h-4 w-4" />

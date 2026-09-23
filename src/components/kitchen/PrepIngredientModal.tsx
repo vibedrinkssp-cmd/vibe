@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client-safe';
 import { queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { deductBottleDose } from '@/lib/deduct-bottle-doses';
 import type { OrderItem, Product } from '@/shared/schema';
 
 interface OpenBottle {
@@ -141,11 +142,8 @@ export function PrepIngredientModal({
     try {
       for (const item of selectedItems) {
         if (item.type === 'bottle') {
-          const { error } = await supabase.rpc('deduct_bottle_doses', {
-            p_bottle_id: item.bottleId,
-            p_doses_used: item.quantity,
-          });
-          if (error) throw new Error(`Garrafa ${item.name}: ${error.message}`);
+          const err = await deductBottleDose(item.bottleId, item.quantity);
+          if (err) throw new Error(`Garrafa ${item.name}: ${err}`);
         } else {
           const { error } = await supabase.rpc('deduct_product_stock', {
             p_product_id: item.productId,

@@ -16,6 +16,7 @@ import type { CustomDrink, CustomDrinkDose, CustomDrinkEnergetico, CustomDrinkFr
 import { nanoid } from 'nanoid';
 import { supabase } from '@/integrations/supabase/client-safe';
 import { queryClient } from '@/lib/queryClient';
+import { deductBottleDose } from '@/lib/deduct-bottle-doses';
 import { useDrinkFruits } from '@/hooks/use-drink-fruits';
 import { getFruitEmoji } from '@/lib/emoji-icons';
 
@@ -28,11 +29,8 @@ import { getFruitEmoji } from '@/lib/emoji-icons';
  */
 async function deductRecentDrinkBottles(drink: CustomDrink): Promise<{ ok: true } | { ok: false; itemName: string }> {
   for (const d of drink.doses ?? []) {
-    const { error } = await supabase.rpc('deduct_bottle_doses', {
-      p_bottle_id: d.bottleId,
-      p_doses_used: d.doseCount,
-    });
-    if (error) return { ok: false, itemName: d.bottleName };
+    const err = await deductBottleDose(d.bottleId, d.doseCount);
+    if (err) return { ok: false, itemName: d.bottleName };
   }
   if (drink.energetico?.type === 'garrafa') {
     const { data: bottle } = await supabase
@@ -43,11 +41,8 @@ async function deductRecentDrinkBottles(drink: CustomDrink): Promise<{ ok: true 
       .limit(1)
       .maybeSingle();
     if (bottle) {
-      const { error } = await supabase.rpc('deduct_bottle_doses', {
-        p_bottle_id: bottle.id,
-        p_doses_used: (drink.quantity || 1),
-      });
-      if (error) return { ok: false, itemName: drink.energetico.productName };
+      const err = await deductBottleDose(bottle.id, drink.quantity || 1);
+      if (err) return { ok: false, itemName: drink.energetico.productName };
     }
   }
   queryClient.invalidateQueries({ queryKey: ['open-bottles-kitchen'] });

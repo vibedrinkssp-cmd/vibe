@@ -11,6 +11,7 @@ import { nanoid } from 'nanoid';
 import { mapProduct } from '@/lib/db-mappers';
 import { fetchAllowedByType, filterByAllowedProducts } from '@/lib/allowed-bottles';
 import { filterVisibleIceFlavorOptions, getIceFlavorPhotoUrl, iceAgua } from '@/lib/ice-flavor-icons';
+import { deductBottleDose } from '@/lib/deduct-bottle-doses';
 import type { Product } from '@/shared/schema';
 import { TierBottleCarousel, type AvailableBottleWithTier } from './TierBottleCarousel';
 import type { CustomDrink } from '@/shared/schema';
@@ -370,11 +371,8 @@ export function CustomDrinkModal({ open, onOpenChange, drinkType, onAddCustomDri
     try {
       if (selectedEnergetico.kind === 'bottle') {
         // Free energético from open bottle – deduct 1 dose per drink quantity
-        const { error } = await supabase.rpc('deduct_bottle_doses', {
-          p_bottle_id: selectedEnergetico.bottle.id,
-          p_doses_used: qty,
-        });
-        if (error) { toast({ title: `Erro ao deduzir energético: ${error.message}`, variant: 'destructive' }); return false; }
+        const err = await deductBottleDose(selectedEnergetico.bottle.id, qty);
+        if (err) { toast({ title: `Erro ao deduzir energético: ${err}`, variant: 'destructive' }); return false; }
       } else if (selectedEnergetico.kind === 'baly') {
         // BALY/BIG BOSS 2L: localiza o produto real e usa auto_consume_energy_dose
         // (consome doses de garrafa aberta E auto-abre nova quando esgota, descontando estoque)
@@ -466,8 +464,8 @@ export function CustomDrinkModal({ open, onOpenChange, drinkType, onAddCustomDri
     if (!resolvedBottles || resolvedBottles.length === 0) { toast({ title: 'Selecione ao menos um destilado', variant: 'destructive' }); return false; }
 
     for (const sb of resolvedBottles) {
-      const { error } = await supabase.rpc('deduct_bottle_doses', { p_bottle_id: sb.bottle.id, p_doses_used: sb.doses * quantity });
-      if (error) { toast({ title: `Erro ao deduzir doses de ${sb.bottle.product_name}`, variant: 'destructive' }); return false; }
+      const err = await deductBottleDose(sb.bottle.id, sb.doses * quantity);
+      if (err) { toast({ title: `Erro ao deduzir doses de ${sb.bottle.product_name}`, variant: 'destructive' }); return false; }
     }
     if (selectedEnergetico) {
       const ok = await deductEnergeticoStock(quantity);

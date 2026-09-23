@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useMemo, type ReactNode
 import type { Product, CartItem, ComboData, CustomDrink } from '@/shared/schema';
 import { CERVEJAS_CATEGORY_ID, calculateBeerDiscount } from '@/lib/beer-discount';
 import { computeCartPromoDiscount, mapCartItemsForPromotions, useActivePromotions, type PromoMatch } from '@/lib/weekly-promotions';
+import { returnBottleDoses } from '@/lib/deduct-bottle-doses';
 import {
   safeLocalStorageGetJson,
   safeLocalStorageSetItem,
@@ -158,8 +159,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCustomDrinks(prev => [...prev, drink]);
   };
 
+  // Doses são debitadas da garrafa aberta ao MONTAR o drink (dentro do wizard),
+  // não ao finalizar o pedido — então remover do carrinho antes de comprar
+  // precisa estornar, senão o controle de garrafa fica descontado sem venda.
+  // Best-effort: não bloqueia a remoção do carrinho se o estorno falhar.
   const removeCustomDrink = (drinkId: string) => {
-    setCustomDrinks(prev => prev.filter(d => d.id !== drinkId));
+    setCustomDrinks(prev => {
+      const removed = prev.find(d => d.id === drinkId);
+      if (removed) void returnBottleDoses(removed);
+      return prev.filter(d => d.id !== drinkId);
+    });
   };
 
   const clearCart = () => {
