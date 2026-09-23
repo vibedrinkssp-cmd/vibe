@@ -55,6 +55,7 @@ const BodySchema = z.discriminatedUnion('action', [
   }).passthrough(),
   z.object({ action: z.literal('register-payment'), sessionToken: z.string().min(1).optional(), customerId: z.string().uuid(), amount: z.number().positive(), paymentMethod: z.enum(PAYMENT_METHODS) }).passthrough(),
   z.object({ action: z.literal('delete-entry'), sessionToken: z.string().min(1).optional(), entryId: z.string().uuid() }).passthrough(),
+  z.object({ action: z.literal('delete-customer'), sessionToken: z.string().min(1).optional(), customerId: z.string().uuid() }).passthrough(),
 ]);
 
 class HttpError extends Error {
@@ -240,6 +241,19 @@ async function deleteEntry(supabase: ReturnType<typeof createClient>, entryId: s
   return { success: true as const };
 }
 
+async function deleteCustomer(supabase: ReturnType<typeof createClient>, customerId: string) {
+  // Cascade: caderneta_entries e caderneta_payments têm ON DELETE CASCADE em customer_id.
+  const { data, error } = await (supabase.from('caderneta_customers') as any)
+    .delete()
+    .eq('id', customerId)
+    .select('id')
+    .maybeSingle();
+
+  if (error) throw new HttpError(500, error.message);
+  if (!data) throw new HttpError(404, 'Cliente não encontrado');
+  return { success: true as const };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
@@ -285,6 +299,9 @@ serve(async (req) => {
       case 'delete-entry':
         ensureRole(session.role, ADMIN_ROLES);
         return new Response(JSON.stringify(await deleteEntry(supabase, parsed.data.entryId)), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      case 'delete-customer':
+        ensureRole(session.role, ADMIN_ROLES);
+        return new Response(JSON.stringify(await deleteCustomer(supabase, parsed.data.customerId)), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erro interno do servidor';

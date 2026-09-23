@@ -13,6 +13,7 @@ import { queryClient } from '@/lib/queryClient';
 import { useAuth } from '@/lib/auth';
 import {
   createCadernetaCustomer,
+  deleteCadernetaCustomer,
   deleteCadernetaEntry,
   getCadernetaLedger,
   listCadernetaCustomers,
@@ -78,6 +79,7 @@ export function CadernetaTab({ readOnly = false, sessionTokenOverride }: { readO
   const [paymentAmount, setPaymentAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [confirmDeleteDialog, setConfirmDeleteDialog] = useState<{ entryId: string } | null>(null);
+  const [confirmDeleteCustomerDialog, setConfirmDeleteCustomerDialog] = useState<{ id: string; name: string; balance: number } | null>(null);
   const [periodPreset, setPeriodPreset] = useState<'all' | 'today' | '7d' | '30d' | 'month' | 'custom'>('all');
   const [customStart, setCustomStart] = useState('');
   const [customEnd, setCustomEnd] = useState('');
@@ -180,6 +182,26 @@ export function CadernetaTab({ readOnly = false, sessionTokenOverride }: { readO
     },
     onError: (error: Error) => {
       toast({ title: 'Erro ao excluir lançamento', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  const deleteCustomerMutation = useMutation({
+    mutationFn: async (customerId: string) => {
+      if (!sessionToken) {
+        throw new Error('Sessão administrativa expirada. Faça login novamente.');
+      }
+
+      await deleteCadernetaCustomer(sessionToken, customerId);
+    },
+    onSuccess: (_data, customerId) => {
+      queryClient.invalidateQueries({ queryKey: ['caderneta-customers-admin'] });
+      queryClient.invalidateQueries({ queryKey: ['caderneta-ledger'] });
+      if (selectedCustomerId === customerId) setSelectedCustomerId(null);
+      toast({ title: 'Cliente excluído' });
+      setConfirmDeleteCustomerDialog(null);
+    },
+    onError: (error: Error) => {
+      toast({ title: 'Erro ao excluir cliente', description: error.message, variant: 'destructive' });
     },
   });
 
@@ -381,18 +403,20 @@ export function CadernetaTab({ readOnly = false, sessionTokenOverride }: { readO
                   const balance = balances[c.id] || 0;
                   const isSelected = selectedCustomerId === c.id;
                   return (
-                    <button
+                    <div
                       key={c.id}
-                      type="button"
-                      className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors ${
+                      className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${
                         isSelected ? 'bg-violet-500/15 border-l-2 border-violet-500' : 'hover:bg-muted/50'
                       }`}
-                      onClick={() => setSelectedCustomerId(c.id)}
                     >
-                      <div className="flex items-center gap-2 min-w-0">
+                      <button
+                        type="button"
+                        className="flex items-center gap-2 min-w-0 flex-1 text-left"
+                        onClick={() => setSelectedCustomerId(c.id)}
+                      >
                         <User className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
                         <span className="text-sm font-medium truncate">{c.name}</span>
-                      </div>
+                      </button>
                       {balance > 0 && (
                         <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-xs flex-shrink-0 ml-2">
                           {formatCurrency(balance)}
@@ -403,7 +427,20 @@ export function CadernetaTab({ readOnly = false, sessionTokenOverride }: { readO
                           OK
                         </Badge>
                       )}
-                    </button>
+                      {!readOnly && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 ml-1 text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setConfirmDeleteCustomerDialog({ id: c.id, name: c.name, balance });
+                          }}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                    </div>
                   );
                 })}
               </div>
@@ -615,6 +652,34 @@ export function CadernetaTab({ readOnly = false, sessionTokenOverride }: { readO
               onClick={() => confirmDeleteDialog && deleteEntryMutation.mutate(confirmDeleteDialog.entryId)}
             >
               {deleteEntryMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Excluir'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirm delete customer */}
+      <Dialog open={!!confirmDeleteCustomerDialog} onOpenChange={() => setConfirmDeleteCustomerDialog(null)}>
+        <DialogContent className="max-w-xs">
+          <DialogHeader>
+            <DialogTitle>Excluir Cliente</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir <strong>{confirmDeleteCustomerDialog?.name}</strong>?
+              {confirmDeleteCustomerDialog && confirmDeleteCustomerDialog.balance > 0 && (
+                <span className="block mt-1 text-red-400 font-medium">
+                  Atenção: saldo devedor de {formatCurrency(confirmDeleteCustomerDialog.balance)} será perdido.
+                </span>
+              )}
+              {' '}Todo o histórico de compras e pagamentos desse cliente será apagado. Esta ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setConfirmDeleteCustomerDialog(null)}>Cancelar</Button>
+            <Button
+              variant="destructive"
+              disabled={deleteCustomerMutation.isPending}
+              onClick={() => confirmDeleteCustomerDialog && deleteCustomerMutation.mutate(confirmDeleteCustomerDialog.id)}
+            >
+              {deleteCustomerMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Excluir Cliente'}
             </Button>
           </DialogFooter>
         </DialogContent>

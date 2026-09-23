@@ -199,3 +199,13 @@ export async function deleteCadernetaEntry(
     entryId,
   }, sessionToken);
 }
+
+export async function deleteCadernetaCustomer(
+  sessionToken: string | null,
+  customerId: string,
+): Promise<{ success: true }> {
+  return invokeAdminCaderneta<{ success: true }>({
+    action: 'delete-customer',
+    customerId,
+  }, sessionToken);
+}
