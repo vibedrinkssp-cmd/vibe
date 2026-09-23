@@ -86,8 +86,8 @@ export function SpecialDrinksCarousel({ onSelectType }: SpecialDrinksCarouselPro
                 <Flame className="h-3 w-3 text-white" />
               </div>
             </div>
-            <span className="pointer-events-none px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[8px] font-extrabold uppercase tracking-wide shadow">
-              Toque
+            <span className="max-w-[72px] text-center text-[10px] font-bold text-foreground leading-tight line-clamp-2">
+              {type.label}
             </span>
           </button>
         ))}

@@ -1466,6 +1466,9 @@ export default function PDV() {
                         )}
                       </div>
                       <h3 className="font-medium text-xs sm:text-sm mb-1 line-clamp-2 min-h-[2rem]">{product.name}</h3>
+                      {product.description && (
+                        <p className="text-muted-foreground text-[10px] sm:text-xs line-clamp-2 mb-1">{product.description}</p>
+                      )}
                       <p className="text-primary font-bold text-sm sm:text-base">{formatCurrency(product.salePrice)}</p>
                       {infinite ? (
                         <Badge variant="default" className="mt-1 text-xs bg-green-600">
