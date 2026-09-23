@@ -54,6 +54,15 @@ const BodySchema = z.discriminatedUnion('action', [
     items: z.array(EntryPayloadSchema).min(1),
   }).passthrough(),
   z.object({ action: z.literal('register-payment'), sessionToken: z.string().min(1).optional(), customerId: z.string().uuid(), amount: z.number().positive(), paymentMethod: z.enum(PAYMENT_METHODS) }).passthrough(),
+  z.object({
+    action: z.literal('register-legacy-entry'),
+    sessionToken: z.string().min(1).optional(),
+    customerId: z.string().uuid(),
+    description: z.string().trim().min(1).max(240),
+    totalAmount: z.number().positive(),
+    entryDate: z.string().datetime().nullable().optional(),
+    notes: z.string().trim().max(500).nullable().optional(),
+  }).passthrough(),
   z.object({ action: z.literal('delete-entry'), sessionToken: z.string().min(1).optional(), entryId: z.string().uuid() }).passthrough(),
   z.object({ action: z.literal('delete-customer'), sessionToken: z.string().min(1).optional(), customerId: z.string().uuid() }).passthrough(),
 ]);
@@ -219,6 +228,40 @@ async function registerEntries(supabase: ReturnType<typeof createClient>, custom
   return { success: true as const, count: items.length };
 }
 
+// Fiado antigo (anotado no caderno de papel, de antes do sistema). Ao
+// contrário de registerEntries/create_caderneta_entry, NUNCA resolve
+// product_id (nem por id, nem por nome de produto) e por isso nunca aciona
+// deduct_product_stock — só grava o valor devido, com data retroativa
+// opcional. Evita abater estoque de uma venda que já aconteceu há muito tempo.
+async function registerLegacyEntry(
+  supabase: ReturnType<typeof createClient>,
+  customerId: string,
+  description: string,
+  totalAmount: number,
+  entryDate: string | null | undefined,
+  notes: string | null | undefined,
+) {
+  const tag = '📒 Fiado antigo (caderneta de papel)';
+  const combinedNotes = notes ? `${tag}\n${notes}` : tag;
+
+  const { data, error } = await (supabase.from('caderneta_entries') as any)
+    .insert({
+      customer_id: customerId,
+      product_id: null,
+      product_name: description,
+      quantity: 1,
+      unit_price: totalAmount,
+      total_price: totalAmount,
+      notes: combinedNotes,
+      ...(entryDate ? { created_at: entryDate } : {}),
+    })
+    .select('id, customer_id, product_name, quantity, unit_price, total_price, is_paid, paid_at, created_at, notes')
+    .single();
+
+  if (error) throw new HttpError(500, error.message);
+  return { entry: data };
+}
+
 async function registerPayment(supabase: ReturnType<typeof createClient>, customerId: string, amount: number, paymentMethod: (typeof PAYMENT_METHODS)[number]) {
   const { data, error } = await (supabase.from('caderneta_payments') as any)
     .insert({ customer_id: customerId, amount, payment_method: paymentMethod })
@@ -296,6 +339,9 @@ serve(async (req) => {
       case 'register-payment':
         ensureRole(session.role, ADMIN_ROLES);
         return new Response(JSON.stringify(await registerPayment(supabase, parsed.data.customerId, parsed.data.amount, parsed.data.paymentMethod)), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      case 'register-legacy-entry':
+        ensureRole(session.role, ADMIN_ROLES);
+        return new Response(JSON.stringify(await registerLegacyEntry(supabase, parsed.data.customerId, parsed.data.description, parsed.data.totalAmount, parsed.data.entryDate, parsed.data.notes)), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       case 'delete-entry':
         ensureRole(session.role, ADMIN_ROLES);
         return new Response(JSON.stringify(await deleteEntry(supabase, parsed.data.entryId)), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });

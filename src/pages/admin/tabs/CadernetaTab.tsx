@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { searchIncludes } from '@/lib/text-utils';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { BookOpen, Search, User, Loader2, DollarSign, Trash2, Plus, ArrowLeft, CreditCard, Banknote, Smartphone, Calendar, X, TrendingUp } from 'lucide-react';
+import { BookOpen, Search, User, Loader2, DollarSign, Trash2, Plus, ArrowLeft, CreditCard, Banknote, Smartphone, Calendar, X, TrendingUp, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
 import { useAuth } from '@/lib/auth';
@@ -17,6 +18,7 @@ import {
   deleteCadernetaEntry,
   getCadernetaLedger,
   listCadernetaCustomers,
+  registerCadernetaLegacyEntry,
   registerCadernetaPayment,
 } from '@/lib/caderneta';
 
@@ -78,6 +80,11 @@ export function CadernetaTab({ readOnly = false, sessionTokenOverride }: { readO
   const [paymentDialog, setPaymentDialog] = useState<{ customerId: string; customerName: string; balance: number } | null>(null);
   const [paymentAmount, setPaymentAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [legacyDialog, setLegacyDialog] = useState<{ customerId: string; customerName: string } | null>(null);
+  const [legacyDescription, setLegacyDescription] = useState('');
+  const [legacyAmount, setLegacyAmount] = useState('');
+  const [legacyDate, setLegacyDate] = useState('');
+  const [legacyNotes, setLegacyNotes] = useState('');
   const [confirmDeleteDialog, setConfirmDeleteDialog] = useState<{ entryId: string } | null>(null);
   const [confirmDeleteCustomerDialog, setConfirmDeleteCustomerDialog] = useState<{ id: string; name: string; balance: number } | null>(null);
   const [periodPreset, setPeriodPreset] = useState<'all' | 'today' | '7d' | '30d' | 'month' | 'custom'>('all');
@@ -163,6 +170,35 @@ export function CadernetaTab({ readOnly = false, sessionTokenOverride }: { readO
     },
     onError: (error: Error) => {
       toast({ title: 'Erro ao registrar pagamento', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  const registerLegacyMutation = useMutation({
+    mutationFn: async ({ customerId, description, amount, date, notes }: { customerId: string; description: string; amount: number; date: string; notes: string }) => {
+      if (!sessionToken) {
+        throw new Error('Sessão administrativa expirada. Faça login novamente.');
+      }
+
+      await registerCadernetaLegacyEntry(sessionToken, {
+        customerId,
+        description,
+        totalAmount: amount,
+        entryDate: date ? new Date(`${date}T12:00:00`).toISOString() : null,
+        notes: notes.trim() || null,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['caderneta-customers-admin'] });
+      queryClient.invalidateQueries({ queryKey: ['caderneta-ledger'] });
+      toast({ title: '✅ Fiado antigo lançado!' });
+      setLegacyDialog(null);
+      setLegacyDescription('');
+      setLegacyAmount('');
+      setLegacyDate('');
+      setLegacyNotes('');
+    },
+    onError: (error: Error) => {
+      toast({ title: 'Erro ao lançar fiado antigo', description: error.message, variant: 'destructive' });
     },
   });
 
@@ -269,6 +305,26 @@ export function CadernetaTab({ readOnly = false, sessionTokenOverride }: { readO
       customerId: paymentDialog.customerId,
       amount,
       method: paymentMethod,
+    });
+  };
+
+  const handleLegacyEntry = () => {
+    if (!legacyDialog) return;
+    const amount = parseFloat(legacyAmount.replace(',', '.'));
+    if (!legacyDescription.trim()) {
+      toast({ title: 'Descreva o que foi fiado', variant: 'destructive' });
+      return;
+    }
+    if (isNaN(amount) || amount <= 0) {
+      toast({ title: 'Informe um valor válido', variant: 'destructive' });
+      return;
+    }
+    registerLegacyMutation.mutate({
+      customerId: legacyDialog.customerId,
+      description: legacyDescription.trim(),
+      amount,
+      date: legacyDate,
+      notes: legacyNotes,
     });
   };
 
@@ -492,19 +548,41 @@ export function CadernetaTab({ readOnly = false, sessionTokenOverride }: { readO
                       )}
                     </div>
                   </div>
-                  {saldoDevedor > 0 && !readOnly && (
-                    <Button
-                      size="sm"
-                      className="bg-green-600 hover:bg-green-700"
-                      onClick={() => setPaymentDialog({
-                        customerId: selectedCustomerId!,
-                        customerName: selectedCustomer?.name || '',
-                        balance: saldoDevedor,
-                      })}
-                    >
-                      <DollarSign className="h-4 w-4 mr-1" />
-                      Registrar Pagamento
-                    </Button>
+                  {!readOnly && (
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-violet-500/50 text-violet-400"
+                        onClick={() => {
+                          setLegacyDescription('');
+                          setLegacyAmount('');
+                          setLegacyDate(new Date().toISOString().slice(0, 10));
+                          setLegacyNotes('');
+                          setLegacyDialog({
+                            customerId: selectedCustomerId!,
+                            customerName: selectedCustomer?.name || '',
+                          });
+                        }}
+                      >
+                        <History className="h-4 w-4 mr-1" />
+                        Lançamento Antigo
+                      </Button>
+                      {saldoDevedor > 0 && (
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700"
+                          onClick={() => setPaymentDialog({
+                            customerId: selectedCustomerId!,
+                            customerName: selectedCustomer?.name || '',
+                            balance: saldoDevedor,
+                          })}
+                        >
+                          <DollarSign className="h-4 w-4 mr-1" />
+                          Registrar Pagamento
+                        </Button>
+                      )}
+                    </div>
                   )}
                 </div>
               </CardHeader>
@@ -632,6 +710,69 @@ export function CadernetaTab({ readOnly = false, sessionTokenOverride }: { readO
               onClick={handlePayment}
             >
               {registerPaymentMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Confirmar Pagamento'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Legacy entry dialog */}
+      <Dialog open={!!legacyDialog} onOpenChange={(open) => { if (!open) setLegacyDialog(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="h-5 w-5 text-violet-400" />
+              Lançamento Antigo
+            </DialogTitle>
+            <DialogDescription>
+              {legacyDialog?.customerName} — registra um fiado anotado no caderno de papel, sem mexer no estoque atual.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-1 block">O que foi fiado</label>
+              <Input
+                placeholder="Ex.: 2 cervejas + 1 dose de vodka"
+                value={legacyDescription}
+                onChange={e => setLegacyDescription(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">Valor total</label>
+              <Input
+                type="number"
+                step="0.01"
+                placeholder="0,00"
+                value={legacyAmount}
+                onChange={e => setLegacyAmount(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">Data do fiado</label>
+              <Input
+                type="date"
+                value={legacyDate}
+                onChange={e => setLegacyDate(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">Observações (opcional)</label>
+              <Textarea
+                placeholder="Alguma observação sobre esse lançamento..."
+                value={legacyNotes}
+                onChange={e => setLegacyNotes(e.target.value)}
+                rows={2}
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setLegacyDialog(null)}>Cancelar</Button>
+            <Button
+              className="bg-violet-600 hover:bg-violet-700"
+              disabled={registerLegacyMutation.isPending || !legacyDescription.trim() || !legacyAmount}
+              onClick={handleLegacyEntry}
+            >
+              {registerLegacyMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Lançar Fiado'}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -178,6 +178,22 @@ export async function registerCadernetaEntries(
   }, sessionToken);
 }
 
+// Fiado antigo (anotado no caderno de papel). Não vincula produto nem abate
+// estoque — só registra o valor devido, com data retroativa opcional.
+export async function registerCadernetaLegacyEntry(
+  sessionToken: string | null,
+  params: { customerId: string; description: string; totalAmount: number; entryDate?: string | null; notes?: string | null },
+): Promise<{ entry: CadernetaEntry }> {
+  return invokeAdminCaderneta<{ entry: CadernetaEntry }>({
+    action: 'register-legacy-entry',
+    customerId: params.customerId,
+    description: params.description,
+    totalAmount: params.totalAmount,
+    entryDate: params.entryDate ?? null,
+    notes: params.notes ?? null,
+  }, sessionToken);
+}
+
 export async function registerCadernetaPayment(
   sessionToken: string | null,
   params: { customerId: string; amount: number; paymentMethod: string },
