@@ -40,3 +40,5 @@ Thumbs.db
 
 # Supabase CLI
 supabase/.temp/
+
+.vercel
