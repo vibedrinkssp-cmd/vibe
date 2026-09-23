@@ -1429,11 +1429,19 @@ export default function PDV() {
               </Button>
             </div>
 
+            {/* Banner: Monte Seu Combo */}
+            <FeatureBannerCarousel
+              only="combo"
+              onComboOpen={() => setComboOpen(true)}
+              onSpecialDrinksOpen={() => setSpecialDrinksOpen(true)}
+            />
+
             {/* Monte seu Drink */}
             <SpecialDrinksCarousel onSelectType={handleSelectDrinkType} />
 
-            {/* Banners de Funcionalidades */}
+            {/* Banner: Drinks Especiais */}
             <FeatureBannerCarousel
+              only="special-drinks"
               onComboOpen={() => setComboOpen(true)}
               onSpecialDrinksOpen={() => setSpecialDrinksOpen(true)}
             />

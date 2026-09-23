@@ -158,9 +158,10 @@ export default function Home() {
             Loja fechada no momento — pedidos indisponíveis
           </div>
         )}
-        {/* Feature Banners */}
+        {/* Feature Banner: Monte Seu Combo */}
         <div className="mt-2 md:mt-1">
           <FeatureBannerCarousel
+            only="combo"
             onComboOpen={() => setComboModalOpen(true)}
             onSpecialDrinksOpen={() => setSpecialDrinksOpen(true)}
           />
@@ -180,6 +181,15 @@ export default function Home() {
               setCustomDrinkOpen(true);
             }
           }} />
+        </div>
+
+        {/* Feature Banner: Drinks Especiais */}
+        <div className="pb-2">
+          <FeatureBannerCarousel
+            only="special-drinks"
+            onComboOpen={() => setComboModalOpen(true)}
+            onSpecialDrinksOpen={() => setSpecialDrinksOpen(true)}
+          />
         </div>
 
         {/* Sentinel for intersection observer */}

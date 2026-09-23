@@ -14,6 +14,7 @@ interface FeatureBanner {
 interface FeatureBannerCarouselProps {
   onComboOpen: () => void;
   onSpecialDrinksOpen?: () => void;
+  only?: 'special-drinks' | 'combo';
 }
 
 const DEFAULT_IMAGES: Record<string, string> = {
@@ -23,7 +24,8 @@ const DEFAULT_IMAGES: Record<string, string> = {
 
 export function FeatureBannerCarousel({
   onComboOpen,
-  onSpecialDrinksOpen
+  onSpecialDrinksOpen,
+  only,
 }: FeatureBannerCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isUserInteracting, setIsUserInteracting] = useState(false);
@@ -100,10 +102,11 @@ export function FeatureBannerCarousel({
     };
   }, []);
 
-  const features: FeatureBanner[] = [
+  const allFeatures: FeatureBanner[] = [
     { id: 'special-drinks', title: 'Drinks Especiais', onClick: () => onSpecialDrinksOpen?.() },
     { id: 'combo', title: 'Monte Seu Combo', onClick: onComboOpen },
   ];
+  const features = only ? allFeatures.filter((f) => f.id === only) : allFeatures;
 
   if (imagesLoading) {
     return (
@@ -133,29 +136,33 @@ export function FeatureBannerCarousel({
           if (!imagePath) return null;
 
           return (
-            <button
-              key={feature.id}
-              onClick={feature.onClick}
-              aria-label={feature.title}
-              className="group flex-shrink-0 w-[200px] relative snap-start active:scale-95 transition-transform duration-150 bg-transparent p-0 border-0 rounded-2xl ring-1 ring-primary/30 active:ring-2 active:ring-primary"
-              data-testid={`feature-banner-${feature.id}`}
-              type="button"
-            >
-              <SmartImage
-                path={imagePath}
-                widths={W_CARD}
-                sizes="200px"
-                resize="contain"
-                alt=""
-                aria-hidden="true"
-                className="w-full h-auto block rounded-2xl"
-              />
-              {/* "Toque para pedir" affordance badge */}
-              <span className="pointer-events-none absolute bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/95 text-primary-foreground text-[10px] font-extrabold uppercase tracking-wide shadow-lg backdrop-blur-sm whitespace-nowrap">
-                <Hand className="h-3 w-3" />
-                TOQUE PARA PEDIR
+            <div key={feature.id} className="flex-shrink-0 w-[200px] snap-start">
+              <button
+                onClick={feature.onClick}
+                aria-label={feature.title}
+                className="group relative w-full active:scale-95 transition-transform duration-150 bg-transparent p-0 border-0 rounded-2xl ring-1 ring-primary/30 active:ring-2 active:ring-primary"
+                data-testid={`feature-banner-${feature.id}`}
+                type="button"
+              >
+                <SmartImage
+                  path={imagePath}
+                  widths={W_CARD}
+                  sizes="200px"
+                  resize="contain"
+                  alt=""
+                  aria-hidden="true"
+                  className="w-full h-auto block rounded-2xl"
+                />
+                {/* "Toque para pedir" affordance badge */}
+                <span className="pointer-events-none absolute bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/95 text-primary-foreground text-[10px] font-extrabold uppercase tracking-wide shadow-lg backdrop-blur-sm whitespace-nowrap">
+                  <Hand className="h-3 w-3" />
+                  TOQUE PARA PEDIR
+                </span>
+              </button>
+              <span className="pointer-events-none block mt-1 text-center text-xs font-bold text-foreground">
+                {feature.title}
               </span>
-            </button>
+            </div>
           );
         })}
       </div>
