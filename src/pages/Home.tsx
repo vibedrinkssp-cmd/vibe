@@ -46,7 +46,7 @@ export default function Home() {
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [gridColumns, setGridColumns] = useState<GridColumns>(2);
+  const [gridColumns, setGridColumns] = useState<GridColumns>(3);
   const [sortOrder, setSortOrder] = useState<SortOrder>(null);
   const [isStuck, setIsStuck] = useState(false);
   const stickyRef = useRef<HTMLDivElement>(null);
@@ -73,7 +73,7 @@ export default function Home() {
   const handleHomeReset = useCallback(() => {
     setSelectedCategory(null);
     setSearchQuery('');
-    setGridColumns(2);
+    setGridColumns(3);
     setSortOrder(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);

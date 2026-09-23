@@ -33,10 +33,9 @@ export function ScrollableProductGrid({
       case 1:
         return 'grid-cols-1 max-w-md mx-auto';
       case 2:
-        return 'grid-cols-2';
+        return 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
       case 3:
-        // On very narrow screens fall back to 2 cols to prevent card overflow
-        return 'grid-cols-2 sm:grid-cols-3';
+        return 'grid-cols-3 md:grid-cols-4 lg:grid-cols-6';
     }
   };
 
