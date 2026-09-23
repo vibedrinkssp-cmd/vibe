@@ -49,8 +49,8 @@ const SPIRIT_CLASSES = [
 type SpiritClass = typeof SPIRIT_CLASSES[number]['key'];
 const ENERGETICO_KEYWORDS = ['energetico', 'energético'];
 const GELO_KEYWORDS = ['gelo'];
-const CAN_COUNT = 5;
-const FLAVOR_ICE_COUNT = 5;
+const CAN_COUNT = 4;
+const FLAVOR_ICE_COUNT = 4;
 const COMBO_DISCOUNT = 0.10;
 // Fallback: o gelo de água do combo deve usar o produto real GELO COMUM 5KG.
 const WATER_ICE_FALLBACK_PRICE = 15;

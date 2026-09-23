@@ -379,7 +379,7 @@ export function CashClosureTab() {
     const salesData = [
       ['Total de Vendas', formatCurrency(closure.total_sales || 0)],
       ['Total de Pedidos', String(closure.total_orders || 0)],
-      [`  - Balcão`, String(closure.counter_orders_count || 0)],
+      [`  - Caixa`, String(closure.counter_orders_count || 0)],
       [`  - Delivery`, String(closure.delivery_orders_count || 0)],
       ['', ''],
       ['Formas de Pagamento', ''],

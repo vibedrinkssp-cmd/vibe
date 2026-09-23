@@ -539,10 +539,6 @@ export function ExpandableOrderCard({
                      )}
                    </div>
                   <div className="flex items-center gap-1 md:gap-2 flex-wrap">
-                    <span className="font-semibold text-foreground text-sm md:text-base truncate max-w-[120px] sm:max-w-none" data-testid={`customer-name-${order.id}`}>
-                      {customerName}
-                    </span>
-                    <span className="text-muted-foreground/50 hidden sm:inline">|</span>
                     <Badge variant="outline" className="text-xs" data-testid={`badge-order-type-${order.id}`}>
                       {orderType === 'counter' ? <Store className="h-3 w-3 mr-1" /> : <Truck className="h-3 w-3 mr-1" />}
                       <span className="hidden sm:inline">{ORDER_TYPE_LABELS[orderType]}</span>
@@ -565,6 +561,9 @@ export function ExpandableOrderCard({
                       </span>
                     </div>
                   )}
+                  <span className="font-semibold text-foreground text-sm md:text-base truncate max-w-[200px] sm:max-w-none mt-0.5" data-testid={`customer-name-${order.id}`}>
+                    {customerName}
+                  </span>
                 </div>
               </div>
               

@@ -713,7 +713,7 @@ export default function Financeiro() {
                 <SelectTrigger className="w-32 h-8 text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tipo</SelectItem>
-                  <SelectItem value="counter">Balcão</SelectItem>
+                  <SelectItem value="counter">Caixa</SelectItem>
                   <SelectItem value="delivery">Delivery</SelectItem>
                 </SelectContent>
               </Select>
@@ -755,11 +755,11 @@ export default function Financeiro() {
                 sub={`Após ${formatCurrency(metrics.totalSangrias)} sangrias`}
                 color={metrics.netProfit >= 0 ? 'text-green-400' : 'text-red-400'} />
               <MetricCard icon={Target} label="Ticket Médio" value={formatCurrency(metrics.avgTicket)}
-                sub={`Balcão: ${formatCurrency(metrics.avgTicketCounter)}`} color="text-blue-400" />
+                sub={`Caixa: ${formatCurrency(metrics.avgTicketCounter)}`} color="text-blue-400" />
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <MetricCard icon={ShoppingBag} label="Balcão" value={String(metrics.counterOrders)}
+              <MetricCard icon={ShoppingBag} label="Caixa" value={String(metrics.counterOrders)}
                 sub={formatCurrency(metrics.totalCounter)} color="text-purple-400" />
               <MetricCard icon={Truck} label="Delivery" value={String(metrics.deliveryOrders)}
                 sub={`Taxas: ${formatCurrency(metrics.totalDeliveryFees)}`} color="text-cyan-400" />
@@ -783,7 +783,7 @@ export default function Financeiro() {
                       <YAxis tick={{ fontSize: 10 }} tickFormatter={v => `R$${(v/1000).toFixed(0)}k`} />
                       <Tooltip formatter={(v: number) => formatCurrency(v)} />
                       <Legend />
-                      <Bar dataKey="counter" name="Balcão" fill="#8b5cf6" stackId="a" />
+                      <Bar dataKey="counter" name="Caixa" fill="#8b5cf6" stackId="a" />
                       <Bar dataKey="delivery" name="Delivery" fill="#3b82f6" stackId="a" />
                       <Line dataKey="net" name="Lucro Líq." stroke="#22c55e" strokeWidth={2} dot={false} />
                     </ComposedChart>
@@ -800,7 +800,7 @@ export default function Financeiro() {
                 <CardHeader className="pb-2"><CardTitle className="text-sm">Receita por Canal</CardTitle></CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    <RevenueBar label="Balcão" value={metrics.totalCounter} total={metrics.totalSales} color="bg-purple-500" />
+                    <RevenueBar label="Caixa" value={metrics.totalCounter} total={metrics.totalSales} color="bg-purple-500" />
                     <RevenueBar label="Delivery" value={metrics.totalDelivery} total={metrics.totalSales} color="bg-blue-500" />
                     <RevenueBar label="Plataformas" value={metrics.totalPlatform} total={metrics.totalSales + metrics.totalPlatform} color="bg-amber-500" />
                     <Separator />

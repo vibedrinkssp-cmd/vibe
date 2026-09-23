@@ -191,7 +191,7 @@ export function EmployeeReportSection({ orders, sangrias }: Props) {
                   <TableHead>Funcionário</TableHead>
                   <TableHead className="text-right">Vendas</TableHead>
                   <TableHead className="text-right">Pedidos</TableHead>
-                  <TableHead className="text-right hidden sm:table-cell">Balcão</TableHead>
+                  <TableHead className="text-right hidden sm:table-cell">Caixa</TableHead>
                   <TableHead className="text-right hidden sm:table-cell">Delivery</TableHead>
                   <TableHead className="text-right">Ticket Médio</TableHead>
                   <TableHead className="text-right hidden md:table-cell">Sangrias</TableHead>

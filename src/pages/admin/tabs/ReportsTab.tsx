@@ -294,7 +294,7 @@ export function ReportsTab() {
 
     return Object.entries(salesByDay).map(([date, totals]) => ({ 
       date, 
-      'Balcão': totals.counter,
+      'Caixa': totals.counter,
       'Delivery': totals.delivery,
       total: totals.counter + totals.delivery 
     }));
@@ -390,7 +390,7 @@ export function ReportsTab() {
     const summaryData = [
       ['Total de Vendas', formatCurrency(totals.totalSales)],
       ['Total de Pedidos', String(totals.totalOrders)],
-      [`  - Balcão`, String(totals.counterOrders)],
+      [`  - Caixa`, String(totals.counterOrders)],
       [`  - Delivery`, String(totals.deliveryOrders)],
       ['Ticket Médio', formatCurrency(totals.averageTicket)],
       ['', ''],
@@ -752,7 +752,7 @@ export function ReportsTab() {
                     />
                     <Legend />
                     <Bar 
-                      dataKey="Balcão" 
+                      dataKey="Caixa"
                       stackId="a" 
                       fill="hsl(var(--primary))" 
                       radius={[0, 0, 0, 0]}
@@ -1222,7 +1222,7 @@ export function ReportsTab() {
                   <span className="font-bold ml-2">{formatCurrency(totals.averageTicket)}</span>
                 </div>
                 <div className="text-sm">
-                  <span className="text-muted-foreground">Balcão:</span>
+                  <span className="text-muted-foreground">Caixa:</span>
                   <span className="font-bold ml-2">{totals.counterOrders}</span>
                 </div>
                 <div className="text-sm">

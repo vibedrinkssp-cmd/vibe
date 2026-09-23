@@ -78,7 +78,7 @@ export function CashSessionDetailsDialog({ row, open, onOpenChange }: Props) {
         <div className="space-y-1">
           <h4 className="font-semibold text-sm">Pedidos</h4>
           <Line label="Total de Pedidos" value={String(m.orders_count)} />
-          <Line label="Balcão" value={String(m.counter_orders)} />
+          <Line label="Caixa" value={String(m.counter_orders)} />
           <Line label="Delivery" value={String(m.delivery_orders)} />
           <Line label="Taxas de Entrega" value={formatCurrency(m.delivery_fees)} />
         </div>

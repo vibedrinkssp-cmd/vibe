@@ -119,7 +119,7 @@ export function CloseCashDialog({
               <p className="text-sm font-mono font-bold">{totalOrders}</p>
             </div>
             <div className="rounded-lg border p-2 bg-muted/40 text-center">
-              <p className="text-[10px] text-muted-foreground">Balcão</p>
+              <p className="text-[10px] text-muted-foreground">Caixa</p>
               <p className="text-sm font-mono font-bold">{counterOrders}</p>
             </div>
             <div className="rounded-lg border p-2 bg-muted/40 text-center">

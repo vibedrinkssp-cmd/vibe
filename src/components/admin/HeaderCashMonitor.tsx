@@ -193,7 +193,7 @@ export function HeaderCashMonitor() {
                   <p className="text-xs font-bold font-mono">{lastClosure.total_orders || 0}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-muted-foreground">Balcão</p>
+                  <p className="text-[10px] text-muted-foreground">Caixa</p>
                   <p className="text-xs font-bold font-mono">{lastClosure.counter_orders_count || 0}</p>
                 </div>
                 <div>
@@ -346,7 +346,7 @@ export function HeaderCashMonitor() {
             <p className="text-xs font-bold font-mono">{totalOrders}</p>
           </div>
           <div>
-            <p className="text-[10px] text-muted-foreground">Balcão</p>
+            <p className="text-[10px] text-muted-foreground">Caixa</p>
             <p className="text-xs font-bold font-mono">{summary?.counter_orders || 0}</p>
           </div>
           <div>

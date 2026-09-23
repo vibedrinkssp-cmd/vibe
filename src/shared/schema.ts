@@ -283,7 +283,7 @@ export const ORDER_TYPE_LABELS: Record<OrderType, string> = {
   delivery: 'Delivery',
   pickup: 'Retirada',
   local: 'Local',
-  counter: 'Balcão',
+  counter: 'Caixa',
 };
 
 // Salesperson - now uses dynamic employee names from the database

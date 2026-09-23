@@ -276,7 +276,7 @@ export const CashRegisterIndicator = forwardRef<HTMLDivElement>((_, ref) => {
             {/* Orders breakdown */}
             <div className="p-2 rounded bg-muted/50 text-xs text-muted-foreground grid grid-cols-3 text-center">
               <span>Total: {summary?.total_orders || 0}</span>
-              <span>Balcão: {summary?.counter_orders || 0}</span>
+              <span>Caixa: {summary?.counter_orders || 0}</span>
               <span>Delivery: {summary?.delivery_orders || 0}</span>
             </div>
           </CardContent>

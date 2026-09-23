@@ -968,10 +968,6 @@ export default function PDV() {
   };
 
   const handleConfirmPayment = async () => {
-    if (!customerName.trim()) {
-      toast({ title: 'Informe o nome do cliente', description: 'O nome é obrigatório para chamar o cliente e aparecer no painel de retirada.', variant: 'destructive' });
-      return;
-    }
     if (!paymentMethod) {
       toast({ title: 'Selecione um método de pagamento', variant: 'destructive' });
       return;
@@ -1639,14 +1635,13 @@ export default function PDV() {
 
             <div>
               <Label htmlFor="customerName" className="mb-2 block text-sm font-semibold">
-                Nome do Cliente <span className="text-destructive">*</span> — obrigatório, aparece no painel de retirada
+                Nome do Cliente <span className="text-muted-foreground font-normal">(opcional)</span>
               </Label>
               <CustomerNameInput
                 id="customerName"
                 value={customerName}
                 onChange={setCustomerName}
                 placeholder="Ex: JOÃO"
-                required
               />
             </div>
 
@@ -1717,7 +1712,6 @@ export default function PDV() {
             <Button
               className="w-full py-5 text-base"
               disabled={
-                !customerName.trim() ||
                 !paymentMethod ||
                 createOrderMutation.isPending ||
                 (paymentMethod === 'cash' && !!changeFor && parseFloat(changeFor) > 0 && parseFloat(changeFor) < total)
@@ -1777,7 +1771,7 @@ export default function PDV() {
             open={showPixModal}
             onOpenChange={setShowPixModal}
             amount={compositePixAmount || total}
-            description={`PDV - Pedido Balcão`}
+            description={`PDV - Pedido Caixa`}
             orderId={pendingOrderId || ''}
             referenceId={pendingPixPayload?.tempRef || pendingOrderId || ''}
             onPaymentApproved={handlePixPaymentApproved}
