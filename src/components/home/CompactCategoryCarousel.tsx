@@ -1,4 +1,5 @@
-import { useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Category } from '@/shared/schema';
 import { getCategoryIcon } from '@/lib/category-icons';
 
@@ -15,6 +16,41 @@ export function CompactCategoryCarousel({
   onSelectCategory, 
 }: CompactCategoryCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScroll, setCanScroll] = useState({ left: false, right: false });
+
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScroll({
+      left: el.scrollLeft > 4,
+      right: el.scrollLeft + el.clientWidth < el.scrollWidth - 4,
+    });
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    updateScrollState();
+    const observer = new ResizeObserver(updateScrollState);
+    observer.observe(el);
+    // Mouse wheel (vertical) scrolls the row sideways on desktop
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX) || el.scrollWidth <= el.clientWidth) return;
+      e.preventDefault();
+      el.scrollLeft += e.deltaY;
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      observer.disconnect();
+      el.removeEventListener('wheel', onWheel);
+    };
+  }, [updateScrollState, categories.length]);
+
+  const scrollByPage = (direction: 1 | -1) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction * el.clientWidth * 0.8, behavior: 'smooth' });
+  };
   
   const activeCategories = [...categories]
     .filter(c => c.isActive)
@@ -61,6 +97,7 @@ export function CompactCategoryCarousel({
     <div className="relative px-3" data-testid="compact-category-carousel">
       <div
         ref={scrollRef}
+        onScroll={updateScrollState}
         className="flex gap-2.5 overflow-x-auto scrollbar-hide py-2 overscroll-x-contain"
         data-testid="carousel-categories-compact"
       >
@@ -75,6 +112,26 @@ export function CompactCategoryCarousel({
           />
         ))}
       </div>
+      {canScroll.left && (
+        <button
+          onClick={() => scrollByPage(-1)}
+          aria-label="Ver categorias anteriores"
+          className="hidden md:flex absolute left-1 top-1/2 -translate-y-1/2 z-10 h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg"
+          data-testid="button-categories-prev"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+      )}
+      {canScroll.right && (
+        <button
+          onClick={() => scrollByPage(1)}
+          aria-label="Ver mais categorias"
+          className="hidden md:flex absolute right-1 top-1/2 -translate-y-1/2 z-10 h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg"
+          data-testid="button-categories-next"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+      )}
     </div>
   );
 }
