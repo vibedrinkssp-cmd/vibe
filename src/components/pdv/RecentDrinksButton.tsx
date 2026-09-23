@@ -15,8 +15,46 @@ import { useToast } from '@/hooks/use-toast';
 import type { CustomDrink, CustomDrinkDose, CustomDrinkEnergetico, CustomDrinkFruit, CustomDrinkGelo } from '@/shared/schema';
 import { nanoid } from 'nanoid';
 import { supabase } from '@/integrations/supabase/client-safe';
+import { queryClient } from '@/lib/queryClient';
 import { useDrinkFruits } from '@/hooks/use-drink-fruits';
 import { getFruitEmoji } from '@/lib/emoji-icons';
+
+/**
+ * Repetir uma receita salva ("Últimos") pulava a baixa de doses da garrafa aberta —
+ * só os fluxos originais (Monte seu Drink/Caipirinha/Copão/Caipi Ice) descontavam.
+ * Replica aqui a mesma baixa: destilados pelo bottleId já salvo na receita, e o
+ * energético "de garrafa" (grátis) resolvendo a garrafa aberta atual pelo product_id,
+ * já que a receita salva não guarda o bottleId do energético.
+ */
+async function deductRecentDrinkBottles(drink: CustomDrink): Promise<{ ok: true } | { ok: false; itemName: string }> {
+  for (const d of drink.doses ?? []) {
+    const { error } = await supabase.rpc('deduct_bottle_doses', {
+      p_bottle_id: d.bottleId,
+      p_doses_used: d.doseCount,
+    });
+    if (error) return { ok: false, itemName: d.bottleName };
+  }
+  if (drink.energetico?.type === 'garrafa') {
+    const { data: bottle } = await supabase
+      .from('open_bottles')
+      .select('id')
+      .eq('product_id', drink.energetico.productId)
+      .eq('is_empty', false)
+      .limit(1)
+      .maybeSingle();
+    if (bottle) {
+      const { error } = await supabase.rpc('deduct_bottle_doses', {
+        p_bottle_id: bottle.id,
+        p_doses_used: (drink.quantity || 1),
+      });
+      if (error) return { ok: false, itemName: drink.energetico.productName };
+    }
+  }
+  queryClient.invalidateQueries({ queryKey: ['open-bottles-kitchen'] });
+  queryClient.invalidateQueries({ queryKey: ['open-bottles-prep'] });
+  queryClient.invalidateQueries({ queryKey: ['assembly-bottles'] });
+  return { ok: true };
+}
 
 const STORAGE_KEY = 'pdv-recent-drinks-v1';
 const MAX_ITEMS = 20;
@@ -516,12 +554,22 @@ export function RecentDrinksButton({ onAddCustomDrink }: Props) {
     if (open) refresh();
   }, [open, refresh]);
 
-  const handleAdd = (drink: CustomDrink) => {
+  const handleAdd = async (drink: CustomDrink) => {
+    const result = await deductRecentDrinkBottles(drink);
+    if (!result.ok) {
+      toast({ title: `Doses insuficientes em ${result.itemName}`, description: 'Verifique o controle de doses antes de vender.', variant: 'destructive' });
+      return;
+    }
     onAddCustomDrink({ ...drink, id: nanoid(8), quantity: 1 });
     toast({ title: `${drink.name} adicionado!` });
   };
 
-  const handleEditConfirm = (edited: CustomDrink) => {
+  const handleEditConfirm = async (edited: CustomDrink) => {
+    const result = await deductRecentDrinkBottles(edited);
+    if (!result.ok) {
+      toast({ title: `Doses insuficientes em ${result.itemName}`, description: 'Verifique o controle de doses antes de vender.', variant: 'destructive' });
+      return;
+    }
     onAddCustomDrink({ ...edited, id: nanoid(8), quantity: 1 });
     toast({ title: `${edited.name} adicionado!` });
     setEditing(null);
