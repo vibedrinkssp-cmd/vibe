@@ -388,12 +388,27 @@ export default function Checkout() {
     // Mark coupon as used
     if (selectedCoupon) {
       try {
-        await supabase.rpc('use_coupon_admin', {
+        const { error: couponErr } = await supabase.rpc('use_coupon_admin', {
           p_user_id: user.id,
           p_user_coupon_id: selectedCoupon.id,
           p_order_id: orderId,
         });
-      } catch { /* non-critical */ }
+        if (couponErr) {
+          console.error('[Checkout] Falha ao marcar cupom como usado:', couponErr);
+          toast({
+            title: '⚠️ Cupom não pôde ser confirmado',
+            description: 'Seu pedido foi criado normalmente, mas avise a loja para conferir o cupom.',
+            variant: 'destructive',
+          });
+        }
+      } catch (err) {
+        console.error('[Checkout] Exceção ao marcar cupom como usado:', err);
+        toast({
+          title: '⚠️ Cupom não pôde ser confirmado',
+          description: 'Seu pedido foi criado normalmente, mas avise a loja para conferir o cupom.',
+          variant: 'destructive',
+        });
+      }
     }
 
     return orderId;
