@@ -332,10 +332,10 @@ export default function Manager() {
         </div>
       </header>
 
-      {/* Tab Navigation */}
-      <div className="border-b border-primary/20 bg-card/50 flex-shrink-0">
-        <ScrollArea className="w-full">
-          <div className="flex p-2 gap-2 min-w-max md:min-w-0 md:flex-wrap">
+      <div className="flex-1 flex min-h-0 overflow-hidden">
+        {/* Sidebar Navigation (desktop) */}
+        <aside className="hidden md:flex md:flex-col w-56 flex-shrink-0 border-r border-primary/20 bg-card/50 overflow-y-auto">
+          <div className="flex flex-col p-2 gap-1">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -344,55 +344,85 @@ export default function Manager() {
                   key={tab.id}
                   variant={isActive ? "default" : "ghost"}
                   size="sm"
-                  className={`flex items-center gap-2 whitespace-nowrap border min-w-fit font-medium transition-all ${
-                    isActive 
-                      ? "bg-primary text-primary-foreground border-primary shadow-sm" 
-                      : "border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
+                  className={`flex items-center justify-start gap-2 whitespace-nowrap ${
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                   onClick={() => setActiveTab(tab.id)}
                 >
-                  <Icon className="h-4 w-4" />
-                  <span>{tab.label}</span>
+                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">{tab.label}</span>
                 </Button>
               );
             })}
           </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
-      </div>
+        </aside>
 
-      {/* Tab Content */}
-      <main className="flex-1 overflow-y-auto overflow-x-hidden w-full max-w-full">
-        <div className="p-3 md:p-6 max-w-7xl mx-auto pb-20 w-full min-w-0 overflow-x-hidden">
-          {supabaseAuthMissing && (
-            <div className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive flex items-start gap-3">
-              <Shield className="h-4 w-4 mt-0.5 flex-shrink-0" />
-              <div className="flex-1">
-                <p className="font-semibold">Sessão de banco expirada</p>
-                <p className="text-xs opacity-90 mt-0.5">
-                  Algumas operações que dependem de RLS podem falhar silenciosamente. Faça logout e entre novamente para restaurar permissões.
-                </p>
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          {/* Tab Navigation (mobile) */}
+          <div className="md:hidden border-b border-primary/20 bg-card/50 flex-shrink-0">
+            <ScrollArea className="w-full">
+              <div className="flex p-2 gap-2 min-w-max">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <Button
+                      key={tab.id}
+                      variant={isActive ? "default" : "ghost"}
+                      size="sm"
+                      className={`flex items-center gap-2 whitespace-nowrap border min-w-fit font-medium transition-all ${
+                        isActive
+                          ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                          : "border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
+                      }`}
+                      onClick={() => setActiveTab(tab.id)}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{tab.label}</span>
+                    </Button>
+                  );
+                })}
               </div>
-              <Button
-                size="sm"
-                variant="outline"
-                className="border-destructive/40 text-destructive hover:bg-destructive/20"
-                onClick={() => {
-                  clearManagerSession();
-                  authLogout();
-                  setAuthenticated(false);
-                  setManagerSessionToken(null);
-                }}
-              >
-                Reautenticar
-              </Button>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+
+          {/* Tab Content */}
+          <main className="flex-1 overflow-y-auto overflow-x-hidden w-full max-w-full">
+            <div className="p-3 md:p-6 max-w-7xl mx-auto pb-20 w-full min-w-0 overflow-x-hidden">
+              {supabaseAuthMissing && (
+                <div className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive flex items-start gap-3">
+                  <Shield className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="font-semibold">Sessão de banco expirada</p>
+                    <p className="text-xs opacity-90 mt-0.5">
+                      Algumas operações que dependem de RLS podem falhar silenciosamente. Faça logout e entre novamente para restaurar permissões.
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-destructive/40 text-destructive hover:bg-destructive/20"
+                    onClick={() => {
+                      clearManagerSession();
+                      authLogout();
+                      setAuthenticated(false);
+                      setManagerSessionToken(null);
+                    }}
+                  >
+                    Reautenticar
+                  </Button>
+                </div>
+              )}
+              <Suspense fallback={<TabSkeleton />}>
+                {renderTabContent()}
+              </Suspense>
             </div>
-          )}
-          <Suspense fallback={<TabSkeleton />}>
-            {renderTabContent()}
-          </Suspense>
+          </main>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
