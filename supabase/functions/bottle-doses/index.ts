@@ -32,13 +32,10 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { action, bottle_id, doses } = await req.json().catch(() => ({}));
+    const { action, bottle_id, product_id, doses } = await req.json().catch(() => ({}));
 
-    if (action !== "deduct" && action !== "return") {
+    if (action !== "deduct" && action !== "return" && action !== "return-by-product") {
       return jsonResponse({ success: false, error: "Ação inválida" });
-    }
-    if (typeof bottle_id !== "string" || !UUID_RE.test(bottle_id)) {
-      return jsonResponse({ success: false, error: "ID da garrafa inválido" });
     }
     if (!Number.isInteger(doses) || doses < 1 || doses > MAX_DOSES_PER_CALL) {
       return jsonResponse({ success: false, error: "Quantidade de doses inválida" });
@@ -49,10 +46,33 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    let resolvedBottleId = bottle_id;
+
+    if (action === "return-by-product") {
+      // Estorno do energético "de garrafa" (grátis): a receita salva no client
+      // não guarda o bottleId dele, só o product_id. open_bottles só é legível
+      // por staff via RLS, então resolve aqui (service role, ignora RLS) em vez
+      // de deixar o client (site do cliente, sem sessão de staff) consultar direto.
+      if (typeof product_id !== "string" || !UUID_RE.test(product_id)) {
+        return jsonResponse({ success: false, error: "ID do produto inválido" });
+      }
+      const { data: bottle } = await supabaseAdmin
+        .from("open_bottles")
+        .select("id")
+        .eq("product_id", product_id)
+        .order("emptied_at", { ascending: false, nullsFirst: false })
+        .limit(1)
+        .maybeSingle();
+      if (!bottle) return jsonResponse({ success: true }); // nada pra estornar, não é erro
+      resolvedBottleId = bottle.id;
+    } else if (typeof bottle_id !== "string" || !UUID_RE.test(bottle_id)) {
+      return jsonResponse({ success: false, error: "ID da garrafa inválido" });
+    }
+
     const rpcName = action === "deduct" ? "deduct_bottle_doses" : "return_bottle_doses";
     const rpcArgs = action === "deduct"
-      ? { p_bottle_id: bottle_id, p_doses_used: doses }
-      : { p_bottle_id: bottle_id, p_doses_returned: doses };
+      ? { p_bottle_id: resolvedBottleId, p_doses_used: doses }
+      : { p_bottle_id: resolvedBottleId, p_doses_returned: doses };
 
     const { error } = await supabaseAdmin.rpc(rpcName, rpcArgs);
 

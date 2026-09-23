@@ -8,9 +8,13 @@ import type { CustomDrink } from '@/shared/schema';
 // ter feito um pedido). Todo o front — site do cliente, PDV e Cozinha —
 // passa por aqui, que chama a edge function bottle-doses (valida e limita
 // os valores antes de repassar pra RPC).
-async function invokeBottleDoses(action: 'deduct' | 'return', bottleId: string, doses: number): Promise<string | null> {
+async function invokeBottleDoses(
+  action: 'deduct' | 'return' | 'return-by-product',
+  idField: { bottle_id: string } | { product_id: string },
+  doses: number
+): Promise<string | null> {
   const { data, error } = await supabase.functions.invoke('bottle-doses', {
-    body: { action, bottle_id: bottleId, doses },
+    body: { action, doses, ...idField },
   });
   if (error) return error.message || 'Erro ao ajustar doses';
   if (!data?.success) return data?.error || 'Erro ao ajustar doses';
@@ -28,7 +32,7 @@ export async function deductBottleDoses(
   quantity: number = 1
 ): Promise<boolean> {
   for (const sb of selectedBottles) {
-    const err = await invokeBottleDoses('deduct', sb.bottle.bottle_id, sb.doses * quantity);
+    const err = await invokeBottleDoses('deduct', { bottle_id: sb.bottle.bottle_id }, sb.doses * quantity);
     if (err) {
       onError(sb.bottle.product_name);
       return false;
@@ -40,7 +44,7 @@ export async function deductBottleDoses(
 // Debita um único destilado/energético de garrafa fora do formato
 // SelectedBottleEntry (CustomDrinkModal, PrepIngredientModal, RecentDrinksButton).
 export async function deductBottleDose(bottleId: string, dosesUsed: number): Promise<string | null> {
-  return invokeBottleDoses('deduct', bottleId, dosesUsed);
+  return invokeBottleDoses('deduct', { bottle_id: bottleId }, dosesUsed);
 }
 
 // Estorna as doses de um drink que ainda não virou pedido (removido do
@@ -51,23 +55,16 @@ export async function deductBottleDose(bottleId: string, dosesUsed: number): Pro
 export async function returnBottleDoses(drink: CustomDrink): Promise<void> {
   const qty = drink.quantity || 1;
   for (const d of drink.doses ?? []) {
-    const err = await invokeBottleDoses('return', d.bottleId, d.doseCount * qty);
+    const err = await invokeBottleDoses('return', { bottle_id: d.bottleId }, d.doseCount * qty);
     if (err) console.error(`[returnBottleDoses] falha ao estornar ${d.bottleName}:`, err);
   }
   if (drink.energetico?.type === 'garrafa') {
     // A receita salva não guarda o bottleId do energético "de garrafa" (grátis),
-    // só o product_id — resolve pra garrafa aberta mais recente desse produto.
-    const { data: bottle } = await supabase
-      .from('open_bottles')
-      .select('id')
-      .eq('product_id', drink.energetico.productId)
-      .order('emptied_at', { ascending: false, nullsFirst: false })
-      .limit(1)
-      .maybeSingle();
-    if (bottle) {
-      const err = await invokeBottleDoses('return', bottle.id, qty);
-      if (err) console.error(`[returnBottleDoses] falha ao estornar ${drink.energetico.productName}:`, err);
-    }
+    // só o product_id. open_bottles só é legível por staff via RLS, então a
+    // resolução pra garrafa aberta mais recente desse produto acontece dentro
+    // da edge function (service role), não aqui no client.
+    const err = await invokeBottleDoses('return-by-product', { product_id: drink.energetico.productId }, qty);
+    if (err) console.error(`[returnBottleDoses] falha ao estornar ${drink.energetico.productName}:`, err);
   }
 }
 
