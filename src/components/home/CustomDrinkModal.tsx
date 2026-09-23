@@ -466,7 +466,7 @@ export function CustomDrinkModal({ open, onOpenChange, drinkType, onAddCustomDri
     if (!resolvedBottles || resolvedBottles.length === 0) { toast({ title: 'Selecione ao menos um destilado', variant: 'destructive' }); return false; }
 
     for (const sb of resolvedBottles) {
-      const { error } = await supabase.rpc('deduct_bottle_doses', { p_bottle_id: sb.bottle.id, p_doses_used: sb.doses });
+      const { error } = await supabase.rpc('deduct_bottle_doses', { p_bottle_id: sb.bottle.id, p_doses_used: sb.doses * quantity });
       if (error) { toast({ title: `Erro ao deduzir doses de ${sb.bottle.product_name}`, variant: 'destructive' }); return false; }
     }
     if (selectedEnergetico) {

@@ -290,7 +290,7 @@ export function CopaoModal({ open, onOpenChange, onAddCustomDrink }: CopaoModalP
     if (!selectedEnergetico || !selectedGelo || !hasDestilado) return false;
     if (!noAlcohol) {
       const ok = await deductBottleDoses(selectedBottles, (name) =>
-        toast({ title: `Erro ao deduzir doses de ${name}`, variant: 'destructive' })
+        toast({ title: `Erro ao deduzir doses de ${name}`, variant: 'destructive' }), quantity
       );
       if (!ok) return false;
     }

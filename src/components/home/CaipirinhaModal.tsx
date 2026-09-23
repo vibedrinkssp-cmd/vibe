@@ -164,7 +164,7 @@ export function CaipirinhaModal({ open, onOpenChange, onAddCustomDrink }: Caipir
     if (!noAlcohol && selectedBottles.length === 0) return false;
     if (!noAlcohol) {
       const ok = await deductBottleDoses(selectedBottles, (name) =>
-        toast({ title: `Erro ao deduzir doses de ${name}`, variant: 'destructive' })
+        toast({ title: `Erro ao deduzir doses de ${name}`, variant: 'destructive' }), quantity
       );
       if (!ok) return false;
       queryClient.invalidateQueries({ queryKey: ['open-bottles-kitchen'] });
