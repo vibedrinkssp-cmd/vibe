@@ -87,22 +87,22 @@ export function SpecialDrinksCarousel({ onSelectType, onComboOpen, onSpecialDrin
         ref={scrollRef}
         className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory md:justify-center"
       >
-        {onComboOpen && (
+        {onSpecialDrinksOpen && (
           <button
-            onClick={onComboOpen}
+            onClick={onSpecialDrinksOpen}
             className="relative flex-shrink-0 snap-start group flex flex-col items-center gap-1"
-            data-testid="feature-banner-combo"
+            data-testid="feature-banner-special-drinks"
           >
             <div className="relative">
               <div className="w-[68px] h-[68px] rounded-2xl overflow-hidden shadow-lg border-2 border-primary ring-1 ring-primary/40 transition-transform duration-200 active:scale-95 group-hover:scale-105 group-hover:shadow-xl">
-                <img src={comboImage} alt="Monte Seu Combo" className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                <img src={specialDrinksImage} alt="Drinks Especiais" className="w-full h-full object-cover" loading="lazy" decoding="async" />
               </div>
               <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-md">
                 <Sparkles className="h-3 w-3 text-primary-foreground" />
               </div>
             </div>
             <span className="max-w-[72px] text-center text-[10px] font-bold text-foreground leading-tight line-clamp-2">
-              Monte Seu Combo
+              Drinks Especiais
             </span>
           </button>
         )}
@@ -138,22 +138,22 @@ export function SpecialDrinksCarousel({ onSelectType, onComboOpen, onSpecialDrin
           </button>
         ))}
 
-        {onSpecialDrinksOpen && (
+        {onComboOpen && (
           <button
-            onClick={onSpecialDrinksOpen}
+            onClick={onComboOpen}
             className="relative flex-shrink-0 snap-start group flex flex-col items-center gap-1"
-            data-testid="feature-banner-special-drinks"
+            data-testid="feature-banner-combo"
           >
             <div className="relative">
               <div className="w-[68px] h-[68px] rounded-2xl overflow-hidden shadow-lg border-2 border-primary ring-1 ring-primary/40 transition-transform duration-200 active:scale-95 group-hover:scale-105 group-hover:shadow-xl">
-                <img src={specialDrinksImage} alt="Drinks Especiais" className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                <img src={comboImage} alt="Monte Seu Combo" className="w-full h-full object-cover" loading="lazy" decoding="async" />
               </div>
               <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-md">
                 <Sparkles className="h-3 w-3 text-primary-foreground" />
               </div>
             </div>
             <span className="max-w-[72px] text-center text-[10px] font-bold text-foreground leading-tight line-clamp-2">
-              Drinks Especiais
+              Monte Seu Combo
             </span>
           </button>
         )}
