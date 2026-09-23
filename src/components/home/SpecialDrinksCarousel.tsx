@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Flame } from 'lucide-react';
+import { Flame, Sparkles } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client-safe';
 
@@ -19,11 +19,18 @@ const DEFAULT_IMAGES: Record<string, string> = {
   copao: '/assets/drinks/copao.webp',
 };
 
+const DEFAULT_BANNER_IMAGES: Record<string, string> = {
+  'special-drinks': 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=200&h=200&fit=crop&q=60',
+  combo: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=200&h=200&fit=crop&q=60',
+};
+
 interface SpecialDrinksCarouselProps {
   onSelectType?: (typeId: string) => void;
+  onComboOpen?: () => void;
+  onSpecialDrinksOpen?: () => void;
 }
 
-export function SpecialDrinksCarousel({ onSelectType }: SpecialDrinksCarouselProps) {
+export function SpecialDrinksCarousel({ onSelectType, onComboOpen, onSpecialDrinksOpen }: SpecialDrinksCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data: drinkTypes = [] } = useQuery({
@@ -47,7 +54,26 @@ export function SpecialDrinksCarousel({ onSelectType }: SpecialDrinksCarouselPro
     staleTime: 1000 * 60 * 5,
   });
 
+  const { data: bannerImages = {} } = useQuery({
+    queryKey: ['feature-banner-images'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('banners')
+        .select('title, image_url')
+        .eq('is_active', true);
+      if (error) return {};
+      return (data || []).reduce((acc, item) => {
+        acc[item.title] = item.image_url;
+        return acc;
+      }, {} as Record<string, string>);
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
   if (drinkTypes.length === 0) return null;
+
+  const comboImage = bannerImages['combo'] || DEFAULT_BANNER_IMAGES['combo'];
+  const specialDrinksImage = bannerImages['special-drinks'] || DEFAULT_BANNER_IMAGES['special-drinks'];
 
   return (
     <div className="px-3" data-testid="special-drinks-carousel">
@@ -61,6 +87,26 @@ export function SpecialDrinksCarousel({ onSelectType }: SpecialDrinksCarouselPro
         ref={scrollRef}
         className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory md:justify-center"
       >
+        {onComboOpen && (
+          <button
+            onClick={onComboOpen}
+            className="relative flex-shrink-0 snap-start group flex flex-col items-center gap-1"
+            data-testid="feature-banner-combo"
+          >
+            <div className="relative">
+              <div className="w-[68px] h-[68px] rounded-2xl overflow-hidden shadow-lg border-2 border-primary ring-1 ring-primary/40 transition-transform duration-200 active:scale-95 group-hover:scale-105 group-hover:shadow-xl">
+                <img src={comboImage} alt="Monte Seu Combo" className="w-full h-full object-cover" loading="lazy" decoding="async" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-md">
+                <Sparkles className="h-3 w-3 text-primary-foreground" />
+              </div>
+            </div>
+            <span className="max-w-[72px] text-center text-[10px] font-bold text-foreground leading-tight line-clamp-2">
+              Monte Seu Combo
+            </span>
+          </button>
+        )}
+
         {drinkTypes.map((type) => (
           <button
             key={type.id}
@@ -91,6 +137,26 @@ export function SpecialDrinksCarousel({ onSelectType }: SpecialDrinksCarouselPro
             </span>
           </button>
         ))}
+
+        {onSpecialDrinksOpen && (
+          <button
+            onClick={onSpecialDrinksOpen}
+            className="relative flex-shrink-0 snap-start group flex flex-col items-center gap-1"
+            data-testid="feature-banner-special-drinks"
+          >
+            <div className="relative">
+              <div className="w-[68px] h-[68px] rounded-2xl overflow-hidden shadow-lg border-2 border-primary ring-1 ring-primary/40 transition-transform duration-200 active:scale-95 group-hover:scale-105 group-hover:shadow-xl">
+                <img src={specialDrinksImage} alt="Drinks Especiais" className="w-full h-full object-cover" loading="lazy" decoding="async" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-md">
+                <Sparkles className="h-3 w-3 text-primary-foreground" />
+              </div>
+            </div>
+            <span className="max-w-[72px] text-center text-[10px] font-bold text-foreground leading-tight line-clamp-2">
+              Drinks Especiais
+            </span>
+          </button>
+        )}
       </div>
     </div>
   );

@@ -52,7 +52,6 @@ import { playCashRegisterSound, primeCashRegisterSound } from '@/lib/cash-regist
 import type { PaymentSplit } from '@/components/pdv/CompositePaymentModal';
 import { StoreStatusToggle } from '@/components/StoreStatusToggle';
 import { SpecialDrinksCarousel } from '@/components/home/SpecialDrinksCarousel';
-import { FeatureBannerCarousel } from '@/components/home/FeatureBannerCarousel';
 
 // Lazy-loaded modals — only fetch chunks when actually opened (huge bundle reduction)
 const PixQRCodeModal = lazy(() => import('@/components/PixQRCodeModal').then(m => ({ default: m.PixQRCodeModal })));
@@ -1429,19 +1428,9 @@ export default function PDV() {
               </Button>
             </div>
 
-            {/* Banner: Monte Seu Combo */}
-            <FeatureBannerCarousel
-              only="combo"
-              onComboOpen={() => setComboOpen(true)}
-              onSpecialDrinksOpen={() => setSpecialDrinksOpen(true)}
-            />
-
-            {/* Monte seu Drink */}
-            <SpecialDrinksCarousel onSelectType={handleSelectDrinkType} />
-
-            {/* Banner: Drinks Especiais */}
-            <FeatureBannerCarousel
-              only="special-drinks"
+            {/* Monte seu Drink + Combo + Drinks Especiais, tudo em uma linha só */}
+            <SpecialDrinksCarousel
+              onSelectType={handleSelectDrinkType}
               onComboOpen={() => setComboOpen(true)}
               onSpecialDrinksOpen={() => setSpecialDrinksOpen(true)}
             />

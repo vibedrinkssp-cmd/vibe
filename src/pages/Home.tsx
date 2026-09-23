@@ -4,7 +4,6 @@ import { useAuth } from '@/lib/auth';
 import { FixedHeader } from '@/components/layout/FixedHeader';
 import { FixedBottomBar } from '@/components/layout/FixedBottomBar';
 import { ChevronDown } from 'lucide-react';
-import { FeatureBannerCarousel } from '@/components/home/FeatureBannerCarousel';
 import { CompactCategoryCarousel } from '@/components/home/CompactCategoryCarousel';
 import { ProductFiltersBar } from '@/components/home/ProductFiltersBar';
 import { ScrollableProductGrid } from '@/components/home/ScrollableProductGrid';
@@ -158,37 +157,23 @@ export default function Home() {
             Loja fechada no momento — pedidos indisponíveis
           </div>
         )}
-        {/* Feature Banner: Monte Seu Combo */}
-        <div className="mt-2 md:mt-1">
-          <FeatureBannerCarousel
-            only="combo"
+        {/* Monte seu Drink + Combo + Drinks Especiais, tudo em uma linha só */}
+        <div className="py-2 mt-2 md:mt-1">
+          <SpecialDrinksCarousel
             onComboOpen={() => setComboModalOpen(true)}
             onSpecialDrinksOpen={() => setSpecialDrinksOpen(true)}
-          />
-        </div>
-
-        {/* Special Drinks Carousel */}
-        <div className="py-2">
-          <SpecialDrinksCarousel onSelectType={(id) => {
-            setSelectedDrinkType(id);
-            if (id === 'caipirinha') {
-              setCaipirinhaOpen(true);
-            } else if (id === 'copao') {
-              setCopaoOpen(true);
-            } else if (id === 'caipi-ice') {
-              setCaipiIceOpen(true);
-            } else {
-              setCustomDrinkOpen(true);
-            }
-          }} />
-        </div>
-
-        {/* Feature Banner: Drinks Especiais */}
-        <div className="pb-2">
-          <FeatureBannerCarousel
-            only="special-drinks"
-            onComboOpen={() => setComboModalOpen(true)}
-            onSpecialDrinksOpen={() => setSpecialDrinksOpen(true)}
+            onSelectType={(id) => {
+              setSelectedDrinkType(id);
+              if (id === 'caipirinha') {
+                setCaipirinhaOpen(true);
+              } else if (id === 'copao') {
+                setCopaoOpen(true);
+              } else if (id === 'caipi-ice') {
+                setCaipiIceOpen(true);
+              } else {
+                setCustomDrinkOpen(true);
+              }
+            }}
           />
         </div>
 
