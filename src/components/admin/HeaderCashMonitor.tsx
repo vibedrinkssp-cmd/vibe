@@ -8,7 +8,6 @@ import {
 import { supabase } from '@/integrations/supabase/client-safe';
 import { formatCurrency } from '@/pages/admin/shared';
 import { cn } from '@/lib/utils';
-import { OperationPinModal } from '@/components/auth/OperationPinModal';
 import {
   Popover,
   PopoverContent,
@@ -83,7 +82,6 @@ function MetricRow({ icon: Icon, label, value, color }: { icon: any; label: stri
 
 export function HeaderCashMonitor() {
   const [revealed, setRevealed] = useState(false);
-  const [pinOpen, setPinOpen] = useState(false);
 
   // Auto-hide after 30s
   useEffect(() => {
@@ -98,8 +96,7 @@ export function HeaderCashMonitor() {
   const requestReveal = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     e?.preventDefault();
-    if (revealed) { setRevealed(false); return; }
-    setPinOpen(true);
+    setRevealed((r) => !r);
   };
 
   const { data: summary } = useQuery({
@@ -152,7 +149,7 @@ export function HeaderCashMonitor() {
               <button
                 onClick={requestReveal}
                 className="flex items-center gap-1 px-2 py-1 rounded-md border border-border hover:bg-muted text-[10px]"
-                title={revealed ? 'Ocultar valores' : 'Mostrar valores (PIN)'}
+                title={revealed ? 'Ocultar valores' : 'Mostrar valores'}
               >
                 {revealed ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
                 {revealed ? 'Ocultar' : 'Mostrar'}
@@ -239,14 +236,6 @@ export function HeaderCashMonitor() {
           )}
         </PopoverContent>
       </Popover>
-      <OperationPinModal
-        open={pinOpen}
-        operation="ver_caixa"
-        title="Ver Caixa"
-        description="Digite o PIN para exibir os valores (oculta automaticamente em 30s)."
-        onValidated={() => { setPinOpen(false); setRevealed(true); }}
-        onCancel={() => setPinOpen(false)}
-      />
       </>
     );
   }
@@ -286,7 +275,7 @@ export function HeaderCashMonitor() {
             onClick={requestReveal}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') requestReveal(e as any); }}
             className="ml-1 p-1 rounded-md hover:bg-white/10 transition-colors"
-            title={revealed ? 'Ocultar valores' : 'Mostrar valores (PIN)'}
+            title={revealed ? 'Ocultar valores' : 'Mostrar valores'}
           >
             {revealed ? <EyeOff className="h-3.5 w-3.5 text-white/90" /> : <Eye className="h-3.5 w-3.5 text-white/90" />}
           </span>
@@ -363,7 +352,7 @@ export function HeaderCashMonitor() {
             <button
               onClick={requestReveal}
               className="flex items-center gap-1 px-2 py-1 rounded-md border border-border hover:bg-muted text-[10px]"
-              title={revealed ? 'Ocultar valores' : 'Mostrar valores (PIN)'}
+              title={revealed ? 'Ocultar valores' : 'Mostrar valores'}
             >
               {revealed ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
               {revealed ? 'Ocultar' : 'Mostrar valores'}
@@ -393,14 +382,6 @@ export function HeaderCashMonitor() {
         </div>
       </PopoverContent>
     </Popover>
-    <OperationPinModal
-      open={pinOpen}
-      operation="ver_caixa"
-      title="Ver Caixa"
-      description="Digite o PIN para exibir os valores (oculta automaticamente em 30s)."
-      onValidated={() => { setPinOpen(false); setRevealed(true); }}
-      onCancel={() => setPinOpen(false)}
-    />
     </>
   );
 }
