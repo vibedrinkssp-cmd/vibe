@@ -38,6 +38,8 @@ import { useToast } from '@/hooks/use-toast';
 import { usePDVRealtime } from '@/hooks/use-realtime-sync';
 import { queryClient } from '@/lib/queryClient';
 import { supabase } from '@/integrations/supabase/client-safe';
+import { FEE_PLATFORMS, computePlatformFee, usePlatformFeeSettings, type FeePlatform } from '@/lib/platform-fees';
+import { getPlatformLabel } from '@/lib/external-platforms';
 import type { Product, Category, CustomDrink } from '@/shared/schema';
 import { type PaymentMethod, isInfiniteStockProduct } from '@/shared/schema';
 import { CartContent } from '@/components/pdv-cart';
@@ -158,6 +160,8 @@ interface PdvOrderPayload {
     salesperson: string | null;
   };
   items: PdvOrderItemPayload[];
+  /** Venda de plataforma (iFood/99): grava a taxa real do pedido. */
+  platformFee?: { platform: FeePlatform; percent: number };
 }
 
 function formatCurrency(value: number | string): string {
@@ -289,6 +293,10 @@ export default function PDV() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
+  // Origem da venda: null = balcão; iFood/99 são pagas no app e têm taxa por pedido.
+  const [salesChannel, setSalesChannel] = useState<FeePlatform | null>(null);
+  const [platformFeePercent, setPlatformFeePercent] = useState('');
+  const { data: platformFeeSettings = [] } = usePlatformFeeSettings();
   const [changeFor, setChangeFor] = useState('');
   const [customerName, setCustomerName] = useState('');
   const pdvCustomerName = customerName.trim() ? customerName.trim().toUpperCase() : 'Balcão';
@@ -462,6 +470,19 @@ export default function PDV() {
 
       console.log('PDV createOrder result:', orderId);
 
+      if (orderData.platformFee) {
+        const { error: feeError } = await supabase.rpc('set_order_platform_fee' as never, {
+          p_order_id: orderId,
+          p_platform: orderData.platformFee.platform,
+          p_fee_percent: orderData.platformFee.percent,
+        } as never);
+        if (feeError) {
+          // Pedido já foi criado: não bloqueia a venda, o relatório usa a taxa padrão da plataforma.
+          console.warn('[PDV] Falha ao gravar taxa da plataforma:', feeError);
+          toast({ title: 'Venda salva, mas a taxa não foi gravada', description: 'O relatório usará a taxa padrão da plataforma.', variant: 'destructive' });
+        }
+      }
+
       return { id: orderId as string, items: orderData.items };
     },
     onSuccess: async (data) => {
@@ -497,7 +518,7 @@ export default function PDV() {
         changeFor: paymentMethod === 'cash' && changeFor ? Number(changeFor) : null,
         notes: notes || null,
         customerName: pdvCustomerName,
-        salesperson: null,
+        salesperson: salesChannel,
         createdAt: new Date().toISOString(),
         items: [
           ...cart.map(item => ({
@@ -539,6 +560,8 @@ export default function PDV() {
       setPdvCustomDrinks([]);
       setNotes('');
       setPaymentMethod(null);
+      setSalesChannel(null);
+      setPlatformFeePercent('');
       setChangeFor('');
       setCustomerName('');
       setManualDiscount(''); setManualSurcharge('');
@@ -975,6 +998,19 @@ export default function PDV() {
     setIsPaymentDialogOpen(true);
   };
 
+  const handleSelectSalesChannel = (channel: FeePlatform | null) => {
+    setSalesChannel(channel);
+    if (!channel) {
+      setPlatformFeePercent('');
+      setPaymentMethod(null);
+      return;
+    }
+    const defaultFee = platformFeeSettings.find(s => s.platform === channel)?.fee_percent ?? 0;
+    setPlatformFeePercent(String(defaultFee));
+    // Pago no app: mesma convenção dos pedidos importados (pix digital, sem QR do Mercado Pago).
+    setPaymentMethod('pix');
+  };
+
   const handleConfirmPayment = async () => {
     if (!paymentMethod) {
       toast({ title: 'Selecione um método de pagamento', variant: 'destructive' });
@@ -983,7 +1019,8 @@ export default function PDV() {
 
     // PIX: NÃO criar pedido ainda — apenas guardar payload e abrir QR Code.
     // O pedido só será inserido após o MP confirmar o pagamento (handlePixPaymentApproved).
-    if (paymentMethod === 'pix') {
+    // Venda de plataforma (iFood/99) já foi paga no app: não gera QR.
+    if (paymentMethod === 'pix' && !salesChannel) {
       const order = {
         user_id: user?.id || null,
         order_type: 'counter' as const,
@@ -1060,7 +1097,7 @@ export default function PDV() {
       change_for: paymentMethod === 'cash' && changeFor ? Number(changeFor) : null,
       notes: notes || null,
       customer_name: pdvCustomerName,
-      salesperson: null,
+      salesperson: salesChannel,
     };
 
     console.log('Creating PDV order:', order);
@@ -1097,7 +1134,11 @@ export default function PDV() {
     const surchargeItemNormal = buildSurchargeItem(surchargeValue);
     if (surchargeItemNormal) items.push(surchargeItemNormal);
 
-    createOrderMutation.mutate({ order, items });
+    createOrderMutation.mutate({
+      order,
+      items,
+      platformFee: salesChannel ? { platform: salesChannel, percent: parseNumeric(platformFeePercent) } : undefined,
+    });
   };
 
   const handlePixPaymentApproved = async (mpPaymentId?: string) => {
@@ -1630,7 +1671,14 @@ export default function PDV() {
         </Button>
       </div>
 
-      <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
+      <Dialog
+        open={isPaymentDialogOpen}
+        onOpenChange={(open) => {
+          setIsPaymentDialogOpen(open);
+          // Fechar sem finalizar não pode deixar a próxima venda marcada como iFood/99.
+          if (!open && salesChannel) handleSelectSalesChannel(null);
+        }}
+      >
         <DialogContent className="max-w-sm sm:max-w-md mx-2">
           <DialogHeader>
             <DialogTitle className="text-xl sm:text-2xl">Pagamento</DialogTitle>
@@ -1656,6 +1704,59 @@ export default function PDV() {
 
 
             <div>
+              <Label className="mb-2 block text-sm">Origem da Venda</Label>
+              <div className="grid grid-cols-3 gap-2">
+                <Button
+                  variant={!salesChannel ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleSelectSalesChannel(null)}
+                  data-testid="button-channel-balcao"
+                >
+                  Balcão
+                </Button>
+                {FEE_PLATFORMS.map((platform) => (
+                  <Button
+                    key={platform}
+                    variant={salesChannel === platform ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handleSelectSalesChannel(platform)}
+                    data-testid={`button-channel-${platform}`}
+                  >
+                    {getPlatformLabel(platform)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {salesChannel && (
+              <div className="space-y-2 rounded-lg border-2 border-primary/30 bg-secondary/40 p-3">
+                <Label htmlFor="platformFee" className="text-sm font-semibold">
+                  Taxa cobrada pela {getPlatformLabel(salesChannel)} neste pedido (%)
+                </Label>
+                <Input
+                  id="platformFee"
+                  inputMode="decimal"
+                  value={platformFeePercent}
+                  onChange={(e) => setPlatformFeePercent(e.target.value.replace(',', '.'))}
+                  className="bg-background border-primary/40 text-lg font-bold"
+                  data-testid="input-platform-fee"
+                />
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Taxa</span>
+                  <span className="font-medium text-destructive">
+                    - {formatCurrency(computePlatformFee(total, parseNumeric(platformFeePercent)))}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Líquido a receber</span>
+                  <span className="font-bold text-green-500">
+                    {formatCurrency(total - computePlatformFee(total, parseNumeric(platformFeePercent)))}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className={salesChannel ? 'hidden' : undefined}>
               <Label className="mb-2 block text-sm">Forma de Pagamento</Label>
               <div className="grid grid-cols-2 gap-2">
                 {paymentMethods.map((method) => (
@@ -1731,23 +1832,27 @@ export default function PDV() {
               {createOrderMutation.isPending ? 'Processando...' : 'Finalizar Venda'}
             </Button>
 
-            <div className="relative flex items-center gap-2 pt-1">
-              <div className="flex-1 border-t border-border" />
-              <span className="text-xs text-muted-foreground">ou</span>
-              <div className="flex-1 border-t border-border" />
-            </div>
+            {!salesChannel && (
+              <>
+                <div className="relative flex items-center gap-2 pt-1">
+                  <div className="flex-1 border-t border-border" />
+                  <span className="text-xs text-muted-foreground">ou</span>
+                  <div className="flex-1 border-t border-border" />
+                </div>
 
-            <Button
-              variant="outline"
-              className="w-full py-4 text-sm border-primary/50 text-primary hover:bg-primary/10"
-              onClick={() => {
-                setIsPaymentDialogOpen(false);
-                setShowCompositePayment(true);
-              }}
-            >
-              <Layers className="h-4 w-4 mr-2" />
-              Pagamento Composto (dividir conta)
-            </Button>
+                <Button
+                  variant="outline"
+                  className="w-full py-4 text-sm border-primary/50 text-primary hover:bg-primary/10"
+                  onClick={() => {
+                    setIsPaymentDialogOpen(false);
+                    setShowCompositePayment(true);
+                  }}
+                >
+                  <Layers className="h-4 w-4 mr-2" />
+                  Pagamento Composto (dividir conta)
+                </Button>
+              </>
+            )}
           </div>
         </DialogContent>
       </Dialog>

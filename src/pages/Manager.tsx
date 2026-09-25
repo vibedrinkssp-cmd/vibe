@@ -2,7 +2,7 @@ import { useState, lazy, Suspense, useEffect } from 'react';
 import { 
   Shield, Lock, Eye, EyeOff, LogOut, Loader2,
   ShoppingBag, Grid3X3, Image, Wine, Sparkles,
-  BarChart3, Settings, FileDown, Database, Briefcase,
+  BarChart3, ClipboardList, Settings, FileDown, Database, Briefcase,
   BookOpen, Warehouse, Package, KeyRound, Ticket, MonitorPlay, QrCode, BadgePercent, Users
 } from 'lucide-react';
 import { StoreStatusToggle } from '@/components/StoreStatusToggle';
@@ -37,6 +37,7 @@ const PacksTab = lazy(() => import('./admin/tabs/PacksTab').then(m => ({ default
 const QrCodeTab = lazy(() => import('./admin/tabs/QrCodeTab').then(m => ({ default: m.QrCodeTab })));
 
 // Admin-migrated tabs
+const DailyReportTab = lazy(() => import('./admin/tabs/DailyReportTab').then(m => ({ default: m.DailyReportTab })));
 const ReportsTab = lazy(() => import('./admin/tabs/ReportsTab').then(m => ({ default: m.ReportsTab })));
 const SettingsTab = lazy(() => import('./admin/tabs/SettingsTab').then(m => ({ default: m.SettingsTab })));
 const BackupDataTab = lazy(() => import('./admin/tabs/BackupDataTab').then(m => ({ default: m.BackupDataTab })));
@@ -79,6 +80,7 @@ const tabs = [
   { id: 'promocoes', label: 'Promoções', icon: BadgePercent },
   { id: 'qrcode', label: 'QR Code', icon: QrCode },
   // Admin tools
+  { id: 'relatorio-dia', label: 'Relatório Diário', icon: ClipboardList },
   { id: 'reports', label: 'Relatórios', icon: BarChart3 },
   { id: 'settings', label: 'Configurações', icon: Settings },
   { id: 'import', label: 'Importar CSV', icon: FileDown },
@@ -294,6 +296,7 @@ export default function Manager() {
       case 'cupons': return <PosCouponsTab />;
       case 'promocoes': return <WeeklyPromotionsTab />;
       case 'qrcode': return <QrCodeTab />;
+      case 'relatorio-dia': return <DailyReportTab />;
       case 'reports': return <ReportsTab />;
       case 'settings': return <SettingsTab />;
       case 'import': return <ImportProductsTab />;
