@@ -77,7 +77,7 @@ export function ProductDetailDrawer({
         
         <div className="flex flex-col max-h-[calc(90vh-60px)]">
           {/* Product Image — compact, never forces scroll */}
-          <div className="relative w-full h-40 sm:h-48 flex-shrink-0 bg-gradient-to-br from-secondary/80 to-secondary overflow-hidden">
+          <div className="relative w-full h-40 sm:h-48 flex-shrink-0 bg-white overflow-hidden">
             {product.imageUrl ? (
               <SmartImage
                 path={product.imageUrl}
