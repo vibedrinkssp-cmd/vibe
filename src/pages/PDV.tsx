@@ -1499,7 +1499,7 @@ export default function PDV() {
                     data-testid={`card-product-${product.id}`}
                   >
                     <CardContent className="p-2 sm:p-3">
-                      <div className="aspect-square w-full mb-2 rounded-md overflow-hidden bg-secondary/40 flex items-center justify-center">
+                      <div className="aspect-square w-full mb-2 rounded-md overflow-hidden bg-white flex items-center justify-center">
                         {product.imageUrl ? (
                           <SmartImage
                             path={product.imageUrl}
