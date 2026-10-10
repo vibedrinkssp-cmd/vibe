@@ -345,6 +345,10 @@ export default function Checkout() {
       p_notes: noteParts.length > 0 ? noteParts.join(' | ') : null,
       p_delivery_distance: Math.round(distanceKm * 100) / 100,
       p_client_request_id: clientRequestIdRef.current,
+      // Enviar p_customer_name (mesmo null) faz a chamada casar so com a sobrecarga de 13 parametros,
+      // evitando PGRST203 enquanto a sobrecarga obsoleta de 12 parametros existir no banco.
+      // Com null, a funcao usa o nome do cadastro do cliente.
+      p_customer_name: null,
     };
 
     // RPC SECURITY DEFINER cria pedido + itens em transação atômica e bypassa RLS para
