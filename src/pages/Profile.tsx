@@ -28,7 +28,7 @@ import { supabase } from '@/integrations/supabase/client-safe';
 import { useOrders, useOrderItems, useAddresses } from '@/hooks/use-supabase-data';
 import { mapAddress } from '@/lib/db-mappers';
 import { AddressAutocomplete } from '@/components/location/AddressAutocomplete';
-import { lookupCepByStreet } from '@/lib/viacep';
+import { lookupAddressByCep, lookupCepByStreet } from '@/lib/viacep';
 import { InteractiveAddressMap } from '@/components/location/InteractiveAddressMap';
 import { useGoogleMaps, type AddressComponents } from '@/hooks/use-google-maps';
 import type { Order, OrderItem, Address } from '@/shared/schema';
@@ -802,7 +802,21 @@ export default function Profile() {
                           <FormItem>
                             <FormLabel className="text-foreground">CEP</FormLabel>
                             <FormControl>
-                              <Input {...field} className="bg-secondary/50 border-primary/20" placeholder="00000-000" />
+                              <Input
+                                {...field}
+                                inputMode="numeric"
+                                onChange={async (e) => {
+                                  field.onChange(e);
+                                  const found = await lookupAddressByCep(e.target.value);
+                                  if (!found) return;
+                                  addressForm.setValue('street', found.street || addressForm.getValues('street'));
+                                  addressForm.setValue('neighborhood', found.neighborhood || addressForm.getValues('neighborhood'));
+                                  addressForm.setValue('city', found.city);
+                                  addressForm.setValue('state', found.state);
+                                }}
+                                className="bg-secondary/50 border-primary/20"
+                                placeholder="00000-000"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

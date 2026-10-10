@@ -16,7 +16,7 @@ import { checkPhone, customerLogin, registerCustomer, changePassword, requestPas
 import { validateCPF, formatCPF, cleanCPF, generatePasswordFromCPF } from '@/lib/cpf-utils';
 import { z } from 'zod';
 import { AddressAutocomplete } from '@/components/location/AddressAutocomplete';
-import { lookupCepByStreet } from '@/lib/viacep';
+import { lookupAddressByCep, lookupCepByStreet } from '@/lib/viacep';
 import { InteractiveAddressMap } from '@/components/location/InteractiveAddressMap';
 import { useGoogleMaps, type AddressComponents } from '@/hooks/use-google-maps';
 import logoImage from '@/assets/logo-vibedrinks.gif';
@@ -863,7 +863,19 @@ export default function Login() {
                           <Input
                             placeholder="CEP"
                             value={zipCode}
-                            onChange={(e) => setZipCode(e.target.value)}
+                            inputMode="numeric"
+                            onChange={async (e) => {
+                              setZipCode(e.target.value);
+                              const found = await lookupAddressByCep(e.target.value);
+                              if (!found) return;
+                              setStreet(found.street || street);
+                              setSelectedNeighborhood(found.neighborhood || selectedNeighborhood);
+                              setCity(found.city);
+                              setState(found.state);
+                              setLatitude(null);
+                              setLongitude(null);
+                              setDistanceError('');
+                            }}
                             className="bg-secondary/50 border-primary/20 text-foreground h-10"
                             data-testid="input-zipcode"
                           />
