@@ -205,7 +205,6 @@ export default function Log() {
       case 'pdv': return !external && order.orderType === 'counter';
       case 'ifood': return order.salesperson?.toLowerCase() === 'ifood' && order.externalOrigin !== 'ifood_test';
       case '99food': return order.salesperson?.toLowerCase() === '99food';
-      case 'ifood_test': return order.externalOrigin === 'ifood_test';
       default: return true;
     }
   };
@@ -216,7 +215,6 @@ export default function Log() {
     pdv: logOrders.filter(o => !isExternalOrder(o) && o.orderType === 'counter').length,
     ifood: logOrders.filter(o => o.salesperson?.toLowerCase() === 'ifood' && o.externalOrigin !== 'ifood_test').length,
     '99food': logOrders.filter(o => o.salesperson?.toLowerCase() === '99food').length,
-    ifood_test: logOrders.filter(o => o.externalOrigin === 'ifood_test').length,
   }), [logOrders]);
 
   const filteredOrders = useMemo(() => logOrders.filter(filterByOrigin), [logOrders, originFilter]);

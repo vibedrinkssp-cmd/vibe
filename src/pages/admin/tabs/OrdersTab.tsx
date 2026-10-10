@@ -227,8 +227,6 @@ export function OrdersTab() {
         return order.salesperson?.toLowerCase() === 'ifood' && order.externalOrigin !== 'ifood_test';
       case '99food':
         return order.salesperson?.toLowerCase() === '99food';
-      case 'ifood_test':
-        return order.externalOrigin === 'ifood_test';
       default:
         return true;
     }
@@ -241,7 +239,6 @@ export function OrdersTab() {
     pdv: allOrdersWithDetails.filter(o => !isExternalOrder(o) && o.orderType === 'counter' && o.status === 'pending').length,
     ifood: allOrdersWithDetails.filter(o => o.salesperson?.toLowerCase() === 'ifood' && o.externalOrigin !== 'ifood_test' && o.status === 'pending').length,
     '99food': allOrdersWithDetails.filter(o => o.salesperson?.toLowerCase() === '99food' && o.status === 'pending').length,
-    ifood_test: allOrdersWithDetails.filter(o => o.externalOrigin === 'ifood_test' && o.status === 'pending').length,
   };
 
   const activeCounts = {
@@ -250,7 +247,6 @@ export function OrdersTab() {
     pdv: allOrdersWithDetails.filter(o => !isExternalOrder(o) && o.orderType === 'counter' && !['delivered', 'cancelled'].includes(o.status)).length,
     ifood: allOrdersWithDetails.filter(o => o.salesperson?.toLowerCase() === 'ifood' && o.externalOrigin !== 'ifood_test' && !['delivered', 'cancelled'].includes(o.status)).length,
     '99food': allOrdersWithDetails.filter(o => o.salesperson?.toLowerCase() === '99food' && !['delivered', 'cancelled'].includes(o.status)).length,
-    ifood_test: allOrdersWithDetails.filter(o => o.externalOrigin === 'ifood_test' && !['delivered', 'cancelled'].includes(o.status)).length,
   };
 
   // For platforms sub-tab, show all orders (allow annulling any)

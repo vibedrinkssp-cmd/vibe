@@ -2,10 +2,9 @@ import iconPdv from '@/assets/icon-pdv.png';
 import iconVm from '@/assets/logo-vibedrinks.gif';
 import iconIfood from '@/assets/icon-ifood.jpg';
 import icon99food from '@/assets/icon-99food.jpg';
-import iconIfoodTest from '@/assets/icon-ifood-test.png';
 import { LayoutGrid } from 'lucide-react';
 
-export type OriginFilterId = 'all' | 'vm_delivery' | 'pdv' | 'ifood' | '99food' | 'ifood_test';
+export type OriginFilterId = 'all' | 'vm_delivery' | 'pdv' | 'ifood' | '99food';
 
 interface FilterTab {
   id: OriginFilterId;
@@ -20,7 +19,6 @@ const ALL_TABS: FilterTab[] = [
   { id: 'pdv', label: 'PDV', image: iconPdv },
   { id: 'ifood', label: 'iFood', image: iconIfood },
   { id: '99food', label: '99Food', image: icon99food },
-  { id: 'ifood_test', label: 'iFood TESTE', image: iconIfoodTest },
 ];
 
 interface OrderOriginFiltersProps {

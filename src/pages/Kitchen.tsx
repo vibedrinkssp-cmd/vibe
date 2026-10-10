@@ -197,7 +197,6 @@ export default function Kitchen() {
       case 'pdv': return !external && order.orderType === 'counter';
       case 'ifood': return order.salesperson?.toLowerCase() === 'ifood' && order.externalOrigin !== 'ifood_test';
       case '99food': return order.salesperson?.toLowerCase() === '99food';
-      case 'ifood_test': return order.externalOrigin === 'ifood_test';
       default: return true;
     }
   };
@@ -213,7 +212,6 @@ export default function Kitchen() {
     pdv: kitchenBase.filter(o => o.orderType === 'counter').length,
     ifood: 0,
     '99food': 0,
-    ifood_test: 0,
   }), [kitchenBase]);
 
   // COZINHA (KDE) só mostra pedidos que TÊM item de preparo (kitchenBase). Pedidos
@@ -488,7 +486,7 @@ export default function Kitchen() {
             activeFilter={originFilter}
             onFilterChange={setOriginFilter}
             counts={originCounts}
-            hiddenFilters={['ifood', '99food', 'ifood_test']}
+            hiddenFilters={['ifood', '99food']}
           />
         </div>
         {isError && (
