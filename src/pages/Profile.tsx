@@ -28,6 +28,7 @@ import { supabase } from '@/integrations/supabase/client-safe';
 import { useOrders, useOrderItems, useAddresses } from '@/hooks/use-supabase-data';
 import { mapAddress } from '@/lib/db-mappers';
 import { AddressAutocomplete } from '@/components/location/AddressAutocomplete';
+import { lookupCepByStreet } from '@/lib/viacep';
 import { InteractiveAddressMap } from '@/components/location/InteractiveAddressMap';
 import { useGoogleMaps, type AddressComponents } from '@/hooks/use-google-maps';
 import type { Order, OrderItem, Address } from '@/shared/schema';
@@ -641,6 +642,9 @@ export default function Profile() {
                       addressForm.setValue('city', addr.city);
                       addressForm.setValue('state', addr.state.length === 2 ? addr.state : 'SP');
                       addressForm.setValue('zipCode', addr.zipCode);
+                      if (!addr.zipCode) {
+                        lookupCepByStreet(addr.state, addr.city, addr.street).then((cep) => cep && addressForm.setValue('zipCode', cep));
+                      }
                       addressForm.setValue('latitude', addr.latitude);
                       addressForm.setValue('longitude', addr.longitude);
                       addressForm.setValue('neighborhood', addr.neighborhood);

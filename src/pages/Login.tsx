@@ -16,6 +16,7 @@ import { checkPhone, customerLogin, registerCustomer, changePassword, requestPas
 import { validateCPF, formatCPF, cleanCPF, generatePasswordFromCPF } from '@/lib/cpf-utils';
 import { z } from 'zod';
 import { AddressAutocomplete } from '@/components/location/AddressAutocomplete';
+import { lookupCepByStreet } from '@/lib/viacep';
 import { InteractiveAddressMap } from '@/components/location/InteractiveAddressMap';
 import { useGoogleMaps, type AddressComponents } from '@/hooks/use-google-maps';
 import logoImage from '@/assets/logo-vibedrinks.gif';
@@ -767,6 +768,9 @@ export default function Login() {
                           setCity(addr.city);
                           setState(addr.state.length === 2 ? addr.state : 'SP');
                           setZipCode(addr.zipCode);
+                          if (!addr.zipCode) {
+                            lookupCepByStreet(addr.state, addr.city, addr.street).then((cep) => cep && setZipCode(cep));
+                          }
                           setLatitude(addr.latitude);
                           setLongitude(addr.longitude);
                           // Check distance
