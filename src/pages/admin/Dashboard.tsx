@@ -22,7 +22,6 @@ import {
  ArrowLeftRight,
  ArrowUpFromLine,
   
-  Store,
   Cigarette,
   MapPin,
   ClipboardCheck,
@@ -71,7 +70,6 @@ const SaqDepTab = lazy(() => import('./tabs/SaqDepTab').then(m => ({ default: m.
 // CadernetaTab removed — only available in Manager
 const ClientsTab = lazy(() => import('./tabs/ClientsTab').then(m => ({ default: m.ClientsTab })));
 
-const IfoodTestTab = lazy(() => import('./tabs/IfoodTestTab').then(m => ({ default: m.IfoodTestTab })));
 const SyncInTab = lazy(() => import('./tabs/SyncInTab').then(m => ({ default: m.SyncInTab })));
 const ScheduleTab = lazy(() => import('./tabs/ScheduleTab').then(m => ({ default: m.ScheduleTab })));
 
@@ -110,7 +108,6 @@ const tabs = [
   
   { id: 'motoboys', label: 'Motoboys', icon: Bike },
   
-  { id: 'ifood-teste', label: 'iFood TESTE', icon: Store, alwaysShowLabel: true },
   { id: 'sync-in', label: 'SYNC IN', icon: ClipboardCheck, alwaysShowLabel: true },
   { id: 'escala', label: 'ESCALA', icon: CalendarDays, alwaysShowLabel: true },
   { id: 'ponto', label: 'PONTO', icon: Fingerprint, alwaysShowLabel: true },
@@ -293,7 +290,6 @@ export default function AdminDashboard() {
       
       case 'motoboys': return <MotoboysTab />;
       
-      case 'ifood-teste': return <IfoodTestTab />;
       case 'sync-in': return <SyncInTab />;
       case 'escala': return <ScheduleTab />;
       case 'ponto': return <TimeClockTab />;
