@@ -194,7 +194,6 @@ export default function Kitchen() {
     const external = isExternalOrder(order);
     switch (originFilter) {
       case 'vm_delivery': return !external && (order.orderType === 'delivery' || order.orderType === 'pickup');
-      case 'pdv': return !external && order.orderType === 'counter';
       case 'ifood': return order.salesperson?.toLowerCase() === 'ifood' && order.externalOrigin !== 'ifood_test';
       case '99food': return order.salesperson?.toLowerCase() === '99food';
       default: return true;
@@ -209,7 +208,6 @@ export default function Kitchen() {
   const originCounts = useMemo(() => ({
     all: kitchenBase.length,
     vm_delivery: kitchenBase.filter(o => o.orderType === 'delivery' || o.orderType === 'pickup').length,
-    pdv: kitchenBase.filter(o => o.orderType === 'counter').length,
     ifood: 0,
     '99food': 0,
   }), [kitchenBase]);

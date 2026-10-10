@@ -202,7 +202,6 @@ export default function Log() {
     const external = isExternalOrder(order);
     switch (originFilter) {
       case 'vm_delivery': return !external && (order.orderType === 'delivery' || order.orderType === 'pickup');
-      case 'pdv': return !external && order.orderType === 'counter';
       case 'ifood': return order.salesperson?.toLowerCase() === 'ifood' && order.externalOrigin !== 'ifood_test';
       case '99food': return order.salesperson?.toLowerCase() === '99food';
       default: return true;
@@ -212,7 +211,6 @@ export default function Log() {
   const originCounts = useMemo(() => ({
     all: logOrders.length,
     vm_delivery: logOrders.filter(o => !isExternalOrder(o) && (o.orderType === 'delivery' || o.orderType === 'pickup')).length,
-    pdv: logOrders.filter(o => !isExternalOrder(o) && o.orderType === 'counter').length,
     ifood: logOrders.filter(o => o.salesperson?.toLowerCase() === 'ifood' && o.externalOrigin !== 'ifood_test').length,
     '99food': logOrders.filter(o => o.salesperson?.toLowerCase() === '99food').length,
   }), [logOrders]);

@@ -1,10 +1,9 @@
-import iconPdv from '@/assets/icon-pdv.png';
 import iconVm from '@/assets/logo-vibedrinks.gif';
 import iconIfood from '@/assets/icon-ifood.jpg';
 import icon99food from '@/assets/icon-99food.jpg';
 import { LayoutGrid } from 'lucide-react';
 
-export type OriginFilterId = 'all' | 'vm_delivery' | 'pdv' | 'ifood' | '99food';
+export type OriginFilterId = 'all' | 'vm_delivery' | 'ifood' | '99food';
 
 interface FilterTab {
   id: OriginFilterId;
@@ -16,7 +15,6 @@ interface FilterTab {
 const ALL_TABS: FilterTab[] = [
   { id: 'all', label: 'Todos', fallbackIcon: <LayoutGrid className="w-6 h-6" /> },
   { id: 'vm_delivery', label: 'Delivery', image: iconVm },
-  { id: 'pdv', label: 'PDV', image: iconPdv },
   { id: 'ifood', label: 'iFood', image: iconIfood },
   { id: '99food', label: '99Food', image: icon99food },
 ];

@@ -221,8 +221,6 @@ export function OrdersTab() {
     switch (activeSubTab) {
       case 'vm_delivery':
         return !external && (order.orderType === 'delivery' || order.orderType === 'pickup');
-      case 'pdv':
-        return !external && order.orderType === 'counter';
       case 'ifood':
         return order.salesperson?.toLowerCase() === 'ifood' && order.externalOrigin !== 'ifood_test';
       case '99food':
@@ -236,7 +234,6 @@ export function OrdersTab() {
   const pendingCounts = {
     all: allOrdersWithDetails.filter(o => o.status === 'pending').length,
     vm_delivery: allOrdersWithDetails.filter(o => !isExternalOrder(o) && (o.orderType === 'delivery' || o.orderType === 'pickup') && o.status === 'pending').length,
-    pdv: allOrdersWithDetails.filter(o => !isExternalOrder(o) && o.orderType === 'counter' && o.status === 'pending').length,
     ifood: allOrdersWithDetails.filter(o => o.salesperson?.toLowerCase() === 'ifood' && o.externalOrigin !== 'ifood_test' && o.status === 'pending').length,
     '99food': allOrdersWithDetails.filter(o => o.salesperson?.toLowerCase() === '99food' && o.status === 'pending').length,
   };
@@ -244,7 +241,6 @@ export function OrdersTab() {
   const activeCounts = {
     all: allOrdersWithDetails.filter(o => !['delivered', 'cancelled'].includes(o.status)).length,
     vm_delivery: allOrdersWithDetails.filter(o => !isExternalOrder(o) && (o.orderType === 'delivery' || o.orderType === 'pickup') && !['delivered', 'cancelled'].includes(o.status)).length,
-    pdv: allOrdersWithDetails.filter(o => !isExternalOrder(o) && o.orderType === 'counter' && !['delivered', 'cancelled'].includes(o.status)).length,
     ifood: allOrdersWithDetails.filter(o => o.salesperson?.toLowerCase() === 'ifood' && o.externalOrigin !== 'ifood_test' && !['delivered', 'cancelled'].includes(o.status)).length,
     '99food': allOrdersWithDetails.filter(o => o.salesperson?.toLowerCase() === '99food' && !['delivered', 'cancelled'].includes(o.status)).length,
   };
