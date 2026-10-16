@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { Fragment, useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
 // notification-sound-engine local agent removed
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +27,6 @@ import {
   ClipboardCheck,
   CalendarDays,
   Fingerprint,
-  MoreHorizontal,
 } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -92,34 +91,33 @@ function TabSkeleton() {
 }
 
 const tabs = [
-  { id: 'pedidos', label: 'Pedidos', icon: Package, primary: true },
-  { id: 'delivery', label: 'Delivery', icon: Truck, primary: true },
-  { id: 'tracking', label: 'Tracking', icon: MapPin },
-  { id: 'caixa', label: 'Caixa', icon: Wallet, primary: true },
-  { id: 'saqdep', label: 'Saques', icon: ArrowUpFromLine },
-  { id: 'garrafas', label: 'Garrafas', icon: Wine, alwaysShowLabel: true, primary: true },
-  { id: 'macos', label: 'Maços', icon: Cigarette, alwaysShowLabel: true },
-  { id: 'sangrias', label: 'Sangrias', icon: Receipt },
-  { id: 'fechamento', label: 'Fechamento', icon: Calculator },
-  { id: 'fechamento-boys', label: 'Fech. Boys', icon: ClipboardCheck },
-  { id: 'estoque', label: 'Estoque', icon: Warehouse, primary: true },
-  { id: 'barcodes', label: 'Códigos de Barras', icon: ScanLine },
-  // Caderneta removed — only in Manager
-  { id: 'clientes', label: 'Clientes', icon: Users },
-  
-  { id: 'motoboys', label: 'Motoboys', icon: Bike },
-  
-  { id: 'sync-in', label: 'SYNC IN', icon: ClipboardCheck, alwaysShowLabel: true },
-  { id: 'escala', label: 'ESCALA', icon: CalendarDays, alwaysShowLabel: true },
-  { id: 'ponto', label: 'PONTO', icon: Fingerprint, alwaysShowLabel: true },
-  
+  // Dia a dia
+  { id: 'pedidos', label: 'Pedidos', icon: Package, group: 'Dia a dia' },
+  { id: 'delivery', label: 'Delivery', icon: Truck, group: 'Dia a dia' },
+  { id: 'tracking', label: 'Tracking', icon: MapPin, group: 'Dia a dia' },
+  { id: 'caixa', label: 'Caixa', icon: Wallet, group: 'Dia a dia' },
+  { id: 'garrafas', label: 'Garrafas', icon: Wine, alwaysShowLabel: true, group: 'Dia a dia' },
+  { id: 'estoque', label: 'Estoque', icon: Warehouse, group: 'Dia a dia' },
+  // Dinheiro
+  { id: 'saqdep', label: 'Saques', icon: ArrowUpFromLine, group: 'Dinheiro' },
+  { id: 'sangrias', label: 'Sangrias', icon: Receipt, group: 'Dinheiro' },
+  { id: 'fechamento', label: 'Fechamento', icon: Calculator, group: 'Dinheiro' },
+  { id: 'fechamento-boys', label: 'Fech. Boys', icon: ClipboardCheck, group: 'Dinheiro' },
+  // Cadastros
+  { id: 'clientes', label: 'Clientes', icon: Users, group: 'Cadastros' },
+  { id: 'motoboys', label: 'Motoboys', icon: Bike, group: 'Cadastros' },
+  { id: 'macos', label: 'Maços', icon: Cigarette, alwaysShowLabel: true, group: 'Cadastros' },
+  { id: 'barcodes', label: 'Códigos de Barras', icon: ScanLine, group: 'Cadastros' },
+  // Equipe
+  { id: 'sync-in', label: 'SYNC IN', icon: ClipboardCheck, alwaysShowLabel: true, group: 'Equipe' },
+  { id: 'escala', label: 'ESCALA', icon: CalendarDays, alwaysShowLabel: true, group: 'Equipe' },
+  { id: 'ponto', label: 'PONTO', icon: Fingerprint, alwaysShowLabel: true, group: 'Equipe' },
 ];
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { role, logout, isHydrated } = useAuth();
   const [activeTab, setActiveTab] = useState('pedidos');
-  const [showAllTabs, setShowAllTabs] = useState(false);
   const [isSSEConnected, setIsSSEConnected] = useState(false);
   const { isOnline: isCloudOnline } = useSupabaseHealth({
     enabled: isHydrated && role === 'admin',
@@ -134,9 +132,6 @@ export default function AdminDashboard() {
   const pdvCashSoundPlayedRef = useRef<Set<string>>(new Set());
 
   const isAuthorized = isHydrated && role === 'admin';
-  // Menu enxuto: só o dia a dia, o resto fica em "Mais" (a aba ativa nunca some)
-  const visibleTabs = showAllTabs ? tabs : tabs.filter((t) => t.primary || t.id === activeTab);
-  const moreTabsCount = tabs.length - visibleTabs.length;
 
   useEffect(() => {
     if (!isAuthorized) return;
@@ -380,13 +375,19 @@ export default function AdminDashboard() {
         {/* Sidebar Navigation (desktop) */}
         <aside className="hidden md:flex md:flex-col w-56 flex-shrink-0 border-r border-primary/20 bg-card/50 overflow-y-auto">
           <div className="flex flex-col p-2 gap-1">
-            {visibleTabs.map((tab) => {
+            {tabs.map((tab, index) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               const showBadge = tab.id === 'macos' && emptyPacksCount > 0;
+              const startsGroup = tab.group !== tabs[index - 1]?.group;
               return (
+                <Fragment key={tab.id}>
+                {startsGroup && (
+                  <p className="px-2 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70 first:pt-0">
+                    {tab.group}
+                  </p>
+                )}
                 <Button
-                  key={tab.id}
                   variant={isActive ? "default" : "ghost"}
                   size="sm"
                   className={`flex items-center justify-start gap-2 whitespace-nowrap ${
@@ -405,18 +406,9 @@ export default function AdminDashboard() {
                     </Badge>
                   )}
                 </Button>
+                </Fragment>
               );
             })}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="justify-start gap-2 text-muted-foreground"
-              onClick={() => setShowAllTabs((v) => !v)}
-              data-testid="tabs-toggle-more"
-            >
-              <MoreHorizontal className="h-4 w-4" />
-              {showAllTabs ? 'Menos' : `Mais (${moreTabsCount})`}
-            </Button>
           </div>
         </aside>
 
@@ -425,7 +417,7 @@ export default function AdminDashboard() {
           <div className="md:hidden border-b border-primary/20 bg-card/50 flex-shrink-0">
             <ScrollArea className="w-full">
               <div className="flex p-2 gap-1 min-w-max">
-                {visibleTabs.map((tab) => {
+                {tabs.map((tab) => {
                   const Icon = tab.icon;
                   const isActive = activeTab === tab.id;
                   const showBadge = tab.id === 'macos' && emptyPacksCount > 0;
@@ -453,16 +445,6 @@ export default function AdminDashboard() {
                     </Button>
                   );
                 })}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 whitespace-nowrap"
-                  onClick={() => setShowAllTabs((v) => !v)}
-                  data-testid="tabs-toggle-more-mobile"
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                  {showAllTabs ? 'Menos' : `Mais (${moreTabsCount})`}
-                </Button>
               </div>
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
