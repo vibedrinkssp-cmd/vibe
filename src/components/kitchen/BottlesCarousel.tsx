@@ -1,18 +1,13 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Wine, ChevronDown, ChevronUp, RefreshCw, Loader2, Trash2, Plus, Search } from 'lucide-react';
+import { Wine, ChevronDown, ChevronUp, RefreshCw, Loader2, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { CurrencyInput } from '@/components/ui/currency-input';
 import { supabase } from '@/integrations/supabase/client-safe';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
-import { normalizeSearch } from '@/lib/text-utils';
+import { OpenBottleDialog } from '@/components/bottles/OpenBottleDialog';
 
 interface OpenBottle {
   id: string;
@@ -123,7 +118,7 @@ export function BottlesCarousel() {
           <Wine className="h-5 w-5" />
           <span>Nenhuma garrafa aberta</span>
         </div>
-        <OpenBottleKitchenDialog />
+        <OpenBottleDialog openedBy="Cozinha" />
       </div>
     );
   }
@@ -220,7 +215,7 @@ export function BottlesCarousel() {
               )}
             </Button>
           </CollapsibleTrigger>
-          <OpenBottleKitchenDialog compact />
+          <OpenBottleDialog openedBy="Cozinha" compact />
         </div>
 
         <CollapsibleContent className="mt-3 space-y-3">
@@ -244,173 +239,5 @@ export function BottlesCarousel() {
         </CollapsibleContent>
       </div>
     </Collapsible>
-  );
-}
-
-// ─── Dialog: Abrir Garrafa pela Cozinha ─────────────────────────────
-const LIQUID_TYPES = new Set(['destilado', 'whisky', 'gin', 'vodka', 'cachaca', 'licor', 'corote', 'vinho', 'energetico', 'espumante']);
-
-interface LiquidProduct {
-  id: string;
-  name: string;
-  stock: number | null;
-  product_type: string | null;
-}
-
-function OpenBottleKitchenDialog({ compact = false }: { compact?: boolean } = {}) {
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const [productId, setProductId] = useState('');
-  const [totalMl, setTotalMl] = useState('1000');
-  const [mlPerDose, setMlPerDose] = useState('50');
-  const [dosePrice, setDosePrice] = useState('8');
-  const [submitting, setSubmitting] = useState(false);
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const { data: products = [] } = useQuery({
-    queryKey: ['kitchen-liquid-products'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('products')
-        .select('id, name, stock, product_type')
-        .eq('is_active', true)
-        .in('product_type', [...LIQUID_TYPES])
-        .order('name', { ascending: true });
-      if (error) throw error;
-      return (data || []) as LiquidProduct[];
-    },
-    enabled: open,
-  });
-
-  const filtered = useMemo(() => {
-    const q = normalizeSearch(search.trim());
-    return products
-      .filter(p => (p.stock ?? 0) > 0)
-      .filter(p => !q || normalizeSearch(p.name).includes(q))
-      .slice(0, 60);
-  }, [products, search]);
-
-  const selected = products.find(p => p.id === productId);
-  const doses = parseInt(totalMl) && parseInt(mlPerDose) ? Math.floor(parseInt(totalMl) / parseInt(mlPerDose)) : 0;
-
-  const reset = () => {
-    setProductId(''); setSearch(''); setTotalMl('1000'); setMlPerDose('50'); setDosePrice('8');
-  };
-
-  const handleSubmit = async () => {
-    if (!productId) return;
-    setSubmitting(true);
-    try {
-      const { data: bottleId, error } = await supabase.rpc('open_bottle', {
-        p_product_id: productId,
-        p_total_ml: parseInt(totalMl),
-        p_ml_per_dose: parseInt(mlPerDose),
-        p_opened_by: 'Cozinha',
-      });
-      if (error) throw error;
-      const price = parseFloat(dosePrice) || 0;
-      if (price > 0 && bottleId) {
-        await supabase.rpc('update_bottle_dose_price', {
-          p_bottle_id: bottleId,
-          p_dose_price: price,
-        });
-      }
-      queryClient.invalidateQueries({ queryKey: ['open-bottles-kitchen'] });
-      queryClient.invalidateQueries({ queryKey: ['open-bottles'] });
-      queryClient.invalidateQueries({ queryKey: ['open-bottles-prep'] });
-      queryClient.invalidateQueries({ queryKey: ['allowed-bottle-candidates-admin'] });
-      toast({ title: '🍾 Garrafa aberta!' });
-      setOpen(false);
-      reset();
-    } catch (err: any) {
-      toast({ title: 'Erro ao abrir garrafa', description: err.message, variant: 'destructive' });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
-      <DialogTrigger asChild>
-        <Button size={compact ? 'sm' : 'default'} className="gap-1 shrink-0">
-          <Plus className="h-4 w-4" />
-          {compact ? 'Abrir' : 'Abrir Garrafa'}
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Wine className="h-5 w-5 text-primary" /> Abrir Nova Garrafa
-          </DialogTitle>
-          <DialogDescription>Selecione o produto líquido e informe o volume.</DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4 py-2 flex-1 overflow-y-auto">
-          {!selected ? (
-            <div className="space-y-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Buscar vodka, whisky, gin..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" autoFocus />
-              </div>
-              <ScrollArea className="max-h-[220px] border rounded-lg">
-                {filtered.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">{search ? 'Nenhum produto encontrado' : 'Busque um produto líquido'}</p>
-                ) : (
-                  <div className="p-1 space-y-0.5">
-                    {filtered.map(p => (
-                      <button key={p.id} onClick={() => { setProductId(p.id); setSearch(''); }} className="w-full flex items-center gap-2 p-2 rounded-md hover:bg-muted text-left">
-                        <Wine className="h-4 w-4 text-primary shrink-0" />
-                        <span className="text-sm flex-1 truncate">{p.name}</span>
-                        <span className="text-xs text-muted-foreground">Est: {p.stock}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </ScrollArea>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 p-2.5 border border-primary/50 bg-primary/5 rounded-lg">
-              <Wine className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium flex-1 truncate">{selected.name}</span>
-              <Badge variant="secondary" className="text-xs">Est: {selected.stock}</Badge>
-              <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => setProductId('')}>Trocar</Button>
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <Label className="text-xs">Volume Total (ml)</Label>
-              <Input type="number" value={totalMl} onChange={e => setTotalMl(e.target.value)} />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs">ML por Dose</Label>
-              <div className="flex gap-1">
-                <Button type="button" size="sm" variant={mlPerDose === '50' ? 'default' : 'outline'} className="flex-1" onClick={() => setMlPerDose('50')}>50</Button>
-                <Button type="button" size="sm" variant={mlPerDose === '100' ? 'default' : 'outline'} className="flex-1" onClick={() => setMlPerDose('100')}>100</Button>
-                <Button type="button" size="sm" variant={mlPerDose === '400' ? 'default' : 'outline'} className="flex-1" onClick={() => setMlPerDose('400')}>400</Button>
-              </div>
-            </div>
-          </div>
-
-          {doses > 0 && (
-            <div className="p-2 bg-primary/10 rounded text-center text-sm">
-              Total: <span className="font-bold text-primary">{doses}</span> doses
-            </div>
-          )}
-
-          <div className="space-y-1">
-            <Label className="text-xs">Preço por Dose</Label>
-            <CurrencyInput value={dosePrice} onChange={(v) => setDosePrice(String(v))} step={0.5} />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={submitting}>Cancelar</Button>
-          <Button onClick={handleSubmit} disabled={!productId || submitting}>
-            {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Wine className="h-4 w-4 mr-2" />}
-            Abrir Garrafa
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 }
