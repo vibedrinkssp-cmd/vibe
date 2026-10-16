@@ -174,6 +174,9 @@ function useDeleteBottle() {
   });
 }
 
+const LOW_BOTTLE_PERCENT = 20;
+const STALE_BOTTLE_DAYS = 3;
+
 // Componente visual da garrafa
 function BottleLevel({ remaining, total, isEmpty }: { remaining: number; total: number; isEmpty: boolean }) {
   const percentage = total > 0 ? (remaining / total) * 100 : 0;
@@ -247,44 +250,83 @@ function isLiquidProduct(product: { name: string; product_type?: string | null }
   return LIQUID_KEYWORDS.some(kw => nameLower.includes(kw));
 }
 
-// Modal para abrir nova garrafa
-function OpenBottleDialog({ 
-  products, 
-  onOpen 
-}: { 
-  products: Array<{ id: string; name: string; stock: number | null; product_type?: string | null }>;
-  onOpen: (productId: string, totalMl: number, mlPerDose: number, dosePrice: number, notes?: string) => void;
+// Extrai o volume (ml) do nome do produto: "SMIRNOFF 998ML" -> 998, "VODKA 1L" -> 1000, "GIN 1,5 LITROS" -> 1500
+function parseVolumeMl(name: string): number | null {
+  const ml = name.match(/(\d{2,4})\s*ml\b/i);
+  if (ml) return parseInt(ml[1], 10);
+  const liters = name.match(/(\d+(?:[.,]\d+)?)\s*(?:l|lt|lts|litros?)\b/i);
+  if (liters) return Math.round(parseFloat(liters[1].replace(',', '.')) * 1000);
+  return null;
+}
+
+const DEFAULT_VOLUME_ML = 1000;
+const DEFAULT_DOSE_PRICE = 8;
+const DOSE_SIZES_ML = [50, 100] as const;
+
+type OpenBottleProduct = { id: string; name: string; stock: number | null; product_type?: string | null };
+type OpenBottleParams = { productId: string; totalMl: number; mlPerDose: number; dosePrice: number };
+
+// Modal para abrir nova garrafa: escolhe o produto e confirma. Volume e preço já vêm preenchidos.
+function OpenBottleDialog({
+  products,
+  bottles,
+  onOpen,
+}: {
+  products: OpenBottleProduct[];
+  bottles: OpenBottle[];
+  onOpen: (params: OpenBottleParams) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState('');
-  const [totalMl, setTotalMl] = useState('1000');
-  const [mlPerDose, setMlPerDose] = useState('50');
-  const [dosePrice, setDosePrice] = useState('8');
-  const [notes, setNotes] = useState('');
+  const [totalMl, setTotalMl] = useState(String(DEFAULT_VOLUME_ML));
+  const [mlPerDose, setMlPerDose] = useState<number>(DOSE_SIZES_ML[0]);
+  const [dosePrice, setDosePrice] = useState(String(DEFAULT_DOSE_PRICE));
   const [search, setSearch] = useState('');
 
-  const handleSubmit = () => {
-    if (!productId || !totalMl || !mlPerDose) return;
-    onOpen(productId, parseInt(totalMl), parseInt(mlPerDose), parseFloat(dosePrice) || 0, notes);
-    setOpen(false);
+  const selectedProduct = products.find(p => p.id === productId);
+
+  const reset = () => {
     setProductId('');
-    setTotalMl('1000');
-    setMlPerDose('50');
-    setDosePrice('8');
-    setNotes('');
+    setTotalMl(String(DEFAULT_VOLUME_ML));
+    setMlPerDose(DOSE_SIZES_ML[0]);
+    setDosePrice(String(DEFAULT_DOSE_PRICE));
     setSearch('');
   };
 
-  const doses = parseInt(totalMl) && parseInt(mlPerDose) ? Math.floor(parseInt(totalMl) / parseInt(mlPerDose)) : 0;
+  const selectProduct = (p: OpenBottleProduct) => {
+    setProductId(p.id);
+    setSearch('');
+    setTotalMl(String(parseVolumeMl(p.name) ?? DEFAULT_VOLUME_ML));
+    // Reaproveita a configuração da última garrafa aberta deste produto
+    const last = bottles.find(b => b.product_id === p.id);
+    if (last) {
+      setMlPerDose(last.ml_per_dose);
+      if (last.dose_price > 0) setDosePrice(String(last.dose_price));
+    }
+  };
+
+  const totalMlNum = parseInt(totalMl, 10) || 0;
+  const doses = totalMlNum > 0 ? Math.floor(totalMlNum / mlPerDose) : 0;
+  const canSubmit = !!selectedProduct && doses > 0;
+
+  const handleSubmit = () => {
+    if (!selectedProduct || doses <= 0) return;
+    onOpen({
+      productId: selectedProduct.id,
+      totalMl: totalMlNum,
+      mlPerDose,
+      dosePrice: parseFloat(dosePrice) || 0,
+    });
+    setOpen(false);
+    reset();
+  };
 
   const liquidProducts = products
     .filter(p => (p.stock ?? 0) > 0 && isLiquidProduct(p))
     .filter(p => !search || p.name.toLowerCase().includes(search.toLowerCase()));
 
-  const selectedProduct = products.find(p => p.id === productId);
-
   return (
-    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) { setSearch(''); setProductId(''); } }}>
+    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
       <DialogTrigger asChild>
         <Button className="gap-2">
           <Plus className="h-4 w-4" />
@@ -298,122 +340,112 @@ function OpenBottleDialog({
             Abrir Nova Garrafa
           </DialogTitle>
           <DialogDescription>
-            Selecione o produto líquido e informe o volume.
+            Escolha a garrafa. Ela sai do estoque e fica aberta no controle de dose.
           </DialogDescription>
         </DialogHeader>
-        
-        <div className="space-y-4 py-4 flex-1 overflow-y-auto">
-          <div className="space-y-2">
-            <Label>Produto</Label>
-            {selectedProduct ? (
-              <div className="flex items-center gap-2 p-2.5 border border-primary/50 bg-primary/5 rounded-lg">
-                <Wine className="h-4 w-4 text-primary flex-shrink-0" />
-                <span className="text-sm font-medium flex-1 truncate">{selectedProduct.name}</span>
-                <Badge variant="secondary" className="text-xs">Est: {selectedProduct.stock}</Badge>
-                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => setProductId('')}>
-                  Trocar
-                </Button>
-              </div>
-            ) : (
-              <>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Buscar vodka, whisky, gin, energético..."
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    className="pl-9"
-                    autoFocus
-                  />
-                </div>
-                <ScrollArea className="max-h-[180px] border rounded-lg">
-                  {liquidProducts.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-4">
-                      {search ? 'Nenhum produto líquido encontrado' : 'Busque um produto líquido'}
-                    </p>
-                  ) : (
-                    <div className="p-1 space-y-0.5">
-                      {liquidProducts.map(p => (
-                        <button
-                          key={p.id}
-                          onClick={() => { setProductId(p.id); setSearch(''); }}
-                          className="w-full flex items-center gap-2 p-2 rounded-md hover:bg-muted text-left transition-colors"
-                        >
-                          <Wine className="h-4 w-4 text-primary flex-shrink-0" />
-                          <span className="text-sm flex-1 truncate">{p.name}</span>
-                          <span className="text-xs text-muted-foreground">Est: {p.stock}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </ScrollArea>
-              </>
-            )}
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Volume Total (ml)</Label>
-              <Input 
-                type="number" 
-                value={totalMl} 
-                onChange={(e) => setTotalMl(e.target.value)}
-                placeholder="Ex: 1000"
-              />
+        <div className="space-y-4 py-2 flex-1 overflow-y-auto">
+          {selectedProduct ? (
+            <div className="flex items-center gap-2 p-2.5 border border-primary/50 bg-primary/5 rounded-lg">
+              <Wine className="h-4 w-4 text-primary flex-shrink-0" />
+              <span className="text-sm font-medium flex-1 truncate">{selectedProduct.name}</span>
+              <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => setProductId('')}>
+                Trocar
+              </Button>
             </div>
-            <div className="space-y-2">
-              <Label>ML por Dose</Label>
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant={mlPerDose === '50' ? 'default' : 'outline'}
-                  className="flex-1 text-lg font-bold"
-                  onClick={() => setMlPerDose('50')}
-                >
-                  50ml
-                </Button>
-                <Button
-                  type="button"
-                  variant={mlPerDose === '100' ? 'default' : 'outline'}
-                  className="flex-1 text-lg font-bold"
-                  onClick={() => setMlPerDose('100')}
-                >
-                  100ml
-                </Button>
+          ) : (
+            <>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar vodka, whisky, gin, energético..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="pl-9"
+                  autoFocus
+                />
               </div>
-            </div>
-          </div>
-
-          {doses > 0 && (
-            <div className="p-3 bg-primary/10 rounded-lg text-center">
-              <span className="text-sm text-muted-foreground">Total de doses: </span>
-              <span className="text-xl font-bold text-primary">{doses}</span>
-            </div>
+              <ScrollArea className="max-h-[260px] border rounded-lg">
+                {liquidProducts.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    {search ? 'Nenhum produto líquido em estoque' : 'Busque um produto líquido'}
+                  </p>
+                ) : (
+                  <div className="p-1 space-y-0.5">
+                    {liquidProducts.map(p => (
+                      <button
+                        key={p.id}
+                        onClick={() => selectProduct(p)}
+                        className="w-full flex items-center gap-2 p-2 rounded-md hover:bg-muted text-left transition-colors"
+                      >
+                        <Wine className="h-4 w-4 text-primary flex-shrink-0" />
+                        <span className="text-sm flex-1 truncate">{p.name}</span>
+                        <span className="text-xs text-muted-foreground">Est: {p.stock}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </>
           )}
 
-          <div className="space-y-2">
-            <Label>Preço por Dose</Label>
-            <CurrencyInput 
-              value={dosePrice} 
-              onChange={(v) => setDosePrice(String(v))}
-              step={0.50}
-              placeholder="8,00"
-            />
-          </div>
+          {selectedProduct && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Volume (ml)</Label>
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    value={totalMl}
+                    onChange={(e) => setTotalMl(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Tamanho da dose</Label>
+                  <div className="flex gap-2">
+                    {DOSE_SIZES_ML.map(size => (
+                      <Button
+                        key={size}
+                        type="button"
+                        variant={mlPerDose === size ? 'default' : 'outline'}
+                        className="flex-1 font-bold"
+                        onClick={() => setMlPerDose(size)}
+                      >
+                        {size}ml
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
-          <div className="space-y-2">
-            <Label>Observações (opcional)</Label>
-            <Input 
-              value={notes} 
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Ex: Lote #123"
-            />
-          </div>
+              <div className="space-y-2">
+                <Label>Preço por dose</Label>
+                <CurrencyInput
+                  value={dosePrice}
+                  onChange={(v) => setDosePrice(String(v))}
+                  step={0.5}
+                  placeholder="8,00"
+                />
+              </div>
+
+              <div className="p-3 bg-primary/10 rounded-lg text-center space-y-1">
+                <p className="text-sm">
+                  <span className="text-muted-foreground">Rende </span>
+                  <span className="text-xl font-bold text-primary">{doses}</span>
+                  <span className="text-muted-foreground"> doses</span>
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Estoque: {selectedProduct.stock ?? 0} → {Math.max((selectedProduct.stock ?? 0) - 1, 0)}
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-          <Button onClick={handleSubmit} disabled={!productId || !totalMl || !mlPerDose}>
+          <Button onClick={handleSubmit} disabled={!canSubmit}>
             <Wine className="h-4 w-4 mr-2" />
             Abrir Garrafa
           </Button>
@@ -449,6 +481,8 @@ function BottleCard({
   const [editMlPerDose, setEditMlPerDose] = useState(String(bottle.ml_per_dose));
   const percentage = bottle.total_doses > 0 ? (bottle.remaining_doses / bottle.total_doses) * 100 : 0;
   const remainingMl = bottle.remaining_doses * bottle.ml_per_dose;
+  const openDays = Math.floor((Date.now() - new Date(bottle.opened_at).getTime()) / 86_400_000);
+  const isLow = !bottle.is_empty && percentage <= LOW_BOTTLE_PERCENT;
 
   // Sincroniza valor exibido quando garrafa muda externamente (e usuário não está editando)
   useEffect(() => {
@@ -467,9 +501,9 @@ function BottleCard({
 
   return (
     <Card className={`relative overflow-hidden transition-all ${bottle.is_empty ? 'opacity-60 border-destructive/30' : 'border-primary/20'}`}>
-      {bottle.is_empty && (
+      {(bottle.is_empty || isLow) && (
         <div className="absolute top-2 right-2">
-          <Badge variant="destructive" className="text-xs">VAZIA</Badge>
+          <Badge variant="destructive" className="text-xs">{bottle.is_empty ? 'VAZIA' : 'ACABANDO'}</Badge>
         </div>
       )}
       
@@ -560,8 +594,38 @@ function BottleCard({
 
         <div className="text-xs text-muted-foreground space-y-1">
           <p>Volume: {bottle.total_ml}ml ({bottle.ml_per_dose}ml/dose)</p>
-          <p>Aberta: {new Date(bottle.opened_at).toLocaleDateString('pt-BR')}</p>
+          <p className={openDays >= STALE_BOTTLE_DAYS && !bottle.is_empty ? 'text-amber-500 font-medium' : undefined}>
+            Aberta {openDays === 0 ? 'hoje' : `há ${openDays} dia${openDays > 1 ? 's' : ''}`}
+            {bottle.opened_by ? ` · ${bottle.opened_by}` : ''}
+          </p>
         </div>
+
+        {!readOnly && !bottle.is_empty && (
+          <div className="grid grid-cols-3 gap-1.5">
+            <Button size="sm" className="font-bold" disabled={isLoading} onClick={() => onUseDose(1)}>
+              −1 dose
+            </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="font-bold"
+              disabled={isLoading || bottle.remaining_doses < 2}
+              onClick={() => onUseDose(2)}
+            >
+              −2
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-destructive"
+              disabled={isLoading}
+              onClick={() => onUseDose(bottle.remaining_doses)}
+              title="Marcar a garrafa como vazia"
+            >
+              Acabou
+            </Button>
+          </div>
+        )}
 
         {!readOnly && onEditStock && (
           <Dialog open={editStockOpen} onOpenChange={(o) => {
@@ -672,7 +736,10 @@ export function BottlesTab({ readOnly = false }: { readOnly?: boolean } = {}) {
     };
   }, []);
 
-  const activeBottles = bottles.filter(b => !b.is_empty);
+  // Quem está acabando aparece primeiro
+  const activeBottles = bottles
+    .filter(b => !b.is_empty)
+    .sort((a, b) => a.remaining_doses / a.total_doses - b.remaining_doses / b.total_doses);
   const emptyBottles = bottles.filter(b => b.is_empty);
 
   const totalDosesAvailable = activeBottles.reduce((sum, b) => sum + b.remaining_doses, 0);
@@ -703,10 +770,8 @@ export function BottlesTab({ readOnly = false }: { readOnly?: boolean } = {}) {
         {!readOnly && (
           <OpenBottleDialog 
             products={products.map(p => ({ id: p.id, name: p.name, stock: p.stock, product_type: p.productType }))} 
-            onOpen={(productId, totalMl, mlPerDose, dosePrice, notes) => {
-              // Atômico: abre garrafa + salva preço da dose no mesmo fluxo (sem setTimeout/race)
-              openBottleMutation.mutate({ productId, totalMl, mlPerDose, dosePrice, notes });
-            }}
+            bottles={bottles}
+            onOpen={(params) => openBottleMutation.mutate(params)}
           />
         )}
       </div>
