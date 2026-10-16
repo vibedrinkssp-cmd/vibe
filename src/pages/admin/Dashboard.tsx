@@ -27,6 +27,21 @@ import {
   ClipboardCheck,
   CalendarDays,
   Fingerprint,
+  ShoppingBag,
+  Grid3X3,
+  Image as ImageIcon,
+  MonitorPlay,
+  Sparkles,
+  BookOpen,
+  Ticket,
+  BadgePercent,
+  QrCode,
+  ClipboardList,
+  BarChart3,
+  Settings,
+  FileDown,
+  Database,
+  KeyRound,
 } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -75,6 +90,21 @@ const ScheduleTab = lazy(() => import('./tabs/ScheduleTab').then(m => ({ default
 
 const MotoboyClosureTab = lazy(() => import('./tabs/MotoboyClosureTab').then(m => ({ default: m.MotoboyClosureTab })));
 const TimeClockTab = lazy(() => import('./tabs/TimeClockTab').then(m => ({ default: m.TimeClockTab })));
+const ProductsTab = lazy(() => import('./tabs/ProductsTab').then(m => ({ default: m.ProductsTab })));
+const BannersTab = lazy(() => import('./tabs/BannersTab').then(m => ({ default: m.BannersTab })));
+const PagercomTab = lazy(() => import('./tabs/PagercomTab').then(m => ({ default: m.PagercomTab })));
+const SpecialDrinksConfigTab = lazy(() => import('./tabs/SpecialDrinksConfigTab').then(m => ({ default: m.SpecialDrinksConfigTab })));
+const SpecialDrinksRecipesTab = lazy(() => import('./tabs/SpecialDrinksRecipesTab').then(m => ({ default: m.SpecialDrinksRecipesTab })));
+const CadernetaTab = lazy(() => import('./tabs/CadernetaTab').then(m => ({ default: m.CadernetaTab })));
+const PosCouponsTab = lazy(() => import('./tabs/PosCouponsTab').then(m => ({ default: m.PosCouponsTab })));
+const WeeklyPromotionsTab = lazy(() => import('./tabs/WeeklyPromotionsTab').then(m => ({ default: m.WeeklyPromotionsTab })));
+const QrCodeTab = lazy(() => import('./tabs/QrCodeTab').then(m => ({ default: m.QrCodeTab })));
+const DailyReportTab = lazy(() => import('./tabs/DailyReportTab').then(m => ({ default: m.DailyReportTab })));
+const ReportsTab = lazy(() => import('./tabs/ReportsTab').then(m => ({ default: m.ReportsTab })));
+const SettingsTab = lazy(() => import('./tabs/SettingsTab').then(m => ({ default: m.SettingsTab })));
+const ImportProductsTab = lazy(() => import('./tabs/ImportProductsTab'));
+const BackupDataTab = lazy(() => import('./tabs/BackupDataTab').then(m => ({ default: m.BackupDataTab })));
+const CredentialsTab = lazy(() => import('./tabs/CredentialsTab').then(m => ({ default: m.CredentialsTab })));
 
 function TabSkeleton() {
   return (
@@ -103,6 +133,18 @@ const tabs = [
   { id: 'sangrias', label: 'Sangrias', icon: Receipt, group: 'Dinheiro' },
   { id: 'fechamento', label: 'Fechamento', icon: Calculator, group: 'Dinheiro' },
   { id: 'fechamento-boys', label: 'Fech. Boys', icon: ClipboardCheck, group: 'Dinheiro' },
+  { id: 'caderneta', label: 'Caderneta', icon: BookOpen, group: 'Dinheiro' },
+  { id: 'relatorio-dia', label: 'Relatório Diário', icon: ClipboardList, group: 'Dinheiro' },
+  // Catálogo
+  { id: 'produtos', label: 'Produtos', icon: ShoppingBag, group: 'Catálogo' },
+  { id: 'categorias', label: 'Categorias', icon: Grid3X3, group: 'Catálogo' },
+  { id: 'banners', label: 'Banners', icon: ImageIcon, group: 'Catálogo' },
+  { id: 'promocoes', label: 'Promoções', icon: BadgePercent, group: 'Catálogo' },
+  { id: 'cupons', label: 'Cupons', icon: Ticket, group: 'Catálogo' },
+  { id: 'drink-types', label: 'Monte Drink', icon: Wine, group: 'Catálogo' },
+  { id: 'drinks-especiais', label: 'Drinks Especiais', icon: Sparkles, group: 'Catálogo' },
+  { id: 'pagercom', label: 'PAGERCOM', icon: MonitorPlay, group: 'Catálogo' },
+  { id: 'qrcode', label: 'QR Code', icon: QrCode, group: 'Catálogo' },
   // Cadastros
   { id: 'clientes', label: 'Clientes', icon: Users, group: 'Cadastros' },
   { id: 'motoboys', label: 'Motoboys', icon: Bike, group: 'Cadastros' },
@@ -112,6 +154,12 @@ const tabs = [
   { id: 'sync-in', label: 'SYNC IN', icon: ClipboardCheck, alwaysShowLabel: true, group: 'Equipe' },
   { id: 'escala', label: 'ESCALA', icon: CalendarDays, alwaysShowLabel: true, group: 'Equipe' },
   { id: 'ponto', label: 'PONTO', icon: Fingerprint, alwaysShowLabel: true, group: 'Equipe' },
+  // Sistema
+  { id: 'reports', label: 'Relatórios', icon: BarChart3, group: 'Sistema' },
+  { id: 'settings', label: 'Configurações', icon: Settings, group: 'Sistema' },
+  { id: 'import', label: 'Importar CSV', icon: FileDown, group: 'Sistema' },
+  { id: 'backup', label: 'BKP e Dados', icon: Database, group: 'Sistema' },
+  { id: 'credenciais', label: 'Credenciais', icon: KeyRound, group: 'Sistema' },
 ];
 
 export default function AdminDashboard() {
@@ -278,12 +326,12 @@ export default function AdminDashboard() {
       case 'tracking': return <TrackingTab />;
       case 'caixa': return <CaixaTab />;
       case 'saqdep': return <SaqDepTab />;
-      case 'garrafas': return <BottlesTab readOnly />;
+      case 'garrafas': return <BottlesTab />;
       case 'macos': return <PacksTab />;
       case 'sangrias': return <SangriasTab />;
       case 'fechamento': return <CashClosureTab />;
       case 'fechamento-boys': return <MotoboyClosureTab />;
-      case 'estoque': return <StockTab readOnly />;
+      case 'estoque': return <StockTab />;
       case 'barcodes': return <BarcodesTab />;
       // caderneta removed from admin
       case 'clientes': return <ClientsTab />;
@@ -293,6 +341,22 @@ export default function AdminDashboard() {
       case 'sync-in': return <SyncInTab />;
       case 'escala': return <ScheduleTab />;
       case 'ponto': return <TimeClockTab />;
+      case 'caderneta': return <CadernetaTab />;
+      case 'relatorio-dia': return <DailyReportTab />;
+      case 'produtos': return <ProductsTab />;
+      case 'categorias': return <CategoriesTab />;
+      case 'banners': return <BannersTab />;
+      case 'promocoes': return <WeeklyPromotionsTab />;
+      case 'cupons': return <PosCouponsTab />;
+      case 'drink-types': return <SpecialDrinksConfigTab />;
+      case 'drinks-especiais': return <SpecialDrinksRecipesTab />;
+      case 'pagercom': return <PagercomTab />;
+      case 'qrcode': return <QrCodeTab />;
+      case 'reports': return <ReportsTab />;
+      case 'settings': return <SettingsTab />;
+      case 'import': return <ImportProductsTab />;
+      case 'backup': return <BackupDataTab />;
+      case 'credenciais': return <CredentialsTab />;
       
       default: return <OrdersTab />;
     }
