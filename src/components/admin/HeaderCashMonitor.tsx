@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Wallet, TrendingUp, TrendingDown, AlertTriangle, Clock,
-  DollarSign, CreditCard, Plus, Smartphone, ArrowDownCircle, ArrowUpCircle, 
+  DollarSign, CreditCard, Smartphone, ArrowDownCircle, ArrowUpCircle, 
   ShoppingCart, Package, Truck, BarChart3, Receipt, Eye, EyeOff
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client-safe';
@@ -15,9 +15,7 @@ import {
 } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { OpenCashDialog } from '@/pages/admin/tabs/caixa/OpenCashDialog';
-import { useOpenCashRegister } from '@/pages/admin/tabs/caixa/useOpenCashRegister';
+import { OpenCashButton } from '@/components/cash/OpenCashButton';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -85,8 +83,6 @@ function MetricRow({ icon: Icon, label, value, color }: { icon: any; label: stri
 
 export function HeaderCashMonitor() {
   const [revealed, setRevealed] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
-  const openMutation = useOpenCashRegister(() => setOpenDialog(false));
 
   // Auto-hide after 30s
   useEffect(() => {
@@ -137,20 +133,7 @@ export function HeaderCashMonitor() {
   if (!isOpen) {
     return (
       <div className="flex items-center gap-2">
-      <Button
-        size="sm"
-        className="h-8 gap-1.5 font-bold animate-pulse"
-        onClick={() => setOpenDialog(true)}
-      >
-        <Plus className="h-4 w-4" />
-        Abrir Caixa
-      </Button>
-      <OpenCashDialog
-        open={openDialog}
-        onOpenChange={setOpenDialog}
-        onConfirm={(openingCash) => openMutation.mutate(openingCash)}
-        isPending={openMutation.isPending}
-      />
+      <OpenCashButton pulse className="h-8" />
       <Popover>
         <PopoverTrigger asChild>
           <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 transition-all cursor-pointer">

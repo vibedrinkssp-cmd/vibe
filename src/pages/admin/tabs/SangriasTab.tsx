@@ -1,4 +1,5 @@
 // Sangrias Tab Component - Lançamentos Avulsos
+import { OpenCashButton } from "@/components/cash/OpenCashButton";
 import { useState } from 'react';
 import { searchIncludes } from '@/lib/text-utils';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -434,9 +435,9 @@ export function SangriasTab() {
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Caixa Fechado</AlertTitle>
           <AlertDescription>
-            Sangrias só podem ser registradas quando o caixa está aberto. 
-            Vá até a aba "Caixa" e abra uma nova sessão para registrar sangrias.
+            Sangrias só podem ser registradas quando o caixa está aberto.
           </AlertDescription>
+          <OpenCashButton className="mt-3" />
         </Alert>
       )}
 

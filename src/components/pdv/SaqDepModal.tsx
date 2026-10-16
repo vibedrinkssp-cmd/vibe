@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client-safe';
 import { queryClient } from '@/lib/queryClient';
 import { PixQRCodeModal } from '@/components/PixQRCodeModal';
 import { cashClosedToast } from '@/lib/cash-session-error';
+import { OpenCashButton } from '@/components/cash/OpenCashButton';
 
 interface SaqDepModalProps {
   open: boolean;
@@ -215,8 +216,9 @@ export function SaqDepModal({ open, onOpenChange }: SaqDepModalProps) {
 
             {/* Cash session status */}
             {!isCashOpen && (
-              <div className="text-sm p-3 rounded bg-destructive/10 text-destructive border border-destructive/30 font-medium">
-                ⚠️ Caixa fechado. Realize a abertura de caixa antes de operar saques.
+              <div className="flex items-center justify-between gap-2 text-sm p-3 rounded bg-destructive/10 text-destructive border border-destructive/30 font-medium">
+                <span>⚠️ Caixa fechado. Abra o caixa antes de operar saques.</span>
+                <OpenCashButton />
               </div>
             )}
 

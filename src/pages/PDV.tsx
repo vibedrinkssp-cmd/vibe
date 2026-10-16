@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect, useMemo, lazy, Suspense } from 'react';
+import { OpenCashButton } from '@/components/cash/OpenCashButton';
 import { normalizeSearch } from '@/lib/text-utils';
 import { DraftTabs, type DraftTab } from '@/components/pdv/DraftTabs';
 import { CustomerNameInput } from '@/components/pdv/CustomerNameInput';
@@ -1341,6 +1342,7 @@ export default function PDV() {
       <header className="bg-[#0A0A0A] border-b border-[#D4AF37]/30 py-3 px-3 md:px-6 flex items-center justify-between sticky top-0 z-50 flex-shrink-0">
         <PanelSwitcher current="pdv" />
         <div className="flex items-center gap-2 md:gap-4">
+          <OpenCashButton pulse />
           <StoreStatusToggle />
           <span className="text-white/70 text-xs sm:text-sm hidden sm:inline">
             {user?.name}
