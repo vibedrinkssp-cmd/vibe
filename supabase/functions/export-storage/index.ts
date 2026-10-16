@@ -1,8 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { isAdminRequest } from '../_shared/admin-auth.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-admin-key',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-admin-key, x-session-token',
 }
 
 async function listAllFiles(supabase: any, bucket: string, folder: string = ''): Promise<any[]> {
@@ -41,21 +42,23 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const adminKey = req.headers.get('x-admin-key')
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    
-    if (!adminKey || adminKey !== serviceRoleKey) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
-    }
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       serviceRoleKey!,
       { auth: { persistSession: false } }
     )
+
+    // Acesso: sessão de admin logado (sem digitar chave) ou, como antes, a service role key no header
+    const adminKey = req.headers.get('x-admin-key')
+    const isLegacyKey = !!adminKey && adminKey === serviceRoleKey
+    if (!isLegacyKey && !(await isAdminRequest(supabase, req))) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
 
     const url = new URL(req.url)
     const bucket = url.searchParams.get('bucket') || 'images'

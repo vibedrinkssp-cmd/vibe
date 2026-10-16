@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client-safe';
+import { getAdminSessionToken } from '@/lib/admin-session';
 import JSZip from 'jszip';
 
 // ============== CONSTANTS ==============
@@ -114,6 +115,39 @@ function nowStr() {
   return new Date().toLocaleTimeString('pt-BR');
 }
 
+// Autenticação do backup: usa a sessão do admin logado (nada de digitar a service role key no navegador)
+function backupFunctionsUrl() {
+  const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || `https://${projectId}.supabase.co`;
+  return `${supabaseUrl}/functions/v1`;
+}
+
+async function adminCallHeaders(): Promise<Record<string, string>> {
+  const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+  const { data } = await supabase.auth.getSession();
+  const sessionToken = getAdminSessionToken();
+  return {
+    apikey: publishableKey,
+    Authorization: `Bearer ${data.session?.access_token ?? publishableKey}`,
+    ...(sessionToken ? { 'x-session-token': sessionToken } : {}),
+  };
+}
+
+const BACKUP_AUTH_ERROR =
+  'Sessão de admin inválida ou funções de backup ainda não atualizadas no servidor. Entre de novo no admin; se continuar, faça o deploy das funções de backup.';
+
+async function callBackupImport(body: Record<string, unknown>): Promise<{ success?: boolean; error?: string; token?: string; path?: string }> {
+  const response = await fetch(`${backupFunctionsUrl()}/admin-backup-import`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(await adminCallHeaders()) },
+    body: JSON.stringify(body),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (response.status === 401) throw new Error(BACKUP_AUTH_ERROR);
+  if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+  return data;
+}
+
 async function getAdminKey(): Promise<string> {
   // Use the service role key passed via edge function header
   // We store it temporarily from a settings fetch
@@ -195,35 +229,14 @@ function ExportDBTab() {
     try {
       addLog('info', 'Iniciando exportação completa do banco de dados...');
 
-      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || `https://${projectId}.supabase.co`;
-
-      // We call the edge function with the anon key in authorization
-      // and pass a special admin key header
-      // For security, we prompt the user for the service role key
-      const serviceKey = prompt(
-        'Digite a Service Role Key do Supabase para exportar todos os dados.\n\n' +
-        'Você encontra em: Supabase Dashboard → Settings → API → service_role key\n\n' +
-        '(Esta chave NÃO é salva em nenhum lugar)'
-      );
-
-      if (!serviceKey) {
-        addLog('error', 'Exportação cancelada - chave não fornecida.');
-        setIsExporting(false);
-        return;
-      }
-
       addLog('info', 'Chamando função de exportação...');
 
-      const response = await fetch(`${supabaseUrl}/functions/v1/export-database`, {
+      const response = await fetch(`${backupFunctionsUrl()}/export-database`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          'x-admin-key': serviceKey,
-        },
+        headers: { 'Content-Type': 'application/json', ...(await adminCallHeaders()) },
       });
 
+      if (response.status === 401) throw new Error(BACKUP_AUTH_ERROR);
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
         throw new Error(errData.error || `HTTP ${response.status}`);
@@ -389,25 +402,6 @@ function ImportDBTab() {
     setProgress(0);
     setLogs([]);
 
-    const serviceKey = prompt(
-      'Digite a Service Role Key do Supabase para importar os dados.\n\n' +
-      'ATENÇÃO: Isso irá sobrescrever dados existentes (upsert por ID).\n\n' +
-      'Você encontra em: Supabase Dashboard → Settings → API → service_role key'
-    );
-
-    if (!serviceKey) {
-      addLog('error', 'Importação cancelada.');
-      setIsImporting(false);
-      return;
-    }
-
-    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || `https://${projectId}.supabase.co`;
-
-    // Create admin client
-    const { createClient } = await import('@supabase/supabase-js');
-    const adminClient = createClient(supabaseUrl, serviceKey);
-
     // Sort tables by import order
     const sortedTables = Object.keys(zipData).sort((a, b) => {
       const idxA = TABLES_ORDER.indexOf(a);
@@ -442,9 +436,13 @@ function ImportDBTab() {
         for (let i = 0; i < coercedRows.length; i += chunkSize) {
           const chunk = coercedRows.slice(i, i + chunkSize);
           
-          const { error } = await adminClient
-            .from(table)
-            .upsert(chunk as any, { onConflict: 'id', ignoreDuplicates: false });
+          let error: { message: string } | null = null;
+          try {
+            const result = await callBackupImport({ action: 'upsert', table, rows: chunk });
+            if (!result.success) error = { message: result.error || 'Falha ao importar' };
+          } catch (err) {
+            error = { message: err instanceof Error ? err.message : 'Erro' };
+          }
 
           if (error) {
             addLog('error', `  Chunk ${Math.floor(i/chunkSize)+1}: ${error.message}`);
@@ -543,29 +541,13 @@ function ExportStorageTab() {
     setLogs([]);
 
     try {
-      const serviceKey = prompt(
-        'Digite a Service Role Key do Supabase para exportar as imagens.\n\n' +
-        'Você encontra em: Supabase Dashboard → Settings → API → service_role key'
-      );
-
-      if (!serviceKey) {
-        addLog('error', 'Exportação cancelada.');
-        setIsExporting(false);
-        return;
-      }
-
-      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || `https://${projectId}.supabase.co`;
-
       addLog('info', 'Listando arquivos do bucket...');
 
-      const response = await fetch(`${supabaseUrl}/functions/v1/export-storage?action=list&bucket=images`, {
-        headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          'x-admin-key': serviceKey,
-        },
+      const response = await fetch(`${backupFunctionsUrl()}/export-storage?action=list&bucket=images`, {
+        headers: await adminCallHeaders(),
       });
 
+      if (response.status === 401) throw new Error(BACKUP_AUTH_ERROR);
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
         throw new Error(errData.error || `HTTP ${response.status}`);
@@ -699,23 +681,6 @@ function ImportStorageTab() {
     setLogs([]);
 
     try {
-      const serviceKey = prompt(
-        'Digite a Service Role Key do Supabase de DESTINO para upload das imagens.\n\n' +
-        'As imagens serão enviadas para o bucket "images" mantendo os mesmos paths.'
-      );
-
-      if (!serviceKey) {
-        addLog('error', 'Importação cancelada.');
-        setIsImporting(false);
-        return;
-      }
-
-      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || `https://${projectId}.supabase.co`;
-
-      const { createClient } = await import('@supabase/supabase-js');
-      const adminClient = createClient(supabaseUrl, serviceKey);
-
       addLog('info', 'Lendo ZIP...');
       const zip = await JSZip.loadAsync(zipFile);
 
@@ -753,9 +718,10 @@ function ImportStorageTab() {
           };
           const contentType = contentTypes[ext] || 'application/octet-stream';
 
-          const { error } = await adminClient.storage
-            .from(bucket)
-            .upload(path, blob, { contentType, upsert: true });
+          const signed = await callBackupImport({ action: 'signed-upload', bucket, path });
+          const { error } = signed.success && signed.token && signed.path
+            ? await supabase.storage.from(bucket).uploadToSignedUrl(signed.path, signed.token, blob, { contentType, upsert: true })
+            : { error: { message: signed.error || 'Falha ao assinar upload' } };
 
           if (error) {
             addLog('warn', `⚠ ${path}: ${error.message}`);
