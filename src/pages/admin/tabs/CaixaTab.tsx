@@ -17,6 +17,7 @@ import { CloseCashDialog } from "./caixa/CloseCashDialog";
 import { OpenCashDialog } from "./caixa/OpenCashDialog";
 import { useCashRegisterRows } from "./caixa/useCashRegisterRows";
 import { CashSessionDetailsDialog } from "./caixa/CashSessionDetailsDialog";
+import { useOpenCashRegister } from "./caixa/useOpenCashRegister";
 
 export function CaixaTab() {
   const { toast } = useToast();
@@ -28,23 +29,9 @@ export function CaixaTab() {
   const [closeDialog, setCloseDialog] = useState(false);
   const [detailsRow, setDetailsRow] = useState<CashRegisterRow | null>(null);
 
-  const openMutation = useMutation({
-    mutationFn: async (openingCash: number) => {
-      const { data, error } = await supabase.rpc("open_cash_register", {
-        p_opening_balance: openingCash,
-        p_opened_by: "Admin",
-      });
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: async () => {
-      queryClient.invalidateQueries({ queryKey: ["cash_register_sessions"] });
-      queryClient.invalidateQueries({ queryKey: ["session_summary"] });
-      await refetch();
-      toast({ title: "Caixa aberto com sucesso!" });
-      setOpenDialog(false);
-    },
-    onError: (e: any) => toast({ title: "Erro ao abrir caixa", description: e?.message || String(e), variant: "destructive" }),
+  const openMutation = useOpenCashRegister(() => {
+    refetch();
+    setOpenDialog(false);
   });
 
   const closeMutation = useMutation({
