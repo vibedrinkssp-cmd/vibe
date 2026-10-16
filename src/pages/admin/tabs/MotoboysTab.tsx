@@ -1,4 +1,5 @@
 // Motoboys Tab Component - Shows registered motoboys as cards
+import { confirmDialog } from '@/lib/dialogs';
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Bike, Phone, Power, FileText, Trash2, Edit2, WifiOff, UserCheck } from 'lucide-react';
@@ -224,7 +225,7 @@ export function MotoboysTab() {
                       <Power className={`w-4 h-4 ${motoboy.isActive ? 'text-green-500' : 'text-red-500'}`} />
                     </Button>
                     <Button size="icon" variant="ghost" className="text-destructive hover:text-destructive h-8 w-8"
-                      onClick={() => { if (confirm('Excluir motoboy?')) deleteMutation.mutate(motoboy.id); }}>
+                      onClick={async () => { if (await confirmDialog('Excluir motoboy?')) deleteMutation.mutate(motoboy.id); }}>
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>

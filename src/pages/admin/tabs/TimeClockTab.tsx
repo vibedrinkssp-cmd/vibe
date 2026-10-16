@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { confirmDialog } from '@/lib/dialogs';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmployees } from '@/hooks/use-employees';
@@ -112,7 +113,7 @@ export function TimeClockTab() {
   });
 
   const deleteEmployee = async (id: string, name: string) => {
-    if (!confirm(`Remover ${name}?`)) return;
+    if (!await confirmDialog(`Remover ${name}?`)) return;
     const { error } = await supabase.rpc('delete_employee', { p_id: id });
     if (error) { toast.error(error.message); return; }
     toast.success('Funcionário removido');
@@ -140,7 +141,7 @@ export function TimeClockTab() {
   const empName = (id: string) => employees.find((e) => e.id === id)?.name ?? '—';
 
   const removeFace = async (id: string, name: string) => {
-    if (!confirm(`Remover rosto cadastrado de ${name}?`)) return;
+    if (!await confirmDialog(`Remover rosto cadastrado de ${name}?`)) return;
     const { error } = await (supabase.from('employees') as any)
       .update({ face_descriptor: null, reference_photo_url: null })
       .eq('id', id);

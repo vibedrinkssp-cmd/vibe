@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { confirmDialog } from '@/lib/dialogs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client-safe';
 import { Button } from '@/components/ui/button';
@@ -138,8 +139,8 @@ export function EmployeesTab() {
                       variant="ghost"
                       size="icon"
                       className="h-7 w-7 text-destructive"
-                      onClick={() => {
-                        if (confirm(`Remover ${emp.name}?`)) deleteMutation.mutate(emp.id);
+                      onClick={async () => {
+                        if (await confirmDialog(`Remover ${emp.name}?`)) deleteMutation.mutate(emp.id);
                       }}
                     >
                       <Trash2 className="h-3.5 w-3.5" />

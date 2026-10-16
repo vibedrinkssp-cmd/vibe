@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { confirmDialog } from '@/lib/dialogs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Camera, Upload, CheckCircle, Loader2, RotateCcw, AlertTriangle, Loader } from 'lucide-react';
@@ -131,7 +132,7 @@ export function PixPosProofModal({
   };
 
   const handleSkip = async () => {
-    const confirmed = window.confirm(
+    const confirmed = await confirmDialog(
       '⚠️ ATENÇÃO\n\nVocê está confirmando o pagamento PIX POS SEM enviar o comprovante.\n\nIsso impede a auditoria posterior. Use apenas se a maquininha estiver inacessível.\n\nDeseja continuar mesmo assim?'
     );
     if (!confirmed) return;

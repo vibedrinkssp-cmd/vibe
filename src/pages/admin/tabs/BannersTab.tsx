@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { confirmDialog } from '@/lib/dialogs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client-safe';
 import { Button } from '@/components/ui/button';
@@ -149,8 +150,8 @@ export function BannersTab() {
     saveMutation.mutate({ bannerId: editingBanner.id, imageUrl: newImageUrl });
   };
 
-  const handleReset = (bannerId: string) => {
-    if (confirm('Restaurar este banner para a imagem padrão?')) {
+  const handleReset = async (bannerId: string) => {
+    if (await confirmDialog({ title: 'Restaurar banner?', description: 'Restaurar este banner para a imagem padrão?', confirmText: 'Restaurar', destructive: false })) {
       resetMutation.mutate(bannerId);
     }
   };

@@ -1,4 +1,5 @@
 // Aba de cupons do PDV — cadastrados via wizard, não atribuídos a clientes
+import { confirmDialog } from '@/lib/dialogs';
 import { useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -236,7 +237,7 @@ export function PosCouponsTab() {
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toggleActiveMutation.mutate(c)} title={c.is_active ? 'Desativar' : 'Ativar'}>
                         {c.is_active ? <PowerOff className="w-4 h-4 text-amber-500" /> : <Power className="w-4 h-4 text-emerald-500" />}
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { if (confirm('Remover este cupom?')) deleteMutation.mutate(c.id); }}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={async () => { if (await confirmDialog('Remover este cupom?')) deleteMutation.mutate(c.id); }}>
                         <Trash2 className="w-4 h-4 text-destructive" />
                       </Button>
                     </div>

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { confirmDialog } from '@/lib/dialogs';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CashRegisterRow } from "./caixa/useCashRegisterRows";
 import { format } from "date-fns";
@@ -128,7 +129,7 @@ export function CaixaTab() {
               variant="outline"
               className="gap-2"
               onClick={async () => {
-                if (!confirm("Reabrir o último caixa fechado? O fechamento associado será removido e os indicadores do dia voltam a aparecer.")) return;
+                if (!await confirmDialog({ title: "Reabrir o último caixa?", description: "O fechamento associado será removido e os indicadores do dia voltam a aparecer.", confirmText: "Reabrir", destructive: false })) return;
                 try {
                   const { data, error } = await supabase.rpc('reopen_last_session', { p_responsible: 'Admin' });
                   if (error) throw error;

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { confirmDialog } from '@/lib/dialogs';
 import { Wine, Droplets, AlertCircle, Package, Trash2, Check, Pencil, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -524,8 +525,8 @@ export function BottlesTab({ readOnly = false }: { readOnly?: boolean } = {}) {
                 key={bottle.id}
                 bottle={bottle}
                 onUseDose={(doses) => useDoseMutation.mutate({ bottleId: bottle.id, doses })}
-                onDelete={() => {
-                  const confirmed = window.confirm(
+                onDelete={async () => {
+                  const confirmed = await confirmDialog(
                     `⚠️ Excluir a garrafa "${bottle.product_name}" com ${bottle.remaining_doses} dose(s) restantes?`
                   );
                   if (confirmed) {
@@ -555,8 +556,8 @@ export function BottlesTab({ readOnly = false }: { readOnly?: boolean } = {}) {
                 key={bottle.id}
                 bottle={bottle}
                 onUseDose={() => {}}
-                onDelete={() => {
-                  const confirmed = window.confirm(`Remover a garrafa vazia "${bottle.product_name}"?`);
+                onDelete={async () => {
+                  const confirmed = await confirmDialog(`Remover a garrafa vazia "${bottle.product_name}"?`);
                   if (confirmed) {
                     deleteBottleMutation.mutate(bottle.id);
                   }

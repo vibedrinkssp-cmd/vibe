@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { confirmDialog } from '@/lib/dialogs';
 import { Plus, Trash2, Search, Package, AlertTriangle, Pencil, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -345,8 +346,8 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
                               size="sm"
                               variant="ghost"
                               className="h-7 w-7 p-0 text-destructive"
-                              onClick={() => {
-                                if (confirm(`Excluir maço "${pack.product_name}" com ${pack.remaining_units} cigarros restantes?`))
+                              onClick={async () => {
+                                if (await confirmDialog(`Excluir maço "${pack.product_name}" com ${pack.remaining_units} cigarros restantes?`))
                                   deleteMutation.mutate(pack.id);
                               }}
                             >
@@ -458,8 +459,8 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
                             size="sm"
                             variant="ghost"
                             className="h-7 w-7 p-0 text-destructive"
-                            onClick={() => {
-                              if (confirm(`Excluir maço vazio "${pack.product_name}"?`))
+                            onClick={async () => {
+                              if (await confirmDialog(`Excluir maço vazio "${pack.product_name}"?`))
                                 deleteMutation.mutate(pack.id);
                             }}
                           >

@@ -1,4 +1,5 @@
 // Orders Tab Component with sub-tabs: VM Delivery, PDV, iFood
+import { confirmDialog } from '@/lib/dialogs';
 import { useState } from 'react';
 import { normalizeSearch } from '@/lib/text-utils';
 import { Check, X, Trash2, ChevronLeft, ChevronRight, Search, Wifi, WifiOff, CheckCircle2, Package, Store, Eye, RefreshCw, Edit2, PackageCheck } from 'lucide-react';
@@ -407,8 +408,8 @@ export function OrdersTab() {
               size="sm"
               variant="destructive"
               className="font-black"
-              onClick={() => {
-                if (confirm('ANULAR este pedido? Ele será completamente removido do sistema sem impactar relatórios.')) {
+              onClick={async () => {
+                if (await confirmDialog('ANULAR este pedido? Ele será completamente removido do sistema sem impactar relatórios.')) {
                   setPendingDeleteId(order.id);
                 }
               }}
@@ -566,8 +567,8 @@ export function OrdersTab() {
           size="sm"
           variant="ghost"
           className="text-muted-foreground/50"
-          onClick={() => {
-            if (confirm('Tem certeza que deseja excluir este pedido?')) {
+          onClick={async () => {
+            if (await confirmDialog('Tem certeza que deseja excluir este pedido?')) {
               setPendingDeleteId(order.id);
             }
           }}

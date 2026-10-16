@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { confirmDialog, promptDialog } from '@/lib/dialogs';
 import { format, startOfDay, subDays, addDays, addMinutes } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Bike, CalendarIcon, DollarSign, TrendingUp, Printer, Filter, Clock, MapPin, User, CreditCard, Package, Ruler, CheckCircle2, Banknote, AlertTriangle, Globe, Eye, EyeOff, FileText, Wallet, XCircle, Send, Plus, Trash2, History } from 'lucide-react';
@@ -193,7 +194,7 @@ export function MotoboyClosureTab() {
   }, [extraModal, toast, refetchExtras]);
 
   const deleteManualExtra = useCallback(async (id: string) => {
-    if (!confirm('Excluir esta corrida lançada?')) return;
+    if (!await confirmDialog('Excluir esta corrida lançada?')) return;
     const { error } = await supabase.rpc('delete_motoboy_manual_extra', { p_id: id } as any);
     if (error) { toast({ title: 'Erro ao excluir', description: error.message, variant: 'destructive' }); return; }
     toast({ title: '🗑️ Corrida removida' });
@@ -321,7 +322,7 @@ export function MotoboyClosureTab() {
   }, [mpoModal, toast, refetchPaymentOrders, refetchExtras, qc]);
 
   const handlePayPaymentOrder = useCallback(async (orderId: string) => {
-    if (!confirm('Marcar esta ordem como PAGA?')) return;
+    if (!await confirmDialog({ title: 'Marcar como paga?', description: 'Marcar esta ordem como PAGA?', confirmText: 'Marcar paga', destructive: false })) return;
     const { error } = await supabase.rpc('pay_motoboy_payment_order', {
       p_order_id: orderId, p_paid_by: 'Admin',
     } as any);
@@ -331,7 +332,7 @@ export function MotoboyClosureTab() {
   }, [toast, refetchPaymentOrders]);
 
   const handleCancelPaymentOrder = useCallback(async (orderId: string) => {
-    const reason = prompt('Motivo do cancelamento?') || '';
+    const reason = (await promptDialog({ title: 'Motivo do cancelamento?', placeholder: 'Opcional' })) || '';
     if (reason === null) return;
     const { error } = await supabase.rpc('cancel_motoboy_payment_order', {
       p_order_id: orderId, p_reason: reason || null,

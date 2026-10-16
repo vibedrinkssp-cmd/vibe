@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { confirmDialog } from '@/lib/dialogs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Wine, ChevronDown, ChevronUp, RefreshCw, Loader2, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -139,12 +140,12 @@ export function BottlesCarousel() {
               variant="ghost"
               className="h-5 w-5 p-0 text-destructive hover:bg-destructive/10"
               disabled={deleteMutation.isPending}
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.stopPropagation();
                 const msg = bottle.is_empty
                   ? `Excluir garrafa vazia "${bottle.product_name}"?`
                   : `⚠️ Garrafa "${bottle.product_name}" ainda tem ${bottle.remaining_doses} doses! Excluir mesmo assim?`;
-                if (confirm(msg)) deleteMutation.mutate(bottle);
+                if (await confirmDialog(msg)) deleteMutation.mutate(bottle);
               }}
             >
               <Trash2 className="h-3 w-3" />

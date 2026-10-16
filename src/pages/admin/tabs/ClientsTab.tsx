@@ -1,4 +1,5 @@
 // Clients Tab Component
+import { confirmDialog } from '@/lib/dialogs';
 import { useState, useEffect } from 'react';
 import { searchIncludes } from '@/lib/text-utils';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
@@ -322,8 +323,8 @@ export function ClientsTab() {
                               size="icon"
                               variant="ghost"
                               className="text-muted-foreground/50 h-8 w-8"
-                              onClick={() => {
-                                if (confirm('Excluir este cliente?')) deleteMutation.mutate(user.id);
+                              onClick={async () => {
+                                if (await confirmDialog('Excluir este cliente?')) deleteMutation.mutate(user.id);
                               }}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -530,8 +531,8 @@ export function ClientsTab() {
                                     size="icon"
                                     variant="ghost"
                                     className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                                    onClick={() => {
-                                      if (confirm('Remover este cupom do cliente?')) {
+                                    onClick={async () => {
+                                      if (await confirmDialog('Remover este cupom do cliente?')) {
                                         removeCouponMutation.mutate(uc.id);
                                       }
                                     }}

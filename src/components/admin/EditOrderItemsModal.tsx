@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { confirmDialog } from '@/lib/dialogs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -174,10 +175,14 @@ export function EditOrderItemsModal({ order, items, onClose, onSave, isSaving }:
       onClose();
       return;
     }
-    const ok = window.confirm(
-      `O total mudará de ${formatCurrency(oldTotal)} para ${formatCurrency(newTotal)}.\n\n` +
-        `${changes.length} alteração(ões) serão aplicadas. Confirmar?`,
-    );
+    const ok = await confirmDialog({
+      title: 'Salvar alterações?',
+      description:
+        `O total mudará de ${formatCurrency(oldTotal)} para ${formatCurrency(newTotal)}.\n\n` +
+        `${changes.length} alteração(ões) serão aplicadas.`,
+      confirmText: 'Salvar',
+      destructive: false,
+    });
     if (!ok) return;
     await onSave(order.id, changes);
   }

@@ -1,4 +1,5 @@
 // Coupons Tab - Admin management of coupon templates
+import { confirmDialog } from '@/lib/dialogs';
 import { useState, useEffect } from 'react';
 import { searchIncludes } from '@/lib/text-utils';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -409,8 +410,8 @@ export function CouponsTab() {
                         size="icon" 
                         variant="ghost" 
                         className="text-muted-foreground hover:text-destructive"
-                        onClick={() => {
-                          if (confirm('Excluir este cupom e todas as atribuições?')) {
+                        onClick={async () => {
+                          if (await confirmDialog('Excluir este cupom e todas as atribuições?')) {
                             deleteMutation.mutate(coupon.id);
                           }
                         }}

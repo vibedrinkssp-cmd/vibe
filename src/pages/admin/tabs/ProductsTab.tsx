@@ -1,4 +1,5 @@
 // Products Tab Component - Inline editing in cards
+import { confirmDialog } from '@/lib/dialogs';
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, Edit2, Trash2, ShoppingBag, Check, X, Sparkles, ScanBarcode, List, FileText } from 'lucide-react';
@@ -746,8 +747,8 @@ export function ProductsTab({ readOnly = false }: { readOnly?: boolean }) {
                           size="icon" 
                           variant="ghost"
                           className="h-8 w-8 flex-shrink-0"
-                          onClick={() => {
-                            if (confirm('Excluir este produto?')) deleteMutation.mutate(product.id);
+                          onClick={async () => {
+                            if (await confirmDialog('Excluir este produto?')) deleteMutation.mutate(product.id);
                           }}
                         >
                           <Trash2 className="w-3 h-3" />

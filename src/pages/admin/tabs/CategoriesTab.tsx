@@ -1,4 +1,5 @@
 // Categories Tab Component
+import { confirmDialog } from '@/lib/dialogs';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Edit2, Trash2, Eye, ShoppingBag } from 'lucide-react';
@@ -228,12 +229,12 @@ export function CategoriesTab() {
                     size="icon" 
                     variant="ghost"
                     className="h-8 w-8"
-                    onClick={() => {
+                    onClick={async () => {
                       if (productCount > 0) {
                         toast({ title: 'Remova os produtos primeiro', variant: 'destructive' });
                         return;
                       }
-                      if (confirm('Excluir esta categoria?')) {
+                      if (await confirmDialog('Excluir esta categoria?')) {
                         deleteMutation.mutate(category.id);
                       }
                     }}

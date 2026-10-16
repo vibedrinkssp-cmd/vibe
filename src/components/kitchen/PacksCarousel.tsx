@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { confirmDialog } from '@/lib/dialogs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Package, ChevronDown, ChevronUp, Trash2, RefreshCw, Plus, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -553,12 +554,12 @@ export function PacksCarousel() {
                               variant="ghost"
                               className="h-5 w-5 p-0 text-destructive hover:bg-destructive/10"
                               disabled={deleteMutation.isPending}
-                              onClick={(e) => {
+                              onClick={async (e) => {
                                 e.stopPropagation();
                                 const msg = pack.is_empty
                                   ? `Excluir maço vazio "${pack.product_name}"?`
                                   : `⚠️ Maço "${pack.product_name}" ainda tem ${pack.remaining_units} cigarros! Excluir mesmo assim?`;
-                                if (confirm(msg)) deleteMutation.mutate(pack.id);
+                                if (await confirmDialog(msg)) deleteMutation.mutate(pack.id);
                               }}
                             >
                               <Trash2 className="h-3 w-3" />

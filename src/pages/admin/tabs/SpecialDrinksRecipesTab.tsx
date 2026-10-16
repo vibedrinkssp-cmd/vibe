@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { confirmDialog } from '@/lib/dialogs';
 import { searchIncludes } from '@/lib/text-utils';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client-safe';
@@ -245,12 +246,12 @@ export function SpecialDrinksRecipesTab({ sessionTokenOverride }: { sessionToken
     }
   };
 
-  const handleDeleteDrink = (drinkId: string, drinkName: string) => {
+  const handleDeleteDrink = async (drinkId: string, drinkName: string) => {
     const recipeIds = recipes
       .filter(recipe => recipe.product_id === drinkId)
       .map(recipe => recipe.id);
 
-    const confirmed = window.confirm(
+    const confirmed = await confirmDialog(
       recipeIds.length > 0
         ? `Excluir o drink especial "${drinkName}" e remover ${recipeIds.length} ingrediente(s) da receita?`
         : `Excluir o drink especial "${drinkName}"?`
