@@ -27,6 +27,7 @@ import {
   ClipboardCheck,
   CalendarDays,
   Fingerprint,
+  MoreHorizontal,
 } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -91,17 +92,17 @@ function TabSkeleton() {
 }
 
 const tabs = [
-  { id: 'pedidos', label: 'Pedidos', icon: Package },
-  { id: 'delivery', label: 'Delivery', icon: Truck },
+  { id: 'pedidos', label: 'Pedidos', icon: Package, primary: true },
+  { id: 'delivery', label: 'Delivery', icon: Truck, primary: true },
   { id: 'tracking', label: 'Tracking', icon: MapPin },
-  { id: 'caixa', label: 'Caixa', icon: Wallet },
+  { id: 'caixa', label: 'Caixa', icon: Wallet, primary: true },
   { id: 'saqdep', label: 'Saques', icon: ArrowUpFromLine },
-  { id: 'garrafas', label: 'Garrafas', icon: Wine, alwaysShowLabel: true },
+  { id: 'garrafas', label: 'Garrafas', icon: Wine, alwaysShowLabel: true, primary: true },
   { id: 'macos', label: 'Maços', icon: Cigarette, alwaysShowLabel: true },
   { id: 'sangrias', label: 'Sangrias', icon: Receipt },
   { id: 'fechamento', label: 'Fechamento', icon: Calculator },
   { id: 'fechamento-boys', label: 'Fech. Boys', icon: ClipboardCheck },
-  { id: 'estoque', label: 'Estoque', icon: Warehouse },
+  { id: 'estoque', label: 'Estoque', icon: Warehouse, primary: true },
   { id: 'barcodes', label: 'Códigos de Barras', icon: ScanLine },
   // Caderneta removed — only in Manager
   { id: 'clientes', label: 'Clientes', icon: Users },
@@ -118,6 +119,7 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const { role, logout, isHydrated } = useAuth();
   const [activeTab, setActiveTab] = useState('pedidos');
+  const [showAllTabs, setShowAllTabs] = useState(false);
   const [isSSEConnected, setIsSSEConnected] = useState(false);
   const { isOnline: isCloudOnline } = useSupabaseHealth({
     enabled: isHydrated && role === 'admin',
@@ -132,6 +134,9 @@ export default function AdminDashboard() {
   const pdvCashSoundPlayedRef = useRef<Set<string>>(new Set());
 
   const isAuthorized = isHydrated && role === 'admin';
+  // Menu enxuto: só o dia a dia, o resto fica em "Mais" (a aba ativa nunca some)
+  const visibleTabs = showAllTabs ? tabs : tabs.filter((t) => t.primary || t.id === activeTab);
+  const moreTabsCount = tabs.length - visibleTabs.length;
 
   useEffect(() => {
     if (!isAuthorized) return;
@@ -375,7 +380,7 @@ export default function AdminDashboard() {
         {/* Sidebar Navigation (desktop) */}
         <aside className="hidden md:flex md:flex-col w-56 flex-shrink-0 border-r border-primary/20 bg-card/50 overflow-y-auto">
           <div className="flex flex-col p-2 gap-1">
-            {tabs.map((tab) => {
+            {visibleTabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               const showBadge = tab.id === 'macos' && emptyPacksCount > 0;
@@ -402,6 +407,16 @@ export default function AdminDashboard() {
                 </Button>
               );
             })}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="justify-start gap-2 text-muted-foreground"
+              onClick={() => setShowAllTabs((v) => !v)}
+              data-testid="tabs-toggle-more"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+              {showAllTabs ? 'Menos' : `Mais (${moreTabsCount})`}
+            </Button>
           </div>
         </aside>
 
@@ -410,7 +425,7 @@ export default function AdminDashboard() {
           <div className="md:hidden border-b border-primary/20 bg-card/50 flex-shrink-0">
             <ScrollArea className="w-full">
               <div className="flex p-2 gap-1 min-w-max">
-                {tabs.map((tab) => {
+                {visibleTabs.map((tab) => {
                   const Icon = tab.icon;
                   const isActive = activeTab === tab.id;
                   const showBadge = tab.id === 'macos' && emptyPacksCount > 0;
@@ -438,6 +453,16 @@ export default function AdminDashboard() {
                     </Button>
                   );
                 })}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 whitespace-nowrap"
+                  onClick={() => setShowAllTabs((v) => !v)}
+                  data-testid="tabs-toggle-more-mobile"
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                  {showAllTabs ? 'Menos' : `Mais (${moreTabsCount})`}
+                </Button>
               </div>
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
