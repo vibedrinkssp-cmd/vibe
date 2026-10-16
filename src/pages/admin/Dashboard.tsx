@@ -228,6 +228,8 @@ export default function AdminDashboard() {
     staleTime: 0,
   });
 
+  const pendingOrdersCount = alertPollOrders?.length ?? 0;
+
   useEffect(() => {
     if (!isAuthorized || !alertPollOrders) return;
     const actionableIds = alertPollOrders
@@ -375,6 +377,19 @@ export default function AdminDashboard() {
           <HeaderAlertStop isAlertActive={isAlertActive} onStop={ackAll} />
           <StoreStatusToggle />
           <HeaderSoundAlert />
+          <Button
+            size="sm"
+            variant={activeTab === 'pedidos' ? 'default' : 'outline'}
+            className={`gap-1.5 ${activeTab !== 'pedidos' ? 'border-primary-foreground/40 text-white hover:bg-primary-foreground/10' : ''}`}
+            onClick={() => setActiveTab('pedidos')}
+            data-testid="button-ver-pedidos"
+          >
+            <Package className="h-4 w-4" />
+            <span className="hidden sm:inline">Ver Pedidos</span>
+            {pendingOrdersCount > 0 && (
+              <Badge variant="destructive" className="h-5 px-1.5 text-[10px] font-bold">{pendingOrdersCount}</Badge>
+            )}
+          </Button>
           <HeaderCashMonitor />
           <Button
             variant={showVisitors ? "default" : "outline"}
