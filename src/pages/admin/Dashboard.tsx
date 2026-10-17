@@ -215,7 +215,7 @@ export default function AdminDashboard() {
     queryKey: ['admin-alert-poll'],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_admin_orders_complete');
-      if (error) return [];
+      if (error) throw error; // mantém os dados anteriores em vez de zerar a fila de alertas
       return ((data || []) as Array<{ id: string; status: string; order_type: string; accepted_at: string | null; created_at: string }>)
         .filter((o) => o.order_type === 'delivery' && (o.status === 'pending' || o.status === 'accepted'))
         .slice(0, 50);

@@ -22,9 +22,30 @@ import {
  *
  * Sem broadcast cross-painel: parar aqui não afeta outras telas.
  */
+const silencedKey = (screen: ScreenSoundId) => `order_alert_silenced_${screen}`;
+
+function loadSilenced(screen: ScreenSoundId): Set<string> {
+  try {
+    const raw = localStorage.getItem(silencedKey(screen));
+    const ids = raw ? (JSON.parse(raw) as unknown) : [];
+    return new Set(Array.isArray(ids) ? ids.filter((id): id is string => typeof id === 'string') : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveSilenced(screen: ScreenSoundId, ids: Set<string>) {
+  try {
+    localStorage.setItem(silencedKey(screen), JSON.stringify([...ids]));
+  } catch {
+    // storage indisponível: o silêncio vale só até recarregar
+  }
+}
+
 export function useOrderAlert(screen: ScreenSoundId = 'generic', volume = 0.85) {
   const pendingRef = useRef<Set<string>>(new Set());
-  const silencedRef = useRef<Set<string>>(new Set());
+  // Persistido: sem isso, recarregar a página re-disparava o alerta de pedidos já silenciados.
+  const silencedRef = useRef<Set<string>>(loadSilenced(screen));
   const [isAlertActive, setIsAlertActive] = useState(false);
 
   useEffect(() => {
@@ -57,9 +78,14 @@ export function useOrderAlert(screen: ScreenSoundId = 'generic', volume = 0.85) 
    */
   const syncPendingOrders = useCallback((actionableIds: string[]) => {
     const incoming = new Set(actionableIds.filter(Boolean));
+    let pruned = false;
     silencedRef.current.forEach((id) => {
-      if (!incoming.has(id)) silencedRef.current.delete(id);
+      if (!incoming.has(id)) {
+        silencedRef.current.delete(id);
+        pruned = true;
+      }
     });
+    if (pruned) saveSilenced(screen, silencedRef.current);
     const next = new Set([...incoming].filter((id) => !silencedRef.current.has(id)));
     // Remover pedidos que não são mais acionáveis
     pendingRef.current.forEach((id) => {
@@ -95,6 +121,7 @@ export function useOrderAlert(screen: ScreenSoundId = 'generic', volume = 0.85) 
   const ackAll = useCallback(() => {
     pendingRef.current.forEach((id) => silencedRef.current.add(id));
     pendingRef.current.clear();
+    saveSilenced(screen, silencedRef.current);
     stopScreenAlert(screen);
     setIsAlertActive(false);
   }, [screen]);
