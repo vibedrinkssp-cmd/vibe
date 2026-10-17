@@ -174,7 +174,7 @@ export default function AdminDashboard() {
   const [showVisitors, setShowVisitors] = useState(() => localStorage.getItem('admin_showVisitors') === 'true');
   const [showTutorial, setShowTutorial] = useState(false);
   const { playOnce } = useNotificationSound({ screen: 'admin' });
-  const { alertOrder, ackOrder, ackAll, syncPendingOrders, isAlertActive } = useOrderAlert('admin');
+  const { alertOrder, ackOrder, ackAll, syncPendingOrders, isAlertActive, pendingCount: unseenOrdersCount } = useOrderAlert('admin');
   const { toast } = useToast();
   const { notifyNewOrder, notifyOrderStatusChange } = usePushNotifications({ playSound: false });
   const pdvCashSoundPlayedRef = useRef<Set<string>>(new Set());
@@ -217,7 +217,7 @@ export default function AdminDashboard() {
       const { data, error } = await supabase.rpc('get_admin_orders_complete');
       if (error) throw error; // mantém os dados anteriores em vez de zerar a fila de alertas
       return ((data || []) as Array<{ id: string; status: string; order_type: string; accepted_at: string | null; created_at: string }>)
-        .filter((o) => o.order_type === 'delivery' && (o.status === 'pending' || o.status === 'accepted'))
+        .filter((o) => o.order_type === 'delivery' && o.status === 'pending')
         .slice(0, 50);
     },
     enabled: isAuthorized,
@@ -228,12 +228,10 @@ export default function AdminDashboard() {
     staleTime: 0,
   });
 
-  const pendingOrdersCount = alertPollOrders?.length ?? 0;
-
   useEffect(() => {
     if (!isAuthorized || !alertPollOrders) return;
     const actionableIds = alertPollOrders
-      .filter((o) => o.order_type === 'delivery' && (o.status === 'pending' || o.status === 'accepted'))
+      .filter((o) => o.order_type === 'delivery' && o.status === 'pending')
       .map((o) => o.id);
     syncPendingOrders(actionableIds);
   }, [isAuthorized, alertPollOrders, syncPendingOrders]);
@@ -288,7 +286,7 @@ export default function AdminDashboard() {
           const status = event.payload?.status;
           const orderId = event.payload?.id;
           const orderType = event.payload?.order_type;
-          const shouldRemainInAdminQueue = orderType === 'delivery' && (status === 'pending' || status === 'accepted');
+          const shouldRemainInAdminQueue = orderType === 'delivery' && status === 'pending';
           if (orderId && !shouldRemainInAdminQueue) ackOrder(orderId);
 
           if (status === 'cancelled' && orderId) {
@@ -386,8 +384,8 @@ export default function AdminDashboard() {
           >
             <Package className="h-4 w-4" />
             <span className="hidden sm:inline">Ver Pedidos</span>
-            {pendingOrdersCount > 0 && (
-              <Badge variant="destructive" className="h-5 px-1.5 text-[10px] font-bold">{pendingOrdersCount}</Badge>
+            {unseenOrdersCount > 0 && (
+              <Badge variant="destructive" className="h-5 px-1.5 text-[10px] font-bold">{unseenOrdersCount}</Badge>
             )}
           </Button>
           <HeaderCashMonitor />

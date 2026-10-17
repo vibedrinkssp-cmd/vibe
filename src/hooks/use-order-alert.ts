@@ -47,6 +47,7 @@ export function useOrderAlert(screen: ScreenSoundId = 'generic', volume = 0.85) 
   // Persistido: sem isso, recarregar a página re-disparava o alerta de pedidos já silenciados.
   const silencedRef = useRef<Set<string>>(loadSilenced(screen));
   const [isAlertActive, setIsAlertActive] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     ensureNotificationSoundUnlockListeners();
@@ -60,6 +61,7 @@ export function useOrderAlert(screen: ScreenSoundId = 'generic', volume = 0.85) 
     if (!orderId) return;
     silencedRef.current.delete(orderId);
     pendingRef.current.add(orderId);
+    setPendingCount(pendingRef.current.size);
     setIsAlertActive(true);
     if (shouldAlertOrder(orderId, screen)) {
       startScreenAlert(screen, volume);
@@ -101,6 +103,7 @@ export function useOrderAlert(screen: ScreenSoundId = 'generic', volume = 0.85) 
       }
     });
 
+    setPendingCount(pendingRef.current.size);
     if (pendingRef.current.size > 0) {
       ensureScreenAlertActive(screen, volume);
       setIsAlertActive(true);
@@ -112,6 +115,7 @@ export function useOrderAlert(screen: ScreenSoundId = 'generic', volume = 0.85) 
 
   const ackOrder = useCallback((orderId: string) => {
     if (orderId) pendingRef.current.delete(orderId);
+    setPendingCount(pendingRef.current.size);
     if (pendingRef.current.size === 0) {
       stopScreenAlert(screen);
       setIsAlertActive(false);
@@ -121,6 +125,7 @@ export function useOrderAlert(screen: ScreenSoundId = 'generic', volume = 0.85) 
   const ackAll = useCallback(() => {
     pendingRef.current.forEach((id) => silencedRef.current.add(id));
     pendingRef.current.clear();
+    setPendingCount(0);
     saveSilenced(screen, silencedRef.current);
     stopScreenAlert(screen);
     setIsAlertActive(false);
@@ -137,6 +142,6 @@ export function useOrderAlert(screen: ScreenSoundId = 'generic', volume = 0.85) 
     ackAll,
     isPending,
     isAlertActive,
-    pendingCount: pendingRef.current.size,
+    pendingCount,
   };
 }
