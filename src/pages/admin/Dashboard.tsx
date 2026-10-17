@@ -381,7 +381,7 @@ export default function AdminDashboard() {
             size="sm"
             variant={activeTab === 'pedidos' ? 'default' : 'outline'}
             className={`gap-1.5 ${activeTab !== 'pedidos' ? 'border-primary-foreground/40 text-white hover:bg-primary-foreground/10' : ''}`}
-            onClick={() => setActiveTab('pedidos')}
+            onClick={() => { ackAll(); setActiveTab('pedidos'); }}
             data-testid="button-ver-pedidos"
           >
             <Package className="h-4 w-4" />
