@@ -118,17 +118,14 @@ export default function Home() {
       ? trendingProducts 
       : products;
     
-    if (!sortOrder) return baseProducts;
-    
-    return [...baseProducts].sort((a, b) => {
-      const nameA = a.name.toLowerCase();
-      const nameB = b.name.toLowerCase();
-      if (sortOrder === 'az') {
-        return nameA.localeCompare(nameB, 'pt-BR');
-      } else {
-        return nameB.localeCompare(nameA, 'pt-BR');
-      }
-    });
+    // Sem escolha do cliente: A-Z por padrão; "Em alta" mantém a ordem de mais recentes
+    const effectiveSort = sortOrder ?? (selectedCategory === TRENDING_CATEGORY_ID ? null : 'az');
+    if (!effectiveSort) return baseProducts;
+
+    const direction = effectiveSort === 'az' ? 1 : -1;
+    return [...baseProducts].sort(
+      (a, b) => direction * a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' })
+    );
   }, [products, trendingProducts, selectedCategory, sortOrder]);
 
   const effectiveCategory = selectedCategory === TRENDING_CATEGORY_ID 
