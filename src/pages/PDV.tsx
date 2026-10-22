@@ -843,10 +843,15 @@ export default function PDV() {
       await redeemPosCoupon(appliedCoupon.id);
     } catch (err) {
       console.warn('[PDV] Falha ao redimir cupom (venda já concluída):', err);
+      toast({
+        title: `Cupom ${appliedCoupon.code} não foi baixado`,
+        description: 'A venda foi concluída, mas o cupom continua disponível. Confira em Cupons.',
+        variant: 'destructive',
+      });
     } finally {
       setAppliedCoupon(null);
     }
-  }, [appliedCoupon]);
+  }, [appliedCoupon, toast]);
 
   const handleApplyCoupon = useCallback(async (code: string): Promise<boolean> => {
     const res = await validatePosCoupon(code);
