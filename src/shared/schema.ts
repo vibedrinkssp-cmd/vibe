@@ -236,6 +236,13 @@ export interface CustomDrinkGelo {
   price: number;
 }
 
+// Produto Ice/longneck escolhido no Caipi Ice: precisa descontar do estoque
+// (o item do wizard não tem product_id, então o pedido ganha um item à parte).
+export interface CustomDrinkIce {
+  productId: string;
+  productName: string;
+}
+
 export interface CustomDrink {
   id: string;
   type: 'custom_drink';
@@ -245,6 +252,7 @@ export interface CustomDrink {
   energetico: CustomDrinkEnergetico | null;
   fruits: CustomDrinkFruit[];
   gelo: CustomDrinkGelo | null;
+  ice?: CustomDrinkIce | null;
   totalPrice: number;
   quantity: number;
 }

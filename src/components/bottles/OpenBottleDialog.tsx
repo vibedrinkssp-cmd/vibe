@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CurrencyInput } from '@/components/ui/currency-input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client-safe';
 import { useToast } from '@/hooks/use-toast';
@@ -57,7 +56,7 @@ export function parseVolumeMl(name: string): number | null {
 const DEFAULT_VOLUME_ML = 1000;
 const DEFAULT_DOSE_PRICE = 8;
 const DOSE_SIZES_ML = [50, 100, 400] as const;
-const SEARCH_RESULTS_LIMIT = 60;
+const SEARCH_RESULTS_LIMIT = 200;
 
 // Telas que mostram garrafas abertas precisam recarregar quando uma nova é aberta
 const BOTTLE_QUERY_KEYS = ['open-bottles', 'open-bottles-kitchen', 'open-bottles-prep', 'assembly-bottles', 'admin-products', 'allowed-bottle-candidates-admin'];
@@ -239,7 +238,7 @@ export function OpenBottleDialog({ openedBy, compact = false }: { openedBy: stri
                   autoFocus
                 />
               </div>
-              <ScrollArea className="max-h-[260px] border rounded-lg">
+              <div className="max-h-[260px] overflow-y-auto overscroll-contain border rounded-lg">
                 {results.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-4">
                     {search ? 'Nenhum produto em estoque com esse nome' : 'Busque um produto'}
@@ -259,7 +258,12 @@ export function OpenBottleDialog({ openedBy, compact = false }: { openedBy: stri
                     ))}
                   </div>
                 )}
-              </ScrollArea>
+              </div>
+              {results.length === SEARCH_RESULTS_LIMIT && (
+                <p className="text-xs text-muted-foreground text-center">
+                  Mostrando os primeiros {SEARCH_RESULTS_LIMIT}. Digite para refinar a busca.
+                </p>
+              )}
             </>
           )}
 

@@ -195,6 +195,7 @@ export function CaipiIceModal({ open, onOpenChange, onAddCustomDrink }: CaipiIce
       })),
       energetico: null, fruits: allFruits,
       gelo: { id: 'agua', name: 'Gelo de Água', price: 0 },
+      ice: { productId: selectedIce.id, productName: selectedIce.name },
       totalPrice, quantity,
     });
     return true;

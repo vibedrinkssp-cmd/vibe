@@ -44,6 +44,10 @@ export function formatCopaoRecipe(drink: CustomDrink, index?: number, total?: nu
     lines.push(`• GELO: ${drink.gelo.name.toUpperCase().replace(/^GELO\s*/, '')}`);
   }
 
+  if (drink.ice) {
+    lines.push(`• ICE: ${drink.ice.productName.toUpperCase()}`);
+  }
+
   if (drink.fruits && drink.fruits.length > 0) {
     lines.push(`• FRUTAS: ${drink.fruits.map(f => f.name.toUpperCase()).join(', ')}`);
   }
@@ -75,7 +79,7 @@ export function explodeCopaoToOrderItems(drink: CustomDrink, fallbackName?: stri
     }];
   }
 
-  return Array.from({ length: qty }).map((_, i) => ({
+  const recipeItems = Array.from({ length: qty }).map((_, i) => ({
     product_id: null as string | null,
     product_name: formatCopaoRecipe(drink, i + 1, qty),
     quantity: 1,
@@ -83,4 +87,18 @@ export function explodeCopaoToOrderItems(drink: CustomDrink, fallbackName?: stri
     total_price: drink.totalPrice,
     is_wizard_item: true,
   }));
+
+  // A Ice/longneck do Caipi Ice já está no preço do drink; este item de preço 0
+  // existe só para o trigger de pedido descontar o estoque dela.
+  if (drink.ice) {
+    recipeItems.push({
+      product_id: drink.ice.productId,
+      product_name: `🧊 ${drink.ice.productName}`,
+      quantity: qty,
+      unit_price: 0,
+      total_price: 0,
+      is_wizard_item: false,
+    });
+  }
+  return recipeItems;
 }
