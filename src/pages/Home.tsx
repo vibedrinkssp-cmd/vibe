@@ -20,6 +20,8 @@ import { useSettingsRealtime, useProductsRealtime } from '@/hooks/use-realtime-s
 import { useProducts, useCategories } from '@/hooks/use-supabase-data';
 import { usePublicStoreInfo } from '@/hooks/use-public-data';
 import { Store } from 'lucide-react';
+import { LetterFilter } from '@/components/common/LetterFilter';
+import { availableLetters, initialLetter } from '@/lib/initial-letter';
 
 const CustomDrinkModal = lazy(() =>
   import('@/components/home/CustomDrinkModal').then((m) => ({ default: m.CustomDrinkModal }))
@@ -47,6 +49,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [gridColumns, setGridColumns] = useState<GridColumns>(3);
   const [sortOrder, setSortOrder] = useState<SortOrder>(null);
+  const [letterFilter, setLetterFilter] = useState<string | null>(null);
   const [isStuck, setIsStuck] = useState(false);
   const stickyRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -74,6 +77,7 @@ export default function Home() {
     setSearchQuery('');
     setGridColumns(3);
     setSortOrder(null);
+    setLetterFilter(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
@@ -128,9 +132,24 @@ export default function Home() {
     );
   }, [products, trendingProducts, selectedCategory, sortOrder]);
 
-  const effectiveCategory = selectedCategory === TRENDING_CATEGORY_ID 
-    ? null 
+  const effectiveCategory = selectedCategory === TRENDING_CATEGORY_ID
+    ? null
     : selectedCategory;
+
+  // Letras disponíveis na categoria atual; o filtro de letra se aplica depois da ordenação
+  const letters = useMemo(
+    () => availableLetters(
+      sortedProducts
+        .filter((p) => !effectiveCategory || p.categoryId === effectiveCategory)
+        .map((p) => p.name)
+    ),
+    [sortedProducts, effectiveCategory]
+  );
+  const activeLetter = letterFilter && letters.has(letterFilter) ? letterFilter : null;
+  const visibleProducts = useMemo(
+    () => (activeLetter ? sortedProducts.filter((p) => initialLetter(p.name) === activeLetter) : sortedProducts),
+    [sortedProducts, activeLetter]
+  );
 
   // TODO: Connect to real notification count from orders
   const notificationCount = 0;
@@ -206,11 +225,12 @@ export default function Home() {
             sortOrder={sortOrder}
             onSortChange={setSortOrder}
           />
+          <LetterFilter value={activeLetter}onChange={setLetterFilter} available={letters} className="px-3 pb-2" />
         </div>
 
         {/* Products */}
         <ScrollableProductGrid 
-          products={sortedProducts}
+          products={visibleProducts}
           categories={categories}
           isLoading={productsLoading}
           selectedCategory={effectiveCategory}

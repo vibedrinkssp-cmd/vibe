@@ -10,6 +10,8 @@ import { ProductsQuickEditTab } from './ProductsQuickEditTab';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { LetterFilter } from '@/components/common/LetterFilter';
+import { availableLetters, initialLetter } from '@/lib/initial-letter';
 import { CurrencyInput } from '@/components/ui/currency-input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -42,6 +44,7 @@ export function ProductsTab({ readOnly = false }: { readOnly?: boolean }) {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all');
+  const [letterFilter, setLetterFilter] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   // Inline editing state
@@ -320,12 +323,13 @@ export function ProductsTab({ readOnly = false }: { readOnly?: boolean }) {
   };
 
   const filteredProducts = products.filter(product => {
-    const matchesSearch = searchTerm === '' || 
+    const matchesSearch = searchTerm === '' ||
       searchIncludes(product.name, searchTerm) ||
       (product.description && searchIncludes(product.description, searchTerm));
     const matchesCategory = selectedCategoryId === 'all' || product.categoryId === selectedCategoryId;
-    return matchesSearch && matchesCategory;
-  });
+    const matchesLetter = !letterFilter || initialLetter(product.name) === letterFilter;
+    return matchesSearch && matchesCategory && matchesLetter;
+  }).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' }));
 
   const handleGenerateProductListPDF = () => {
     const catName = (id: string | null) => categories.find(c => c.id === id)?.name || 'SEM CATEGORIA';
@@ -517,6 +521,12 @@ export function ProductsTab({ readOnly = false }: { readOnly?: boolean }) {
           </SelectContent>
         </Select>
       </div>
+
+      <LetterFilter
+        value={letterFilter}
+        onChange={setLetterFilter}
+        available={availableLetters(products.map(p => p.name))}
+      />
 
       <p className="text-sm text-muted-foreground">
         {filteredProducts.length} {filteredProducts.length === 1 ? 'produto encontrado' : 'produtos encontrados'}
