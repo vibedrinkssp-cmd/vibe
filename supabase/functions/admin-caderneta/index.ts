@@ -340,7 +340,7 @@ serve(async (req) => {
         ensureRole(session.role, ADMIN_ROLES);
         return new Response(JSON.stringify(await registerPayment(supabase, parsed.data.customerId, parsed.data.amount, parsed.data.paymentMethod)), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       case 'register-legacy-entry':
-        ensureRole(session.role, ADMIN_ROLES);
+        ensureRole(session.role, STAFF_ROLES);
         return new Response(JSON.stringify(await registerLegacyEntry(supabase, parsed.data.customerId, parsed.data.description, parsed.data.totalAmount, parsed.data.entryDate, parsed.data.notes)), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       case 'delete-entry':
         ensureRole(session.role, ADMIN_ROLES);

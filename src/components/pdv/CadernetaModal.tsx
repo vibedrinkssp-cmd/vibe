@@ -1,14 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
-import { searchIncludes } from '@/lib/text-utils';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { BookOpen, User, Loader2, Search } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import { BookOpen, Loader2, History } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
 import { supabase } from '@/integrations/supabase/client-safe';
+import { registerCadernetaLegacyEntry } from '@/lib/caderneta';
 import { OperationPinModal } from '@/components/auth/OperationPinModal';
+import { CadernetaCustomerPicker } from './CadernetaCustomerPicker';
 import { prepareCadernetaOrder } from './caderneta-order-utils';
 import { parseLooseCigarettePackId, stripLooseCigaretteMarker } from './loose-cigarette-utils';
 import { parseNumeric } from '@/lib/format-utils';
@@ -17,14 +18,6 @@ import type { Product, CustomDrink } from '@/shared/schema';
 interface CartItem {
   product: Product;
   quantity: number;
-}
-
-interface CadernetaCustomer {
-  id: string;
-  name: string;
-  whatsapp: string | null;
-  is_active: boolean | null;
-  notes: string | null;
 }
 
 interface CadernetaModalProps {
@@ -36,63 +29,63 @@ interface CadernetaModalProps {
   onSuccess: () => void;
 }
 
+type Mode = 'sale' | 'legacy';
+
+interface LegacyForm {
+  description: string;
+  amount: string;
+  date: string;
+}
+
+const EMPTY_LEGACY: LegacyForm = { description: '', amount: '', date: '' };
+
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
+/** Data (yyyy-mm-dd) -> ISO ao meio-dia local, para não cair no dia anterior por fuso. */
+function legacyDateToIso(date: string): string | null {
+  return date ? new Date(`${date}T12:00:00`).toISOString() : null;
+}
+
 export function CadernetaModal({ open, onOpenChange, cart, customDrinks = [], total, onSuccess }: CadernetaModalProps) {
   const { toast } = useToast();
-  const [selectedCustomer, setSelectedCustomer] = useState<string>('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [mode, setMode] = useState<Mode>('sale');
+  const [customer, setCustomer] = useState<{ id: string; name: string } | null>(null);
+  const [legacy, setLegacy] = useState<LegacyForm>(EMPTY_LEGACY);
   const [pinOpen, setPinOpen] = useState(false);
 
   const preparedOrder = useMemo(
     () => prepareCadernetaOrder({ cart, customDrinks, total }),
     [cart, customDrinks, total]
   );
+  const hasItems = preparedOrder.items.length > 0;
+  const legacyAmount = parseFloat(legacy.amount.replace(',', '.'));
 
   useEffect(() => {
     if (open) {
-      setSelectedCustomer('');
-      setSearchTerm('');
+      setCustomer(null);
+      setLegacy(EMPTY_LEGACY);
+      setMode(hasItems ? 'sale' : 'legacy');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  // Use SECURITY DEFINER RPC directly — no edge function, no session token needed
-  const { data: customers = [], isLoading } = useQuery({
-    queryKey: ['caderneta-customers-pdv'],
-    queryFn: async (): Promise<CadernetaCustomer[]> => {
-      // Primary: SECURITY DEFINER RPC (bypasses RLS, works even with flaky auth)
-      try {
-        const { data, error } = await supabase.rpc('list_caderneta_customers_staff', {
-          p_active_only: true,
-        });
-        if (!error && data) {
-          const parsed = typeof data === 'string' ? JSON.parse(data) : data;
-          if (parsed?.customers && Array.isArray(parsed.customers)) {
-            return parsed.customers as CadernetaCustomer[];
-          }
-        }
-        if (error) console.warn('[Caderneta] RPC failed:', error.message);
-      } catch (err) {
-        console.warn('[Caderneta] RPC exception:', err);
-      }
+  const finishSuccess = (title: string) => {
+    queryClient.invalidateQueries({ queryKey: ['pdv-products'] });
+    queryClient.invalidateQueries({ queryKey: ['caderneta-customers-pdv'] });
+    toast({ title });
+    onOpenChange(false);
+    onSuccess();
+  };
 
-      // Fallback: direct query (works if Supabase Auth session is valid + RLS passes)
-      const { data, error } = await (supabase.from('caderneta_customers') as any)
-        .select('id, name, whatsapp, is_active, notes')
-        .eq('is_active', true)
-        .order('name', { ascending: true });
-
-      if (error) throw new Error(error.message);
-      return (data ?? []) as CadernetaCustomer[];
-    },
-    enabled: open,
-  });
-
-  const filteredCustomers = customers.filter(c =>
-    searchIncludes(c.name, searchTerm)
-  );
+  const reportError = (title: string, error: unknown) => {
+    toast({
+      title,
+      description: error instanceof Error ? error.message : 'Falha inesperada ao registrar o fiado.',
+      variant: 'destructive',
+    });
+  };
 
   const confirmMutation = useMutation({
     mutationFn: async () => {
@@ -112,7 +105,7 @@ export function CadernetaModal({ open, onOpenChange, cart, customDrinks = [], to
         };
       });
       const { error } = await supabase.rpc('create_caderneta_entries_batch', {
-        p_customer_id: selectedCustomer,
+        p_customer_id: customer?.id,
         p_items: itemsPayload,
         p_salesperson: null,
       } as any);
@@ -131,29 +124,34 @@ export function CadernetaModal({ open, onOpenChange, cart, customDrinks = [], to
         }
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pdv-products'] });
-      queryClient.invalidateQueries({ queryKey: ['caderneta-customers-pdv'] });
-      toast({ title: '📒 Lançamento na caderneta registrado!' });
-      onOpenChange(false);
-      onSuccess();
-    },
-    onError: (error: unknown) => {
-      toast({
-        title: 'Erro ao registrar na caderneta',
-        description: error instanceof Error ? error.message : 'Falha inesperada ao registrar o fiado.',
-        variant: 'destructive'
-      });
-    },
+    onSuccess: () => finishSuccess('📒 Lançamento na caderneta registrado!'),
+    onError: (error: unknown) => reportError('Erro ao registrar na caderneta', error),
   });
 
+  // Fiado antigo: só registra a dívida, não vincula produto nem baixa estoque
+  const legacyMutation = useMutation({
+    mutationFn: () => registerCadernetaLegacyEntry(null, {
+      customerId: customer!.id,
+      description: legacy.description.trim(),
+      totalAmount: legacyAmount,
+      entryDate: legacyDateToIso(legacy.date),
+    }),
+    onSuccess: () => finishSuccess('📒 Fiado antigo registrado (estoque não alterado)'),
+    onError: (error: unknown) => reportError('Erro ao registrar fiado antigo', error),
+  });
+
+  const isLegacy = mode === 'legacy';
+  const isPending = confirmMutation.isPending || legacyMutation.isPending;
+  const legacyValid = legacy.description.trim().length > 0 && Number.isFinite(legacyAmount) && legacyAmount > 0;
+  const canConfirm = !!customer && !isPending && (isLegacy ? legacyValid : hasItems);
+
   const handleConfirm = () => {
-    if (!selectedCustomer) {
-      toast({ title: 'Selecione um cliente', variant: 'destructive' });
+    if (!customer) {
+      toast({ title: 'Selecione ou cadastre um cliente', variant: 'destructive' });
       return;
     }
-    if (preparedOrder.items.length === 0) {
-      toast({ title: 'Carrinho vazio', variant: 'destructive' });
+    if (isLegacy && !legacyValid) {
+      toast({ title: 'Informe a descrição e o valor do fiado', variant: 'destructive' });
       return;
     }
     setPinOpen(true);
@@ -161,16 +159,26 @@ export function CadernetaModal({ open, onOpenChange, cart, customDrinks = [], to
 
   const handlePinValidated = () => {
     setPinOpen(false);
-    confirmMutation.mutate();
+    if (isLegacy) legacyMutation.mutate();
+    else confirmMutation.mutate();
   };
 
-
-  const customerName = customers.find(c => c.id === selectedCustomer)?.name;
-  const totalItems = preparedOrder.summary.totalItems;
+  const modeButton = (value: Mode, label: string) => (
+    <Button
+      type="button"
+      size="sm"
+      variant={mode === value ? 'default' : 'ghost'}
+      className="flex-1"
+      onClick={() => setMode(value)}
+      data-testid={`caderneta-mode-${value}`}
+    >
+      {label}
+    </Button>
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm sm:max-w-md mx-2">
+      <DialogContent className="max-w-sm sm:max-w-md mx-2 max-h-[92vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-violet-400" />
@@ -179,67 +187,58 @@ export function CadernetaModal({ open, onOpenChange, cart, customDrinks = [], to
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="text-center py-3 bg-secondary rounded-lg">
-            <p className="text-muted-foreground text-xs">Total a lançar</p>
-            <p className="text-3xl font-bold text-violet-400">{formatCurrency(preparedOrder.summary.total)}</p>
-            <p className="text-xs text-muted-foreground mt-1">{totalItems} item(s)</p>
-            {(preparedOrder.summary.discount > 0 || preparedOrder.summary.subtotal !== preparedOrder.summary.total) && (
-              <div className="mt-2 space-y-0.5 text-xs text-muted-foreground">
-                <p>Subtotal original: {formatCurrency(preparedOrder.summary.subtotal)}</p>
-                {preparedOrder.summary.discount > 0 && (
-                  <p>Desconto aplicado: {formatCurrency(preparedOrder.summary.discount)}</p>
-                )}
-              </div>
-            )}
+          <div className="flex gap-1 bg-secondary rounded-lg p-1">
+            {modeButton('sale', 'Venda atual')}
+            {modeButton('legacy', 'Fiado antigo')}
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Selecionar cliente cadastrado</label>
-            {isLoading ? (
-              <div className="flex items-center justify-center py-4">
-                <Loader2 className="h-5 w-5 animate-spin" />
-              </div>
-            ) : customers.length === 0 ? (
-              <p className="text-xs text-muted-foreground text-center py-4">
-                Nenhum cliente cadastrado. Cadastre clientes na aba Caderneta do painel administrativo.
+          {isLegacy ? (
+            <div className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                Para fiados já anotados no caderno. Registra só o valor devido e <strong>não altera o estoque</strong>.
               </p>
-            ) : (
-              <>
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Buscar cliente..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className="pl-9"
-                  />
+              <Input
+                placeholder="Descrição (ex.: Fiado do caderno)"
+                value={legacy.description}
+                onChange={e => setLegacy({ ...legacy, description: e.target.value })}
+                maxLength={240}
+                data-testid="input-legacy-description"
+              />
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Valor (R$)"
+                  inputMode="decimal"
+                  value={legacy.amount}
+                  onChange={e => setLegacy({ ...legacy, amount: e.target.value })}
+                  data-testid="input-legacy-amount"
+                />
+                <Input
+                  type="date"
+                  value={legacy.date}
+                  max={new Date().toISOString().slice(0, 10)}
+                  onChange={e => setLegacy({ ...legacy, date: e.target.value })}
+                  title="Data em que o fiado foi pego (opcional)"
+                  data-testid="input-legacy-date"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-3 bg-secondary rounded-lg">
+              <p className="text-muted-foreground text-xs">Total a lançar</p>
+              <p className="text-3xl font-bold text-violet-400">{formatCurrency(preparedOrder.summary.total)}</p>
+              <p className="text-xs text-muted-foreground mt-1">{preparedOrder.summary.totalItems} item(s)</p>
+              {preparedOrder.summary.discount > 0 && (
+                <div className="mt-2 space-y-0.5 text-xs text-muted-foreground">
+                  <p>Subtotal original: {formatCurrency(preparedOrder.summary.subtotal)}</p>
+                  <p>Desconto aplicado: {formatCurrency(preparedOrder.summary.discount)}</p>
                 </div>
-                <div className="max-h-36 overflow-auto border rounded-lg divide-y">
-                  {filteredCustomers.length === 0 ? (
-                    <p className="text-xs text-muted-foreground text-center py-3">Nenhum cliente encontrado</p>
-                  ) : (
-                    filteredCustomers.map(c => (
-                      <button
-                        key={c.id}
-                        type="button"
-                        className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors ${
-                          selectedCustomer === c.id
-                            ? 'bg-violet-500/20 text-violet-300 font-medium'
-                            : 'hover:bg-muted/50'
-                        }`}
-                        onClick={() => setSelectedCustomer(c.id)}
-                      >
-                        <User className="h-3 w-3 flex-shrink-0" />
-                        {c.name}
-                      </button>
-                    ))
-                  )}
-                </div>
-              </>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
-          {preparedOrder.items.length > 0 && (
+          <CadernetaCustomerPicker open={open} selectedId={customer?.id ?? ''} onSelect={setCustomer} />
+
+          {!isLegacy && hasItems && (
             <div className="max-h-32 overflow-auto border rounded-lg p-2 space-y-1">
               {preparedOrder.items.map((item, index) => (
                 <div key={`${item.productId ?? 'custom'}-${index}`} className="space-y-1 border-b border-border/60 pb-2 last:border-b-0 last:pb-0">
@@ -257,17 +256,18 @@ export function CadernetaModal({ open, onOpenChange, cart, customDrinks = [], to
 
           <Button
             className="w-full py-5 bg-violet-600 hover:bg-violet-700"
-            disabled={!selectedCustomer || preparedOrder.items.length === 0 || confirmMutation.isPending}
+            disabled={!canConfirm}
             onClick={handleConfirm}
+            data-testid="button-caderneta-confirm"
           >
-            {confirmMutation.isPending ? (
+            {isPending ? (
               <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : isLegacy ? (
+              <History className="h-4 w-4 mr-2" />
             ) : (
               <BookOpen className="h-4 w-4 mr-2" />
             )}
-            {confirmMutation.isPending
-              ? 'Registrando...'
-              : `Lançar para ${customerName || '...'}`}
+            {isPending ? 'Registrando...' : `${isLegacy ? 'Registrar fiado antigo para' : 'Lançar para'} ${customer?.name || '...'}`}
           </Button>
         </div>
       </DialogContent>

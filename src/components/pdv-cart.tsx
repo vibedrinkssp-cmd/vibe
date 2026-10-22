@@ -408,7 +408,6 @@ export const CartContent = memo(({
               <button
                 type="button"
                 onClick={onCadernetaClick}
-                disabled={!hasItems}
                 data-testid="button-caderneta"
                 className="h-14 rounded-lg bg-violet-600 hover:bg-violet-500 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white flex flex-col items-center justify-center gap-0.5 shadow-md shadow-violet-900/40 transition"
               >
