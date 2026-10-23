@@ -1,12 +1,8 @@
-import { memo, useState, useCallback, useRef, useEffect } from 'react';
-import { Plus, Minus, Trash2, Package, Check, DollarSign, ArrowLeftRight, Store, BookOpen, Wine, Beer, Lock, Cigarette, PlusCircle, Ticket } from 'lucide-react';
+import { memo, useState, useCallback } from 'react';
+import { Plus, Minus, Trash2, Package, Check, DollarSign, ArrowLeftRight, Store, BookOpen, Wine, Beer, Cigarette, PlusCircle, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CurrencyInput } from '@/components/ui/currency-input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import type { Product, CustomDrink } from '@/shared/schema';
 import type { PdvBeerDiscountResult } from '@/lib/beer-discount';
 
@@ -77,68 +73,8 @@ export const NotesAndDiscountInputs = memo(({
   onDiscountChange,
   onSurchargeChange,
 }: NotesAndDiscountInputsProps) => {
-  const [pinDialogOpen, setPinDialogOpen] = useState(false);
-  const [pin, setPin] = useState('');
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const [pendingValue, setPendingValue] = useState('');
-  const { toast } = useToast();
-
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, []);
-
-  const handleDiscountAttempt = useCallback((value: number) => {
-    const strValue = String(value);
-    // Se já está desbloqueado, propaga livremente o valor enquanto digita
-    if (isUnlocked) {
-      const syntheticEvent = { target: { value: strValue } } as React.ChangeEvent<HTMLInputElement>;
-      onDiscountChange(syntheticEvent);
-      return;
-    }
-    // Bloqueado: apenas armazena o valor pendente — abre PIN após pausa de 800ms
-    setPendingValue(strValue);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (value > 0) {
-      debounceRef.current = setTimeout(() => {
-        setPinDialogOpen(true);
-      }, 800);
-    }
-  }, [isUnlocked, onDiscountChange]);
-
-  const handleVerifyPin = useCallback(async (pinValue: string) => {
-    if (pinValue.length !== 4) return;
-    setIsVerifying(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('verify-discount-pin', {
-        body: { pin: pinValue },
-      });
-      if (error || !data?.success) {
-        toast({ title: 'PIN incorreto', variant: 'destructive' });
-        setPin('');
-        return;
-      }
-      setIsUnlocked(true);
-      setPinDialogOpen(false);
-      setPin('');
-      toast({ title: 'Desconto autorizado!' });
-      const syntheticEvent = { target: { value: pendingValue } } as React.ChangeEvent<HTMLInputElement>;
-      onDiscountChange(syntheticEvent);
-    } catch {
-      toast({ title: 'Erro ao verificar PIN', variant: 'destructive' });
-      setPin('');
-    } finally {
-      setIsVerifying(false);
-    }
-  }, [pendingValue, onDiscountChange, toast]);
-
-  const handleClearDiscount = useCallback(() => {
-    setIsUnlocked(false);
-    const syntheticEvent = { target: { value: '' } } as React.ChangeEvent<HTMLInputElement>;
+  const handleDiscountChange = useCallback((value: number) => {
+    const syntheticEvent = { target: { value: String(value) } } as React.ChangeEvent<HTMLInputElement>;
     onDiscountChange(syntheticEvent);
   }, [onDiscountChange]);
 
@@ -155,16 +91,9 @@ export const NotesAndDiscountInputs = memo(({
       />
       <div className="grid grid-cols-2 gap-2">
         <div className="flex items-center gap-1">
-          {isUnlocked ? (
-            <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={handleClearDiscount}>
-              <Trash2 className="h-4 w-4 text-destructive" />
-            </Button>
-          ) : (
-            <Lock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          )}
           <CurrencyInput
             value={manualDiscount}
-            onChange={handleDiscountAttempt}
+            onChange={handleDiscountChange}
             placeholder="Desconto"
             className="flex-1 min-w-0"
             data-testid="input-discount"
@@ -184,38 +113,6 @@ export const NotesAndDiscountInputs = memo(({
           />
         </div>
       </div>
-
-      <Dialog open={pinDialogOpen} onOpenChange={(open) => { setPinDialogOpen(open); if (!open) { setPin(''); } }}>
-        <DialogContent className="sm:max-w-xs">
-          <DialogHeader>
-            <DialogTitle className="text-center">PIN de Desconto</DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col items-center gap-4 py-4">
-            <p className="text-sm text-muted-foreground text-center">
-              Digite o PIN de 4 dígitos para autorizar o desconto de {formatCurrency(parseFloat(pendingValue) || 0)}
-            </p>
-            <InputOTP
-              maxLength={4}
-              value={pin}
-              onChange={(value) => {
-                setPin(value);
-                if (value.length === 4) {
-                  handleVerifyPin(value);
-                }
-              }}
-              disabled={isVerifying}
-            >
-              <InputOTPGroup>
-                <InputOTPSlot index={0} />
-                <InputOTPSlot index={1} />
-                <InputOTPSlot index={2} />
-                <InputOTPSlot index={3} />
-              </InputOTPGroup>
-            </InputOTP>
-            {isVerifying && <p className="text-xs text-muted-foreground">Verificando...</p>}
-          </div>
-        </DialogContent>
-      </Dialog>
     </>
   );
 });

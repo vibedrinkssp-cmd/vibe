@@ -8,7 +8,6 @@ import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
 import { supabase } from '@/integrations/supabase/client-safe';
 import { registerCadernetaLegacyEntry } from '@/lib/caderneta';
-import { OperationPinModal } from '@/components/auth/OperationPinModal';
 import { CadernetaCustomerPicker } from './CadernetaCustomerPicker';
 import { prepareCadernetaOrder } from './caderneta-order-utils';
 import { parseLooseCigarettePackId, stripLooseCigaretteMarker } from './loose-cigarette-utils';
@@ -53,7 +52,6 @@ export function CadernetaModal({ open, onOpenChange, cart, customDrinks = [], to
   const [mode, setMode] = useState<Mode>('sale');
   const [customer, setCustomer] = useState<{ id: string; name: string } | null>(null);
   const [legacy, setLegacy] = useState<LegacyForm>(EMPTY_LEGACY);
-  const [pinOpen, setPinOpen] = useState(false);
 
   const preparedOrder = useMemo(
     () => prepareCadernetaOrder({ cart, customDrinks, total }),
@@ -154,11 +152,6 @@ export function CadernetaModal({ open, onOpenChange, cart, customDrinks = [], to
       toast({ title: 'Informe a descrição e o valor do fiado', variant: 'destructive' });
       return;
     }
-    setPinOpen(true);
-  };
-
-  const handlePinValidated = () => {
-    setPinOpen(false);
     if (isLegacy) legacyMutation.mutate();
     else confirmMutation.mutate();
   };
@@ -271,14 +264,6 @@ export function CadernetaModal({ open, onOpenChange, cart, customDrinks = [], to
           </Button>
         </div>
       </DialogContent>
-      <OperationPinModal
-        open={pinOpen}
-        operation="registrar_fiado"
-        title="PIN para registrar fiado"
-        description="Informe o PIN de 4 dígitos autorizado para lançar vendas na caderneta."
-        onValidated={handlePinValidated}
-        onCancel={() => setPinOpen(false)}
-      />
     </Dialog>
   );
 }
