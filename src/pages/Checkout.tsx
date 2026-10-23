@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { explodeCopaoToOrderItems } from '@/lib/copao-recipe';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, CreditCard, Banknote, QrCode, Truck, ArrowLeft, Loader2, Copy, Check, Gift, Clock, Route, AlertTriangle, Ticket, X, Edit2 } from 'lucide-react';
+import { MapPin, CreditCard, Banknote, QrCode, Truck, ArrowLeft, Loader2, Copy, Check, Gift, Clock, Route, AlertTriangle, Ticket, X, Edit2, Store } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,6 +62,7 @@ export default function Checkout() {
   const [selectedCoupon, setSelectedCoupon] = useState<UserCoupon | null>(null);
   const [showCouponsModal, setShowCouponsModal] = useState(false);
   const [addressConfirmed, setAddressConfirmed] = useState(false);
+  const [isPickup, setIsPickup] = useState(false);
   const [isBackfillingAddressLocation, setIsBackfillingAddressLocation] = useState(false);
   const attemptedLocationFixesRef = useRef<Set<string>>(new Set());
 
@@ -140,6 +141,16 @@ export default function Checkout() {
     },
   });
 
+  const { data: onlineMotoboys } = useQuery<number>({
+    queryKey: ['online-motoboys-count'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('count_online_motoboys' as any);
+      if (error) throw error;
+      return Number(data) || 0;
+    },
+    refetchInterval: 30000,
+  });
+
   // Get store coordinates from settings
   const storeLocation = useMemo(() => {
     if (settings?.storeLat && settings?.storeLng) {
@@ -191,8 +202,8 @@ export default function Checkout() {
 
   // Sem coordenadas → não conseguimos calcular: operador ajusta a taxa manualmente.
   const hasCoords = address?.latitude != null && address?.longitude != null;
-  const deliveryFee = deliveryFeeResult?.fee ?? (hasCoords ? Number(settings?.minDeliveryFee ?? 3) : 0);
-  const isManualDeliveryFee = !hasCoords;
+  const deliveryFee = isPickup ? 0 : (deliveryFeeResult?.fee ?? (hasCoords ? Number(settings?.minDeliveryFee ?? 3) : 0));
+  const isManualDeliveryFee = !isPickup && !hasCoords;
 
   useEffect(() => {
     if (!user?.id || !address?.id || (address.latitude != null && address.longitude != null)) {
@@ -300,7 +311,7 @@ export default function Checkout() {
   // Helper to create order (used for non-PIX and after PIX approval)
   const createOrderAsync = async (mpPaymentId?: string) => {
     if (!user?.id) throw new Error('Você precisa estar logado para fazer um pedido.');
-    if (!address?.id) throw new Error('Endereço não encontrado.');
+    if (!isPickup && !address?.id) throw new Error('Endereço não encontrado.');
 
     const totalDiscount = comboDiscount + beerDiscount + promotionDiscount + couponDiscount;
     const orderSubtotal = subtotal + customDrinksTotal;
@@ -334,7 +345,7 @@ export default function Checkout() {
     // e o UNIQUE index `uniq_orders_user_client_request_id` impede duplicação.
     const rpcPayload = {
       p_user_id: user.id,
-      p_address_id: address.id,
+      p_address_id: address?.id ?? null,
       p_subtotal: orderSubtotal,
       p_delivery_fee: deliveryFee,
       p_discount: totalDiscount,
@@ -357,7 +368,20 @@ export default function Checkout() {
     // rpcPayload deliberately sends explicit `null` (not `undefined`) for optional args —
     // see comment above. The generated RPC arg types only allow `undefined`, so this needs
     // a cast; the function name itself stays type-checked.
-    const { data: rpcResult, error: orderError } = await supabase.rpc('create_delivery_order_with_items', rpcPayload as any);
+    const { data: rpcResult, error: orderError } = isPickup
+      ? await supabase.rpc('create_pickup_order_with_items' as any, {
+          p_user_id: user.id,
+          p_subtotal: orderSubtotal,
+          p_discount: totalDiscount,
+          p_total: total,
+          p_payment_method: paymentMethod,
+          p_items: JSON.stringify(orderItemsData),
+          p_change_for: rpcPayload.p_change_for,
+          p_notes: rpcPayload.p_notes,
+          p_client_request_id: clientRequestIdRef.current,
+          p_customer_name: null,
+        })
+      : await supabase.rpc('create_delivery_order_with_items', rpcPayload as any);
 
     if (orderError || !rpcResult) {
       console.error('[Checkout] RPC create_delivery_order_with_items failed:', orderError);
@@ -449,7 +473,7 @@ export default function Checkout() {
     // Trava única: bloqueia clique se mutation pending OU se PIX já está sendo criado
     if (createOrderMutation.isPending || isCreatingPixOrder) return;
 
-    if (!addressConfirmed) {
+    if (!isPickup && !addressConfirmed) {
       toast({
         title: 'Confirme o endereço',
         description: 'Confirme seu endereço de entrega antes de finalizar.',
@@ -458,7 +482,7 @@ export default function Checkout() {
       return;
     }
 
-    if (isBackfillingAddressLocation) {
+    if (!isPickup && isBackfillingAddressLocation) {
       toast({
         title: 'Atualizando localização',
         description: 'Estamos localizando seu endereço para calcular a entrega.',
@@ -467,7 +491,7 @@ export default function Checkout() {
     }
     
     // Block if address is beyond configured max distance
-    if (isAddressTooFar) {
+    if (!isPickup && isAddressTooFar) {
       toast({
         title: 'Endereço fora da área de entrega',
         description: `Seu endereço está a ${addressDistanceKm?.toFixed(1)}km. O limite é ${maxDistanceKm}km.`,
@@ -478,7 +502,7 @@ export default function Checkout() {
 
     // Sem coordenadas → seguimos com taxa = 0 e operador ajusta manualmente.
     // (Aviso já é exibido no card de endereço.)
-    if (hasCoords && !deliveryFeeResult) {
+    if (!isPickup && hasCoords && !deliveryFeeResult) {
       toast({
         title: 'Calculando taxa de entrega...',
         description: 'Aguarde o cálculo da taxa de entrega antes de confirmar.',
@@ -648,6 +672,51 @@ export default function Checkout() {
             <Card className="bg-card border-primary/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-foreground">
+                  <Truck className="h-5 w-5 text-primary" />
+                  Como receber
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  {([false, true] as const).map((pickup) => (
+                    <button
+                      key={String(pickup)}
+                      type="button"
+                      onClick={() => setIsPickup(pickup)}
+                      data-testid={pickup ? 'button-fulfillment-pickup' : 'button-fulfillment-delivery'}
+                      className={`flex flex-col items-center gap-1 p-4 rounded-lg border transition-all ${
+                        isPickup === pickup ? 'border-primary bg-primary/10 text-foreground' : 'border-primary/20 bg-secondary/30 text-muted-foreground'
+                      }`}
+                    >
+                      {pickup ? <Store className="h-5 w-5 text-primary" /> : <Truck className="h-5 w-5 text-primary" />}
+                      <span className="font-medium">{pickup ? 'Retirar na loja' : 'Entrega'}</span>
+                      <span className="text-xs">{pickup ? 'Sem taxa de entrega' : 'Receba em casa'}</span>
+                    </button>
+                  ))}
+                </div>
+                {isPickup ? (
+                  <div className="p-3 rounded-lg border border-primary/20 bg-secondary/50 text-sm">
+                    <p className="font-medium text-foreground">Retire em: {settings?.storeAddress || STORE_INFO.ADDRESS}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Avisaremos quando o pedido estiver pronto para retirada.</p>
+                  </div>
+                ) : onlineMotoboys == null ? null : onlineMotoboys > 0 ? (
+                  <div className="flex items-center gap-2 text-sm text-green-400 bg-green-500/10 p-3 rounded-lg border border-green-500/30" data-testid="text-motoboy-available">
+                    <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                    Entregadores disponíveis agora
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-2 text-sm text-yellow-400 bg-yellow-500/10 p-3 rounded-lg border border-yellow-500/30" data-testid="text-motoboy-unavailable">
+                    <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                    <span>Sem entregador disponível no momento — a entrega pode demorar mais. Se preferir, escolha retirar na loja.</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {!isPickup && (
+            <Card className="bg-card border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-foreground">
                   <MapPin className="h-5 w-5 text-primary" />
                   Endereço de Entrega
                 </CardTitle>
@@ -795,6 +864,7 @@ export default function Checkout() {
                 )}
               </CardContent>
             </Card>
+            )}
 
             <Card className="bg-card border-primary/20">
               <CardHeader>
@@ -833,7 +903,7 @@ export default function Checkout() {
                     <Banknote className="h-5 w-5 text-primary" />
                     <Label htmlFor="cash" className="flex-1 cursor-pointer text-foreground">
                       Dinheiro
-                      <span className="block text-xs text-muted-foreground">Pague na entrega</span>
+                      <span className="block text-xs text-muted-foreground">{isPickup ? 'Pague na retirada' : 'Pague na entrega'}</span>
                     </Label>
                   </div>
 
@@ -847,7 +917,7 @@ export default function Checkout() {
                     <CreditCard className="h-5 w-5 text-primary" />
                     <Label htmlFor="card_pos" className="flex-1 cursor-pointer text-foreground">
                       Cartao (Maquininha)
-                      <span className="block text-xs text-muted-foreground">Credito ou debito na entrega</span>
+                      <span className="block text-xs text-muted-foreground">Credito ou debito {isPickup ? 'na retirada' : 'na entrega'}</span>
                     </Label>
                   </div>
                 </RadioGroup>
@@ -1005,6 +1075,15 @@ export default function Checkout() {
                     </div>
                   )}
 
+                  {isPickup ? (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground flex items-center gap-1">
+                        <Store className="h-3 w-3" />
+                        Retirada na loja
+                      </span>
+                      <span className="text-green-500">Grátis</span>
+                    </div>
+                  ) : (<>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground flex items-center gap-1">
                       <Truck className="h-3 w-3" />
@@ -1032,6 +1111,7 @@ export default function Checkout() {
                       Endereço fora da área de entrega ({deliveryFeeResult.distanceKm.toFixed(1)}km)
                     </div>
                   )}
+                  </>)}
                 </div>
 
                 {/* Coupon section */}
@@ -1089,21 +1169,21 @@ export default function Checkout() {
                 <Button
                   className="w-full bg-primary text-primary-foreground font-semibold py-6 min-h-[56px] mb-4"
                   onClick={handlePlaceOrder}
-                  disabled={createOrderMutation.isPending || isCreatingPixOrder || showPixModal || isBackfillingAddressLocation || !isOpen || isAddressTooFar || !address || !deliveryFeeResult || isBelowMinimum}
+                  disabled={createOrderMutation.isPending || isCreatingPixOrder || showPixModal || (!isPickup && isBackfillingAddressLocation) || !isOpen || (!isPickup && (isAddressTooFar || !address || !deliveryFeeResult)) || isBelowMinimum}
                   data-testid="button-place-order"
                   style={{ marginBottom: 'max(16px, env(safe-area-inset-bottom, 16px))' }}
                 >
-                  {isAddressTooFar ? (
+                  {!isPickup && isAddressTooFar ? (
                     'Endereço fora da área de entrega'
-                  ) : !address ? (
+                  ) : !isPickup && !address ? (
                     'Cadastre um endereço'
-                  ) : isBackfillingAddressLocation ? (
+                  ) : !isPickup && isBackfillingAddressLocation ? (
                     'Localizando endereço...'
-                  ) : address.latitude == null || address.longitude == null ? (
+                  ) : !isPickup && address && (address.latitude == null || address.longitude == null) ? (
                     'Endereço sem localização - Atualize no perfil'
                   ) : !isOpen ? (
                     'Estabelecimento Fechado'
-                  ) : !deliveryFeeResult ? (
+                  ) : !isPickup && !deliveryFeeResult ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
                       Calculando entrega...
