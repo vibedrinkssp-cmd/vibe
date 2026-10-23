@@ -1,5 +1,7 @@
 import type { CustomDrink } from '@/shared/schema';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export function hasRealEnergetico(drink: CustomDrink): boolean {
   const energ = drink.energetico;
   if (!energ) return false;
@@ -94,6 +96,18 @@ export function explodeCopaoToOrderItems(drink: CustomDrink, fallbackName?: stri
     recipeItems.push({
       product_id: drink.ice.productId,
       product_name: `🧊 ${drink.ice.productName}`,
+      quantity: qty,
+      unit_price: 0,
+      total_price: 0,
+      is_wizard_item: false,
+    });
+  }
+  // Gelo de sabor escolhido (Copão e afins): cada copão consome 1 sachê/caixinha.
+  // 'agua' e 'sem' são opções sintéticas, sem produto no estoque.
+  if (drink.gelo && UUID_RE.test(drink.gelo.id)) {
+    recipeItems.push({
+      product_id: drink.gelo.id,
+      product_name: `🧊 ${drink.gelo.name}`,
       quantity: qty,
       unit_price: 0,
       total_price: 0,
