@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
+import { useStoreOpenNow } from '@/lib/store-hours';
 import { FixedHeader } from '@/components/layout/FixedHeader';
 import { FixedBottomBar } from '@/components/layout/FixedBottomBar';
 import { ChevronDown, Search, X } from 'lucide-react';
@@ -19,7 +20,6 @@ import { CaipiIceModal } from '@/components/home/CaipiIceModal';
 import { TutorialModal } from '@/components/home/TutorialModal';
 import { useSettingsRealtime, useProductsRealtime } from '@/hooks/use-realtime-sync';
 import { useProducts, useCategories } from '@/hooks/use-supabase-data';
-import { usePublicStoreInfo } from '@/hooks/use-public-data';
 import { useDeliveryEnabled } from '@/hooks/use-delivery-enabled';
 import { Store } from 'lucide-react';
 import { LetterFilter } from '@/components/common/LetterFilter';
@@ -100,10 +100,10 @@ export default function Home() {
   useProductsRealtime();
   useSettingsRealtime();
 
-  const { data: storeInfo } = usePublicStoreInfo();
   const { deliveryEnabled } = useDeliveryEnabled();
-  // Loja fechada ou entregas desligadas: sem motoboy; o cliente ainda pode retirar na loja.
-  const isDeliveryUnavailable = storeInfo?.isOpen === false || !deliveryEnabled;
+  const storeOpen = useStoreOpenNow();
+  // "Sem motoboy" depende só do botão de entregas; loja fechada tem aviso próprio (horário fixo).
+  const isDeliveryUnavailable = storeOpen && !deliveryEnabled;
 
   const { data: productsData = [], isLoading: productsLoading } = useProducts({ activeOnly: true });
   const { data: rawCategoriesData = [] } = useCategories({ activeOnly: true });
@@ -171,6 +171,12 @@ export default function Home() {
 
       {/* Scrollable Content - passes under fixed header and bottom bar */}
       <main className="pt-14 pb-24 safe-area-bottom">
+        {!storeOpen && (
+          <div className="bg-red-500/10 border border-red-500/30 text-red-700 dark:text-red-400 px-4 py-3 flex items-center gap-2 justify-center text-sm font-medium text-center" data-testid="banner-loja-fechada">
+            <Store className="h-4 w-4 shrink-0" />
+            Loja fechada no momento — abrimos das 14h às 05h (fechado às terças)
+          </div>
+        )}
         {isDeliveryUnavailable && (
           <div className="bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 px-4 py-3 flex items-center gap-2 justify-center text-sm font-medium text-center" data-testid="banner-sem-motoboy">
             <Store className="h-4 w-4 shrink-0" />

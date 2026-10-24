@@ -2,11 +2,10 @@ import { MessageCircle, Phone, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { STORE_INFO } from '@/lib/business-hours';
-import { usePublicStoreInfo } from '@/hooks/use-public-data';
+import { useStoreOpenNow } from '@/lib/store-hours';
 
 export function Footer() {
-  const { data: storeInfo } = usePublicStoreInfo();
-  const isOpen = storeInfo?.isOpen !== false;
+  const isOpen = useStoreOpenNow();
 
   return (
     <footer className="bg-gradient-to-b from-black/50 to-black purple-frame rounded-t-2xl mt-12">

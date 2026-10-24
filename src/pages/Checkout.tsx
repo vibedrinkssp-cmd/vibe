@@ -637,8 +637,8 @@ export default function Checkout() {
     }).format(price);
   };
 
-  // Loja fechada ou entregas desligadas = sem motoboy: só "Retirar na loja" (pedido nunca é bloqueado por isso).
-  const deliveryUnavailable = settings?.isOpen === false || !deliveryEnabled;
+  // Só o botão de entregas define "sem motoboy": então só "Retirar na loja" (pedido nunca é bloqueado por isso).
+  const deliveryUnavailable = !deliveryEnabled;
 
   // Sem entrega disponível: força "Retirar na loja".
   useEffect(() => {
