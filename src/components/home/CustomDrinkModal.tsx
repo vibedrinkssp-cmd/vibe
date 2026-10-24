@@ -10,7 +10,7 @@ import { getFruitEmoji } from '@/lib/emoji-icons';
 import { nanoid } from 'nanoid';
 import { mapProduct } from '@/lib/db-mappers';
 import { fetchAllowedByType, filterByAllowedProducts } from '@/lib/allowed-bottles';
-import { filterVisibleIceFlavorOptions, getIceFlavorPhotoUrl, iceAgua } from '@/lib/ice-flavor-icons';
+import { listAvailableIceFlavors, getIceFlavorPhotoUrl, iceAgua } from '@/lib/ice-flavor-icons';
 import { deductBottleDose } from '@/lib/deduct-bottle-doses';
 import type { Product } from '@/shared/schema';
 import { TierBottleCarousel, type AvailableBottleWithTier } from './TierBottleCarousel';
@@ -228,9 +228,15 @@ export function CustomDrinkModal({ open, onOpenChange, drinkType, onAddCustomDri
           const cans = e.filter((p: Record<string, unknown>) => { const name = (p.name as string || '').toLowerCase(); return !name.includes('2 litros') && !name.includes('2l'); });
           setEnergeticoCans(cans.map(p => mapProduct(p as Record<string, unknown>)));
         }
-        const { data: g } = await supabase.from('products').select('*').eq('product_type', 'gelo').eq('is_active', true).order('name');
+        // Gelos: pelo tipo OU pela categoria "Gelo" (no cadastro importado product_type vem vazio).
+        const { data: geloCats } = await supabase.from('categories_public').select('id').ilike('name', '%gelo%');
+        const geloCatIds = (geloCats || []).map(c => c.id).filter((id): id is string => !!id);
+        const geloFilter = geloCatIds.length
+          ? `product_type.eq.gelo,category_id.in.(${geloCatIds.join(',')})`
+          : 'product_type.eq.gelo';
+        const { data: g } = await supabase.from('products').select('*').or(geloFilter).eq('is_active', true).order('name');
         if (g) {
-          setGelos(filterVisibleIceFlavorOptions(g).map(p => mapProduct(p as Record<string, unknown>)));
+          setGelos(listAvailableIceFlavors(g).map(p => mapProduct(p as Record<string, unknown>)));
         }
         // Fruits now come from centralized useDrinkFruits hook
       } finally { setLoading(false); }

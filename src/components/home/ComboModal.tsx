@@ -22,7 +22,7 @@ import { useCartOptional } from '@/lib/cart';
 import { cn } from '@/lib/utils';
 import { getFruitEmoji } from '@/lib/emoji-icons';
 import { useDrinkFruits } from '@/hooks/use-drink-fruits';
-import { filterVisibleIceFlavorOptions, getIceFlavorPhotoUrl, iceAgua, isWaterIceName } from '@/lib/ice-flavor-icons';
+import { listAvailableIceFlavors, getIceFlavorPhotoUrl, iceAgua, isWaterIceName } from '@/lib/ice-flavor-icons';
 import type { Product, ComboGelo } from '@/shared/schema';
 
 interface ComboModalProps {
@@ -163,7 +163,7 @@ export function ComboModal({ open, onOpenChange, onAddItem, onAddComboComponents
     [categories],
   );
   const flavorIces = useMemo(
-    () => filterVisibleIceFlavorOptions(products.filter(p => p.isActive && p.stock > 0 && geloCatIds.includes(p.categoryId ?? ''))),
+    () => listAvailableIceFlavors(products.filter(p => p.isActive && p.stock > 0 && geloCatIds.includes(p.categoryId ?? ''))),
     [products, geloCatIds],
   );
   const waterIces = useMemo(() => {
