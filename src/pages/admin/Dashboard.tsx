@@ -66,6 +66,7 @@ import { AdminAIAssistant } from '@/components/admin/AdminAIAssistant';
 import { AdminTutorialModal } from '@/components/admin/AdminTutorialModal';
 
 import { StoreStatusToggle } from '@/components/StoreStatusToggle';
+import { DeliveryToggle } from '@/components/DeliveryToggle';
 import { SangriasTab } from './tabs/SangriasTab';
 
 // Lazy-load all tabs — each becomes a separate chunk for reliable loading
@@ -374,6 +375,7 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-1.5 md:gap-3 flex-wrap max-w-full overflow-hidden">
           <HeaderAlertStop isAlertActive={isAlertActive} onStop={ackAll} />
           <StoreStatusToggle />
+          <DeliveryToggle />
           <HeaderSoundAlert />
           <Button
             size="sm"

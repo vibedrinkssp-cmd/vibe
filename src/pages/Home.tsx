@@ -20,6 +20,7 @@ import { TutorialModal } from '@/components/home/TutorialModal';
 import { useSettingsRealtime, useProductsRealtime } from '@/hooks/use-realtime-sync';
 import { useProducts, useCategories } from '@/hooks/use-supabase-data';
 import { usePublicStoreInfo } from '@/hooks/use-public-data';
+import { useDeliveryEnabled } from '@/hooks/use-delivery-enabled';
 import { Store } from 'lucide-react';
 import { LetterFilter } from '@/components/common/LetterFilter';
 import { availableLetters, initialLetter } from '@/lib/initial-letter';
@@ -100,7 +101,9 @@ export default function Home() {
   useSettingsRealtime();
 
   const { data: storeInfo } = usePublicStoreInfo();
-  const isStoreClosed = storeInfo?.isOpen === false;
+  const { deliveryEnabled } = useDeliveryEnabled();
+  // Loja fechada ou entregas desligadas: sem motoboy; o cliente ainda pode retirar na loja.
+  const isDeliveryUnavailable = storeInfo?.isOpen === false || !deliveryEnabled;
 
   const { data: productsData = [], isLoading: productsLoading } = useProducts({ activeOnly: true });
   const { data: rawCategoriesData = [] } = useCategories({ activeOnly: true });
@@ -168,10 +171,10 @@ export default function Home() {
 
       {/* Scrollable Content - passes under fixed header and bottom bar */}
       <main className="pt-14 pb-24 safe-area-bottom">
-        {isStoreClosed && (
-          <div className="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 px-4 py-3 flex items-center gap-2 justify-center text-sm font-medium">
-            <Store className="h-4 w-4" />
-            Loja fechada no momento — pedidos indisponíveis
+        {isDeliveryUnavailable && (
+          <div className="bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 px-4 py-3 flex items-center gap-2 justify-center text-sm font-medium text-center" data-testid="banner-sem-motoboy">
+            <Store className="h-4 w-4 shrink-0" />
+            Sem motoboy para entrega no momento — você pode retirar na loja
           </div>
         )}
         {/* Monte seu Drink + Combo + Drinks Especiais, tudo em uma linha só */}

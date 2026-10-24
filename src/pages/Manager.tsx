@@ -6,6 +6,7 @@ import {
   BookOpen, Warehouse, Package, KeyRound, Ticket, MonitorPlay, QrCode, BadgePercent, Users
 } from 'lucide-react';
 import { StoreStatusToggle } from '@/components/StoreStatusToggle';
+import { DeliveryToggle } from '@/components/DeliveryToggle';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -317,6 +318,7 @@ export default function Manager() {
         </div>
         <div className="flex items-center gap-1 md:gap-2 shrink-0">
           <StoreStatusToggle />
+          <DeliveryToggle />
           <Button
             variant="ghost"
             size="sm"

@@ -54,6 +54,7 @@ import { printOrderTicket } from '@/lib/print-ticket';
 import { playCashRegisterSound, primeCashRegisterSound } from '@/lib/cash-register-sound';
 import type { PaymentSplit } from '@/components/pdv/CompositePaymentModal';
 import { StoreStatusToggle } from '@/components/StoreStatusToggle';
+import { DeliveryToggle } from '@/components/DeliveryToggle';
 import { SpecialDrinksCarousel } from '@/components/home/SpecialDrinksCarousel';
 
 // Lazy-loaded modals — only fetch chunks when actually opened (huge bundle reduction)
@@ -1372,6 +1373,7 @@ export default function PDV() {
         <div className="flex items-center gap-2 md:gap-4">
           <OpenCashButton pulse />
           <StoreStatusToggle />
+          <DeliveryToggle />
           <span className="text-white/70 text-xs sm:text-sm hidden sm:inline">
             {user?.name}
           </span>

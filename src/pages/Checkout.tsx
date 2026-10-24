@@ -30,6 +30,7 @@ import { useUserCoupons } from '@/hooks/use-user-coupons';
 import { usePublicCategories } from '@/hooks/use-public-data';
 import { useAddresses } from '@/hooks/use-supabase-data';
 import { useGoogleMaps } from '@/hooks/use-google-maps';
+import { useDeliveryEnabled } from '@/hooks/use-delivery-enabled';
 import { calculateCouponDiscount, type UserCoupon } from '@/lib/coupon-utils';
 import { computeCartPromoDiscount, mapCartItemsForPromotions, useActivePromotions } from '@/lib/weekly-promotions';
 import type { Settings, PaymentMethod } from '@/shared/schema';
@@ -141,6 +142,8 @@ export default function Checkout() {
       } as Settings;
     },
   });
+
+  const { deliveryEnabled } = useDeliveryEnabled();
 
   const { data: onlineMotoboys } = useQuery<number>({
     queryKey: ['online-motoboys-count'],
@@ -634,7 +637,13 @@ export default function Checkout() {
     }).format(price);
   };
 
-  const isOpen = settings?.isOpen !== false;
+  // Loja fechada ou entregas desligadas = sem motoboy: só "Retirar na loja" (pedido nunca é bloqueado por isso).
+  const deliveryUnavailable = settings?.isOpen === false || !deliveryEnabled;
+
+  // Sem entrega disponível: força "Retirar na loja".
+  useEffect(() => {
+    if (deliveryUnavailable) setIsPickup(true);
+  }, [deliveryUnavailable]);
 
   // Redirect to login if not authenticated (wait for hydration)
   useEffect(() => {
@@ -675,14 +684,14 @@ export default function Checkout() {
           Voltar ao cardapio
         </Button>
 
-        {!isOpen && (
-          <Card className="mb-6 border-red-500/30 bg-red-500/5">
+        {deliveryUnavailable && (
+          <Card className="mb-6 border-amber-500/30 bg-amber-500/5" data-testid="banner-sem-motoboy">
             <CardContent className="pt-6">
-              <div className="flex items-center gap-3 text-red-400">
+              <div className="flex items-center gap-3 text-amber-400">
                 <Clock className="h-5 w-5 flex-shrink-0" />
                 <div>
-                  <p className="font-semibold">{STORE_INFO.STORE_NAME} - Fechado</p>
-                  <p className="text-sm">Estamos fechados no momento. Acompanhe nossas redes para saber quando reabriremos!</p>
+                  <p className="font-semibold">{STORE_INFO.STORE_NAME} - Sem motoboy para entrega</p>
+                  <p className="text-sm">No momento não estamos fazendo entregas. Você pode finalizar o pedido escolhendo "Retirar na loja".</p>
                   <p className="text-xs mt-1 text-muted-foreground">{STORE_INFO.ADDRESS}</p>
                   <p className="text-xs mt-2">Entre em contato: <a href={STORE_INFO.WHATSAPP_LINK} className="text-green-400 hover:underline" target="_blank" rel="noopener noreferrer">WhatsApp {STORE_INFO.WHATSAPP}</a></p>
                 </div>
@@ -709,10 +718,11 @@ export default function Checkout() {
                       key={String(pickup)}
                       type="button"
                       onClick={() => setIsPickup(pickup)}
+                      disabled={!pickup && deliveryUnavailable}
                       data-testid={pickup ? 'button-fulfillment-pickup' : 'button-fulfillment-delivery'}
                       className={`flex flex-col items-center gap-1 p-4 rounded-lg border transition-all ${
                         isPickup === pickup ? 'border-primary bg-primary/10 text-foreground' : 'border-primary/20 bg-secondary/30 text-muted-foreground'
-                      }`}
+                      } ${!pickup && deliveryUnavailable ? 'opacity-40 cursor-not-allowed' : ''}`}
                     >
                       {pickup ? <Store className="h-5 w-5 text-primary" /> : <Truck className="h-5 w-5 text-primary" />}
                       <span className="font-medium">{pickup ? 'Retirar na loja' : 'Entrega'}</span>
@@ -1209,7 +1219,7 @@ export default function Checkout() {
                 <Button
                   className="w-full bg-primary text-primary-foreground font-semibold py-6 min-h-[56px] mb-4"
                   onClick={handlePlaceOrder}
-                  disabled={createOrderMutation.isPending || isCreatingPixOrder || showPixModal || (!isPickup && isBackfillingAddressLocation) || !isOpen || (!isPickup && (isAddressTooFar || !address || !deliveryFeeResult)) || isBelowMinimum}
+                  disabled={createOrderMutation.isPending || isCreatingPixOrder || showPixModal || (!isPickup && isBackfillingAddressLocation) || (!isPickup && deliveryUnavailable) || (!isPickup && (isAddressTooFar || !address || !deliveryFeeResult)) || isBelowMinimum}
                   data-testid="button-place-order"
                   style={{ marginBottom: 'max(16px, env(safe-area-inset-bottom, 16px))' }}
                 >
@@ -1221,8 +1231,8 @@ export default function Checkout() {
                     'Localizando endereço...'
                   ) : !isPickup && address && (address.latitude == null || address.longitude == null) ? (
                     'Endereço sem localização - Atualize no perfil'
-                  ) : !isOpen ? (
-                    'Estabelecimento Fechado'
+                  ) : !isPickup && deliveryUnavailable ? (
+                    'Entrega indisponível - escolha Retirar na loja'
                   ) : !isPickup && !deliveryFeeResult ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
