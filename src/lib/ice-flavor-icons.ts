@@ -57,6 +57,21 @@ function getCanonicalIceFlavorKey(iceName: string): typeof ICE_FLAVOR_ORDER[numb
   return null;
 }
 
+/**
+ * Gelos de sabor que o cliente/operador pode escolher agora: todo produto "Gelo ..."
+ * que não seja gelo de água/cubo/saco e que tenha estoque, em ordem alfabética.
+ * (filterVisibleIceFlavorOptions só conhece 7 sabores fixos e escondia, por exemplo,
+ * "Gelo Coko 200ml", pêssego e pitaya.)
+ */
+export function listAvailableIceFlavors<T extends { name?: string | null; stock?: number | null }>(items: T[]): T[] {
+  return items
+    .filter((item) => {
+      const name = item.name || '';
+      return /^gelo\b/i.test(name.trim()) && !isWaterIceName(name) && Number(item.stock ?? 0) > 0;
+    })
+    .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
+}
+
 export function filterVisibleIceFlavorOptions<T extends { name?: string | null }>(items: T[]): T[] {
   const byFlavor = new Map<typeof ICE_FLAVOR_ORDER[number], T>();
   for (const item of items) {

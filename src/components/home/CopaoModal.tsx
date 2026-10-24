@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client-safe';
 import { useCartOptional } from '@/lib/cart';
 import { useToast } from '@/hooks/use-toast';
 import { useDrinkFruits } from '@/hooks/use-drink-fruits';
-import { filterVisibleIceFlavorOptions, getIceFlavorPhotoUrl, iceAgua } from '@/lib/ice-flavor-icons';
+import { listAvailableIceFlavors, getIceFlavorPhotoUrl, iceAgua } from '@/lib/ice-flavor-icons';
 import { nanoid } from 'nanoid';
 import type { CustomDrink } from '@/shared/schema';
 import { fetchAllowedByType, filterByAllowedProducts } from '@/lib/allowed-bottles';
@@ -17,7 +17,7 @@ import { TierBottleCarousel, type AvailableBottleWithTier, type SelectedBottleEn
 interface AvailableBottle extends AvailableBottleWithTier {}
 interface SelectedBottle extends SelectedBottleEntry {}
 interface EnergeticoOption { type: 'lata' | 'garrafa'; id: string; name: string; price: number; productId: string; }
-interface GeloOption { id: string; name: string; price: number; }
+interface GeloOption { id: string; name: string; price: number; stock?: number; }
 interface FruitOption { id: string; name: string; price: number; icon_url?: string | null; }
 
 interface CopaoModalProps { open: boolean; onOpenChange: (open: boolean) => void; onAddCustomDrink?: (drink: CustomDrink) => void; }
@@ -47,7 +47,7 @@ const normalizeIce = (s: string) =>
 
 const isGeloCaixinha = (name: string) => {
   const n = normalizeIce(name);
-  return n.includes('caixinha') || n.includes('caixa');
+  return n.includes('caixinha') || n.includes('caixa') || n.includes('200ml');
 };
 
 // Ícone único e distintivo para cada sabor de gelo (evita confusão visual)
@@ -198,9 +198,9 @@ export function CopaoModal({ open, onOpenChange, onAddCustomDrink }: CopaoModalP
         const geloCatIds = (geloCats || []).filter(c => c.id).map(c => c.id!);
         const flavorIces: GeloOption[] = [];
         if (geloCatIds.length > 0) {
-          const { data: geloProds } = await supabase.from('products_public').select('id, name, sale_price').in('category_id', geloCatIds).eq('is_active', true).order('sale_price');
-          filterVisibleIceFlavorOptions(geloProds || []).filter(p => (p.name || '').toLowerCase().startsWith('gelo'))
-            .forEach(p => flavorIces.push({ id: p.id!, name: p.name!, price: Number(p.sale_price) }));
+          const { data: geloProds } = await supabase.from('products_public').select('id, name, sale_price, stock').in('category_id', geloCatIds).eq('is_active', true);
+          listAvailableIceFlavors(geloProds || [])
+            .forEach(p => flavorIces.push({ id: p.id!, name: p.name!, price: Number(p.sale_price), stock: Number(p.stock ?? 0) }));
         }
         setGeloOptions(flavorIces);
         // Fruits now come from centralized useDrinkFruits hook
@@ -547,6 +547,7 @@ export function CopaoModal({ open, onOpenChange, onAddCustomDrink }: CopaoModalP
                         ) : (
                           <span className="text-[10px] text-emerald-600 font-semibold">GRÁTIS</span>
                         )}
+                        {opt.stock != null && <span className="text-[10px] text-muted-foreground">{opt.stock} em estoque</span>}
                         {isSelected && <Check className="h-3.5 w-3.5 text-purple-500" />}
                       </button>
                     );

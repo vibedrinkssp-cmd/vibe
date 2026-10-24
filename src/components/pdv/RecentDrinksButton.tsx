@@ -115,7 +115,7 @@ interface Props {
 // ---------- Catalog for swapping ----------
 interface BottleOpt { bottle_id: string; product_id: string; product_name: string; dose_price: number; product_type: string | null }
 interface EnergOpt { productId: string; productName: string; price: number; type: 'garrafa' | 'lata' }
-interface GeloOpt { id: string; name: string; price: number }
+interface GeloOpt { id: string; name: string; price: number; stock: number }
 
 function useRecipeCatalog(open: boolean) {
   const [bottles, setBottles] = useState<BottleOpt[]>([]);
@@ -157,8 +157,8 @@ function useRecipeCatalog(open: boolean) {
         const { data: geloCats } = await supabase.from('categories_public').select('id').ilike('name', '%gelo%');
         const catIds = (geloCats || []).map((c: any) => c.id).filter(Boolean);
         if (catIds.length) {
-          const { data: geloProds } = await supabase.from('products_public').select('id, name, sale_price').in('category_id', catIds).eq('is_active', true).order('sale_price');
-          setGelos((geloProds || []).map((p: any) => ({ id: p.id, name: p.name, price: Number(p.sale_price) })));
+          const { data: geloProds } = await supabase.from('products_public').select('id, name, sale_price, stock').in('category_id', catIds).eq('is_active', true);
+          setGelos(listAvailableIceFlavors(geloProds || []).map((p: any) => ({ id: p.id, name: p.name, price: Number(p.sale_price), stock: Number(p.stock ?? 0) })));
         } else {
           setGelos([]);
         }
@@ -215,7 +215,7 @@ function PickerDialog({
     }
     if (state.kind === 'gelo') {
       return catalog.gelos.filter(g => filter(g.name)).map(g => ({
-        key: g.id, label: g.name, sub: `R$ ${g.price.toFixed(2)}`, payload: g,
+        key: g.id, label: g.name, sub: `${g.stock} em estoque`, payload: g,
       }));
     }
     return catalog.fruits.filter(f => filter(f.name)).map(f => ({
