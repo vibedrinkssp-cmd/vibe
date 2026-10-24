@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { FixedHeader } from '@/components/layout/FixedHeader';
 import { FixedBottomBar } from '@/components/layout/FixedBottomBar';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { CompactCategoryCarousel } from '@/components/home/CompactCategoryCarousel';
 import { ProductFiltersBar } from '@/components/home/ProductFiltersBar';
 import { ScrollableProductGrid } from '@/components/home/ScrollableProductGrid';
@@ -205,6 +206,30 @@ export default function Home() {
               onSelectCategory={setSelectedCategory}
               showTrending={hasTrendingProducts}
             />
+          </div>
+
+          {/* Barra de pesquisa logo abaixo das categorias */}
+          <div className="relative px-3 pb-1.5">
+            <Search className="absolute left-6 top-[calc(50%-3px)] -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <Input
+              type="search"
+              inputMode="search"
+              placeholder="Pesquisar produtos..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-9 h-10 rounded-full text-sm"
+              data-testid="input-search-catalog"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-6 top-[calc(50%-3px)] -translate-y-1/2 text-muted-foreground"
+                aria-label="Limpar pesquisa"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
 
           {/* Pulsing arrow to scroll back to top */}
