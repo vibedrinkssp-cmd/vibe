@@ -120,6 +120,7 @@ const PAYMENT_ICONS: Record<PaymentMethod, typeof CreditCard> = {
   card_pos: CreditCard,
   card_credit: CreditCard,
   card_debit: Wallet,
+  card_online: CreditCard,
   mixed: CreditCard,
 };
 

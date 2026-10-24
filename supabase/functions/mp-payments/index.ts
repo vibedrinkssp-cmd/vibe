@@ -187,6 +187,68 @@ serve(async (req: Request) => {
       return jsonResponse(responseData);
     }
 
+    // Checkout Pro: cria a preferência (link de pagamento do Mercado Pago) para um pedido
+    // 'card_online' já criado. O valor vem SEMPRE do banco, nunca do cliente. A confirmação
+    // chega pelo mp-webhook (external_reference = id do pedido).
+    if (action === 'create_preference') {
+      const orderId = validateUUID(body.order_id, 'order_id');
+      const supabaseAdmin = getSupabaseAdmin();
+      const { data: order, error: orderErr } = await supabaseAdmin
+        .from('orders')
+        .select('id, total, status, payment_method')
+        .eq('id', orderId)
+        .maybeSingle();
+
+      if (orderErr || !order) return jsonResponse({ error: 'Pedido não encontrado' }, 404);
+      if (order.payment_method !== 'card_online' || order.status !== 'pending') {
+        return jsonResponse({ error: 'Este pedido não está aguardando pagamento online' }, 400);
+      }
+
+      const amount = validateAmount(Number(order.total));
+      const siteUrl = (Deno.env.get('SITE_URL') ?? 'https://www.adegavibedrinks.com.br').replace(/\/$/, '');
+      const backUrl = (status: string) => `${siteUrl}/pedidos?pagamento=${status}`;
+
+      const preference = {
+        items: [{
+          id: orderId,
+          title: `Pedido Vibe Drinks #${orderId.slice(0, 8).toUpperCase()}`,
+          quantity: 1,
+          currency_id: 'BRL',
+          unit_price: amount,
+        }],
+        external_reference: orderId,
+        notification_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/mp-webhook`,
+        back_urls: { success: backUrl('sucesso'), pending: backUrl('pendente'), failure: backUrl('falhou') },
+        auto_return: 'approved',
+        // PIX tem fluxo próprio no site; aqui só cartão (e saldo Mercado Pago).
+        payment_methods: { excluded_payment_types: [{ id: 'ticket' }, { id: 'atm' }, { id: 'bank_transfer' }] },
+        statement_descriptor: 'VIBE DRINKS',
+        expires: true,
+        expiration_date_to: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+      };
+
+      const prefResponse = await fetch('https://api.mercadopago.com/checkout/preferences', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(preference),
+      });
+      const prefResult = await prefResponse.json();
+
+      if (!prefResponse.ok || !prefResult.init_point) {
+        console.error('[mercadopago] Preference error:', prefResponse.status, JSON.stringify(prefResult));
+        return fallbackResponse(prefResult.message || 'Não foi possível abrir o pagamento agora', {
+          code: 'MP_PREFERENCE_FAILED',
+          status: prefResponse.status,
+        });
+      }
+
+      console.log('[mercadopago] Preference created for order', orderId, 'pref', prefResult.id);
+      return jsonResponse({ init_point: prefResult.init_point, preference_id: prefResult.id });
+    }
+
     if (action === 'check_status') {
       const paymentId = body.payment_id;
       if (!paymentId) {

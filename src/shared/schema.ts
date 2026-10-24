@@ -272,7 +272,7 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
 };
 
 // Payment method types
-export type PaymentMethod = 'pix' | 'pix_pos' | 'cash' | 'card_pos' | 'card_credit' | 'card_debit' | 'mixed';
+export type PaymentMethod = 'pix' | 'pix_pos' | 'cash' | 'card_pos' | 'card_credit' | 'card_debit' | 'card_online' | 'mixed';
 
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   pix: 'PIX',
@@ -281,6 +281,7 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   card_pos: 'Cartão (Maquininha)',
   card_credit: 'Cartão Crédito',
   card_debit: 'Cartão Débito',
+  card_online: 'Cartão Online',
   mixed: 'Pagamento Composto',
 };
 

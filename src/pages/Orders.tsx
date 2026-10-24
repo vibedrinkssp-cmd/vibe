@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, Wifi, WifiOff, Loader2, RefreshCw, MapPin, Eye, QrCode, XCircle } from 'lucide-react';
+import { ArrowLeft, Package, Wifi, WifiOff, Loader2, RefreshCw, MapPin, Eye, QrCode, XCircle, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -19,6 +19,7 @@ import { PixQRCodeModal } from '@/components/PixQRCodeModal';
 import { useOrders, useOrderItems, useMotoboys } from '@/hooks/use-supabase-data';
 import { supabase } from '@/integrations/supabase/client-safe';
 import { queryClient } from '@/lib/queryClient';
+import { startCardCheckout } from '@/lib/mp-checkout';
 import type { Order, OrderItem, Motoboy, OrderStatus } from '@/shared/schema';
 
 interface OrderWithDetails extends Order {
@@ -34,6 +35,17 @@ export default function Orders() {
   const [showPixModal, setShowPixModal] = useState(false);
   const [selectedOrderForPix, setSelectedOrderForPix] = useState<OrderWithDetails | null>(null);
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
+  const [openingCardOrderId, setOpeningCardOrderId] = useState<string | null>(null);
+
+  const handlePayCardOnline = async (orderId: string) => {
+    setOpeningCardOrderId(orderId);
+    try {
+      await startCardCheckout(orderId);
+    } catch (err) {
+      toast({ title: 'Pagamento não aberto', description: err instanceof Error ? err.message : 'Tente novamente.', variant: 'destructive' });
+      setOpeningCardOrderId(null);
+    }
+  };
   const { playOnce, playLoop, stopAll } = useNotificationSound({ screen: 'customer' });
   // Orders.tsx is customer-facing — uses basic playLoop/stopAll, not useOrderAlert
   const { toast } = useToast();
@@ -336,7 +348,8 @@ export default function Orders() {
                           }
                         >
                           {order.status === 'pending' && order.paymentMethod === 'pix' && '💳 Aguardando PIX'}
-                          {order.status === 'pending' && order.paymentMethod !== 'pix' && 'Aguardando'}
+                          {order.status === 'pending' && order.paymentMethod === 'card_online' && '💳 Aguardando pagamento'}
+                          {order.status === 'pending' && order.paymentMethod !== 'pix' && order.paymentMethod !== 'card_online' && 'Aguardando'}
                           {order.status === 'accepted' && 'Confirmado'}
                           {order.status === 'preparing' && 'Em Preparo'}
                           {order.status === 'ready' && 'Pronto'}
@@ -401,6 +414,40 @@ export default function Orders() {
                         </div>
                       )}
                       
+                      {/* Pending online card payment actions */}
+                      {order.status === 'pending' && order.paymentMethod === 'card_online' && (
+                        <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 mt-4">
+                          <div className="flex items-start gap-3 mb-3">
+                            <CreditCard className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
+                            <div>
+                              <p className="font-semibold text-primary">Pagamento com cartão pendente</p>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Clique em "Pagar com cartão" para concluir pelo Mercado Pago ou cancele o pedido.
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              className="flex-1 bg-primary text-primary-foreground"
+                              onClick={() => handlePayCardOnline(order.id)}
+                              disabled={openingCardOrderId === order.id}
+                            >
+                              {openingCardOrderId === order.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <><CreditCard className="h-4 w-4 mr-1" />Pagar com cartão</>}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                              onClick={() => handleCancelOrder(order.id)}
+                              disabled={cancellingOrderId === order.id}
+                            >
+                              {cancellingOrderId === order.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <><XCircle className="h-4 w-4 mr-1" />Cancelar</>}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
                       {order.motoboy && (
                         <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-3 mt-4">
                           <p className="text-sm text-purple-400 font-medium">Entregador</p>
@@ -460,6 +507,7 @@ export default function Orders() {
                         <div className="text-sm text-muted-foreground">
                           {order.paymentMethod === 'pix' && '💳 PIX'}
                           {order.paymentMethod === 'cash' && '💵 Dinheiro'}
+                          {order.paymentMethod === 'card_online' && '💳 Cartão online'}
                           {order.paymentMethod === 'card_credit' && '💳 Crédito'}
                           {order.paymentMethod === 'card_debit' && '💳 Débito'}
                           {order.paymentMethod === 'card_pos' && '💳 Maquininha'}

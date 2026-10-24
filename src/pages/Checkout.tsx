@@ -18,6 +18,7 @@ import { useCart } from '@/lib/cart';
 import { useAuth } from '@/lib/auth';
 import { queryClient } from '@/lib/queryClient';
 import { supabase } from '@/integrations/supabase/client-safe';
+import { startCardCheckout } from '@/lib/mp-checkout';
 // mapSettings no longer needed - using get_store_info RPC
 import { STORE_INFO } from '@/lib/business-hours';
 import { DeliveryMap } from '@/components/location/DeliveryMap';
@@ -527,6 +528,31 @@ export default function Checkout() {
       } finally {
         setIsCreatingPixOrder(false);
       }
+    } else if (paymentMethod === 'card_online') {
+      // Cartão online: cria o pedido pendente e leva o cliente ao Checkout Pro do Mercado Pago.
+      // O webhook confirma o pagamento; se não pagar, o cron cancela o pedido.
+      setIsCreatingPixOrder(true);
+      try {
+        const orderId = await createOrderAsync();
+        clearCart();
+        setSelectedCoupon(null);
+        regenerateClientRequestId();
+        queryClient.invalidateQueries({ queryKey: ['orders'] });
+        queryClient.invalidateQueries({ queryKey: ['user-coupons'] });
+        try {
+          await startCardCheckout(orderId);
+        } catch (err) {
+          // Pedido já existe (pendente): o cliente pode pagar de novo em "Meus Pedidos".
+          const msg = err instanceof Error ? err.message : 'Não foi possível abrir o pagamento.';
+          toast({ title: 'Pagamento não aberto', description: `${msg} Seu pedido está em "Meus Pedidos" para pagar de novo.`, variant: 'destructive' });
+          navigate('/pedidos');
+        }
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Erro ao criar pedido';
+        toast({ title: 'Erro ao iniciar pagamento', description: msg, variant: 'destructive' });
+      } finally {
+        setIsCreatingPixOrder(false);
+      }
     } else {
       createOrderMutation.mutate();
     }
@@ -890,6 +916,20 @@ export default function Checkout() {
                     <Label htmlFor="pix" className="flex-1 cursor-pointer text-foreground">
                       PIX
                       <span className="block text-xs text-muted-foreground">Pagamento instantaneo</span>
+                    </Label>
+                  </div>
+
+                  <div 
+                    className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
+                      paymentMethod === 'card_online' ? 'border-primary bg-primary/10' : 'border-primary/20 bg-secondary/30'
+                    }`}
+                    onClick={() => setPaymentMethod('card_online')}
+                  >
+                    <RadioGroupItem value="card_online" id="card_online" className="border-primary" />
+                    <CreditCard className="h-5 w-5 text-primary" />
+                    <Label htmlFor="card_online" className="flex-1 cursor-pointer text-foreground">
+                      Cartão online
+                      <span className="block text-xs text-muted-foreground">Crédito ou débito pelo Mercado Pago, pague agora</span>
                     </Label>
                   </div>
 

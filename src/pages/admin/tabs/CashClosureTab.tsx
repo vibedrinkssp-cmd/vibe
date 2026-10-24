@@ -245,6 +245,7 @@ export function CashClosureTab() {
           totals.totalPix += amount;
           break;
         case 'card_credit':
+        case 'card_online':
           totals.totalCardCredit += amount;
           break;
         case 'card_debit':

@@ -5553,6 +5553,7 @@ export type Database = {
         | "card_pos"
         | "card_credit"
         | "card_debit"
+        | "card_online"
         | "mixed"
         | "pix_pos"
       product_tier: "essencial" | "premium" | "luxo"
@@ -5705,6 +5706,7 @@ export const Constants = {
         "card_pos",
         "card_credit",
         "card_debit",
+        "card_online",
         "mixed",
         "pix_pos",
       ],

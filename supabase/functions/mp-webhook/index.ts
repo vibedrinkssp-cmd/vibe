@@ -177,7 +177,7 @@ serve(async (req: Request) => {
           payment_confirmed: true,
           payment_confirmed_at: new Date().toISOString(),
           payment_confirmed_by: `mp_webhook #${paymentId}`,
-          notes: `✅ PIX CONFIRMADO (webhook) - MP #${paymentId}`,
+          notes: `✅ ${payment.payment_type_id === 'credit_card' ? 'CARTÃO DE CRÉDITO' : payment.payment_type_id === 'debit_card' ? 'CARTÃO DE DÉBITO' : 'PIX'} CONFIRMADO (webhook) - MP #${paymentId}`,
         })
         .eq('id', orderId)
         .eq('status', 'pending'); // optimistic lock

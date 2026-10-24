@@ -16,15 +16,20 @@ Deno.serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Find pending PIX orders older than 10 minutes (não confirmados = cancelados)
-    const thirtyMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    // PIX pendente há mais de 10 min e cartão online (Checkout Pro) pendente há mais de 35 min
+    // (o link do Mercado Pago expira em 30) não confirmados = cancelados.
+    const pixCutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const cardCutoff = new Date(Date.now() - 35 * 60 * 1000).toISOString();
 
-    const { data: expiredOrders, error: fetchError } = await supabase
-      .from("orders")
-      .select("id, created_at, user_id, total")
-      .eq("status", "pending")
-      .eq("payment_method", "pix")
-      .lt("created_at", thirtyMinutesAgo);
+    const [pixRes, cardRes] = await Promise.all([
+      supabase.from("orders").select("id, created_at, user_id, total")
+        .eq("status", "pending").eq("payment_method", "pix").lt("created_at", pixCutoff),
+      supabase.from("orders").select("id, created_at, user_id, total")
+        .eq("status", "pending").eq("payment_method", "card_online").lt("created_at", cardCutoff),
+    ]);
+
+    const fetchError = pixRes.error ?? cardRes.error;
+    const expiredOrders = [...(pixRes.data ?? []), ...(cardRes.data ?? [])];
 
     if (fetchError) {
       console.error("Error fetching expired orders:", fetchError);

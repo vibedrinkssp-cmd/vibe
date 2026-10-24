@@ -238,6 +238,7 @@ export function ReportsTab() {
           result.totalCash += amount;
           break;
         case 'card_credit':
+        case 'card_online':
           result.totalCardCredit += amount;
           break;
         case 'card_debit':

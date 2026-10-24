@@ -433,7 +433,8 @@ export function OrdersTab() {
       );
     }
 
-    const isPix = order.paymentMethod === 'pix';
+    // PIX e cartão online são pagos antes (Mercado Pago): sem botão de conferência manual.
+    const isPix = order.paymentMethod === 'pix' || order.paymentMethod === 'card_online';
     const isCash = order.paymentMethod === 'cash';
     const isDeliveryCash = isCash && order.orderType === 'delivery';
     // Botão grande de recebimento físico só aparece em delivery cash não confirmado

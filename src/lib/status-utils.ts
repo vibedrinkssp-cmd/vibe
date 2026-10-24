@@ -38,7 +38,7 @@ export function getStatusLabel(status: string): string {
 }
 
 /**
- * Pedido PIX ainda NÃO confirmado pelo Mercado Pago (webhook/polling).
+ * Pedido PIX ou cartão online ainda NÃO confirmado pelo Mercado Pago (webhook/polling).
  * Enquanto isso for verdadeiro, o pedido NÃO deve aparecer em nenhuma tela
  * operacional/administrativa — ele só "existe" de verdade após a confirmação.
  * A trava de banco `enforce_pix_payment_before_progress` garante que ele
@@ -50,7 +50,7 @@ export function isUnconfirmedPixOrder(order: {
   paymentConfirmed?: boolean | null;
 }): boolean {
   return (
-    order.paymentMethod === 'pix' &&
+    (order.paymentMethod === 'pix' || order.paymentMethod === 'card_online') &&
     order.status === 'pending' &&
     order.paymentConfirmed !== true
   );
