@@ -12,6 +12,11 @@ import { STORAGE_BUCKET, ensureImageUrl } from './supabase';
 const OBJECT_PATH = '/storage/v1/object/public/';
 const RENDER_PATH = '/storage/v1/render/image/public/';
 
+// A transformação on-the-fly (/render/image) só existe em projetos Supabase Pro;
+// no plano Free o endpoint falha e todas as fotos aparecem quebradas.
+// Ligue com VITE_SUPABASE_IMAGE_TRANSFORMS=true quando o projeto tiver o recurso.
+const TRANSFORMS_ENABLED = import.meta.env.VITE_SUPABASE_IMAGE_TRANSFORMS === 'true';
+
 export type ImageVariant = {
   w: number;
   q?: number;
@@ -29,6 +34,12 @@ export function imgUrl(
   // Resolve to a full public URL first (handles bucket prefix logic).
   const fullUrl = ensureImageUrl(pathOrUrl);
   if (!fullUrl) return '';
+
+  if (!TRANSFORMS_ENABLED) {
+    return fullUrl.includes(RENDER_PATH)
+      ? fullUrl.split('?')[0].replace(RENDER_PATH, OBJECT_PATH)
+      : fullUrl;
+  }
 
   // Only rewrite Supabase public-object URLs; leave Unsplash/external alone.
   const objectIdx = fullUrl.indexOf(OBJECT_PATH);
@@ -57,7 +68,7 @@ export function imgSrcSet(
   widths: number[],
   opts: Omit<ImageVariant, 'w'> = {},
 ): string {
-  if (!pathOrUrl) return '';
+  if (!pathOrUrl || !TRANSFORMS_ENABLED) return '';
   return widths
     .map((w) => `${imgUrl(pathOrUrl, { ...opts, w })} ${w}w`)
     .join(', ');

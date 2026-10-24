@@ -53,7 +53,7 @@ export function SmartImage({
     <img
       {...rest}
       src={errored && fallbackSrc ? fallbackSrc : src}
-      srcSet={errored && fallbackSrc ? undefined : srcSet}
+      srcSet={errored && fallbackSrc ? undefined : srcSet || undefined}
       sizes={sizes}
       alt={alt ?? ''}
       decoding="async"
