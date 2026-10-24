@@ -76,9 +76,12 @@ interface LastBottleConfig {
 
 interface OpenBottleInput {
   productId: string;
+  productName: string;
   totalMl: number;
   mlPerDose: number;
   dosePrice: number;
+  // Garrafa que já estava aberta no balcão e nunca esteve no estoque do sistema: não desconta estoque.
+  alreadyOpen: boolean;
 }
 
 function useOpenBottleMutation(openedBy: string, onDone: () => void) {
@@ -86,15 +89,38 @@ function useOpenBottleMutation(openedBy: string, onDone: () => void) {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ productId, totalMl, mlPerDose, dosePrice }: OpenBottleInput) => {
-      // open_bottle já desconta 1 unidade do estoque
-      const { data: bottleId, error } = await supabase.rpc('open_bottle', {
-        p_product_id: productId,
-        p_total_ml: totalMl,
-        p_ml_per_dose: mlPerDose,
-        p_opened_by: openedBy,
-      });
-      if (error) throw error;
+    mutationFn: async ({ productId, productName, totalMl, mlPerDose, dosePrice, alreadyOpen }: OpenBottleInput) => {
+      let bottleId: string | null = null;
+      if (alreadyOpen) {
+        // Insere direto (staff tem permissão na tabela) para não passar pela baixa de estoque do open_bottle
+        const doses = Math.floor(totalMl / mlPerDose);
+        const { data, error } = await supabase
+          .from('open_bottles')
+          .insert({
+            product_id: productId,
+            product_name: productName,
+            total_ml: totalMl,
+            ml_per_dose: mlPerDose,
+            total_doses: doses,
+            remaining_doses: doses,
+            opened_by: openedBy,
+            notes: 'Já aberta antes do sistema (sem baixa de estoque)',
+          })
+          .select('id')
+          .single();
+        if (error) throw error;
+        bottleId = data?.id ?? null;
+      } else {
+        // open_bottle já desconta 1 unidade do estoque
+        const { data, error } = await supabase.rpc('open_bottle', {
+          p_product_id: productId,
+          p_total_ml: totalMl,
+          p_ml_per_dose: mlPerDose,
+          p_opened_by: openedBy,
+        });
+        if (error) throw error;
+        bottleId = data;
+      }
       if (!bottleId) throw new Error('Falha ao abrir garrafa: ID não retornado');
       if (dosePrice > 0) {
         const { error: priceError } = await supabase.rpc('update_bottle_dose_price', {
@@ -126,16 +152,18 @@ export function OpenBottleDialog({ openedBy, compact = false }: { openedBy: stri
   const [totalMl, setTotalMl] = useState(String(DEFAULT_VOLUME_ML));
   const [mlPerDose, setMlPerDose] = useState<number>(DOSE_SIZES_ML[0]);
   const [dosePrice, setDosePrice] = useState(String(DEFAULT_DOSE_PRICE));
+  const [alreadyOpen, setAlreadyOpen] = useState(false);
 
   const { data: products = [] } = useQuery({
-    queryKey: ['open-bottle-dialog-products'],
+    queryKey: ['open-bottle-dialog-products', alreadyOpen],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('products')
         .select('id, name, stock, product_type')
-        .eq('is_active', true)
-        .gt('stock', 0)
-        .order('name', { ascending: true });
+        .eq('is_active', true);
+      // Garrafa já aberta fora do estoque: o produto pode estar com estoque 0
+      if (!alreadyOpen) query = query.gt('stock', 0);
+      const { data, error } = await query.order('name', { ascending: true });
       if (error) throw error;
       return (data || []) as BottleProduct[];
     },
@@ -158,6 +186,7 @@ export function OpenBottleDialog({ openedBy, compact = false }: { openedBy: stri
     setTotalMl(String(DEFAULT_VOLUME_ML));
     setMlPerDose(DOSE_SIZES_ML[0]);
     setDosePrice(String(DEFAULT_DOSE_PRICE));
+    setAlreadyOpen(false);
   };
 
   const openMutation = useOpenBottleMutation(openedBy, () => {
@@ -193,6 +222,8 @@ export function OpenBottleDialog({ openedBy, compact = false }: { openedBy: stri
     if (!selected || doses <= 0) return;
     openMutation.mutate({
       productId: selected.id,
+      productName: selected.name,
+      alreadyOpen,
       totalMl: totalMlNum,
       mlPerDose,
       dosePrice: parseFloat(dosePrice) || 0,
@@ -218,6 +249,19 @@ export function OpenBottleDialog({ openedBy, compact = false }: { openedBy: stri
         </DialogHeader>
 
         <div className="space-y-4 py-2 flex-1 overflow-y-auto">
+          <label className="flex items-start gap-2 p-2.5 border rounded-lg cursor-pointer">
+            <input
+              type="checkbox"
+              checked={alreadyOpen}
+              onChange={(e) => setAlreadyOpen(e.target.checked)}
+              className="mt-0.5 rounded border-primary"
+            />
+            <span className="text-sm">
+              Garrafa que já estava aberta
+              <span className="block text-xs text-muted-foreground">Não desconta do estoque. Informe só quanto ainda resta nela.</span>
+            </span>
+          </label>
+
           {selected ? (
             <div className="flex items-center gap-2 p-2.5 border border-primary/50 bg-primary/5 rounded-lg">
               <Wine className="h-4 w-4 text-primary shrink-0" />
@@ -241,7 +285,7 @@ export function OpenBottleDialog({ openedBy, compact = false }: { openedBy: stri
               <div className="max-h-[260px] overflow-y-auto overscroll-contain border rounded-lg">
                 {results.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-4">
-                    {search ? 'Nenhum produto em estoque com esse nome' : 'Busque um produto'}
+                    {search ? (alreadyOpen ? 'Nenhum produto com esse nome' : 'Nenhum produto em estoque com esse nome') : 'Busque um produto'}
                   </p>
                 ) : (
                   <div className="p-1 space-y-0.5">
@@ -271,7 +315,7 @@ export function OpenBottleDialog({ openedBy, compact = false }: { openedBy: stri
             <>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Volume (ml)</Label>
+                  <Label>{alreadyOpen ? 'Quanto resta (ml)' : 'Volume (ml)'}</Label>
                   <Input type="number" inputMode="numeric" value={totalMl} onChange={(e) => setTotalMl(e.target.value)} />
                 </div>
                 <div className="space-y-2">
@@ -304,7 +348,9 @@ export function OpenBottleDialog({ openedBy, compact = false }: { openedBy: stri
                   <span className="text-muted-foreground"> doses</span>
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Estoque: {selected.stock ?? 0} → {Math.max((selected.stock ?? 0) - 1, 0)}
+                  {alreadyOpen
+                    ? `Estoque continua ${selected.stock ?? 0} (não desconta)`
+                    : `Estoque: ${selected.stock ?? 0} → ${Math.max((selected.stock ?? 0) - 1, 0)}`}
                 </p>
               </div>
             </>
