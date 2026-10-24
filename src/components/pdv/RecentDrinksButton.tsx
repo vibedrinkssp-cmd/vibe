@@ -19,6 +19,7 @@ import { queryClient } from '@/lib/queryClient';
 import { deductBottleDose } from '@/lib/deduct-bottle-doses';
 import { useDrinkFruits } from '@/hooks/use-drink-fruits';
 import { getFruitEmoji } from '@/lib/emoji-icons';
+import { listAvailableIceFlavors } from '@/lib/ice-flavor-icons';
 
 /**
  * Repetir uma receita salva ("Últimos") pulava a baixa de doses da garrafa aberta —
