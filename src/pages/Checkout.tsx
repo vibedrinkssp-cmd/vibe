@@ -305,7 +305,9 @@ export default function Checkout() {
 
   // Pedido mínimo de R$20 (exceto PDV)
   const MIN_ORDER_VALUE = 20;
-  const isBelowMinimum = cartTotal < MIN_ORDER_VALUE;
+  // Teste de pagamento: carrinho só com o produto "TESTE R$1" fura o mínimo (remover junto com o produto)
+  const isPaymentTestCart = items.length > 0 && customDrinks.length === 0 && items.every(item => item.product.name.startsWith('TESTE R$1'));
+  const isBelowMinimum = cartTotal < MIN_ORDER_VALUE && !isPaymentTestCart;
 
   // Handler for when DeliveryEstimate calculates the distance
   const handleEstimateChange = useCallback((estimate: { distance: number; duration: number } | null) => {
