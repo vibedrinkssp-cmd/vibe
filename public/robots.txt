@@ -8,4 +8,4 @@ Disallow: /checkout
 Disallow: /pedidos
 Disallow: /perfil
 
-Sitemap: https://vibedrinks-novo.vercel.app/sitemap.xml
+Sitemap: https://www.adegavibedrinks.com.br/sitemap.xml
