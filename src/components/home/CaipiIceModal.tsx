@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useDrinkFruits } from '@/hooks/use-drink-fruits';
 import type { CustomDrink, Product } from '@/shared/schema';
 import { nanoid } from 'nanoid';
-import { mapProduct } from '@/lib/db-mappers';
+import { loadAvailableIces } from '@/lib/ice-products';
 import { TierBottleCarousel, type AvailableBottleWithTier, type SelectedBottleEntry } from './TierBottleCarousel';
 import { fetchAllowedByType, filterByAllowedProducts } from '@/lib/allowed-bottles';
 import { deductBottleDoses } from '@/lib/deduct-bottle-doses';
@@ -39,10 +39,6 @@ const STEP_TITLES: Record<Step, string> = {
   ice: 'ESCOLHA A ICE',
   review: 'SUA CAIPI ICE',
 };
-
-const ICES_CATEGORY_ID = '8e030d4d-ec1f-4722-8b68-0f0f93c13971';
-const CERVEJAS_CATEGORY_ID = '910004ea-3a2c-4f2e-85a5-e94d00ebd3ab';
-const PREMADE_PATTERN = /^caip/i;
 
 export function CaipiIceModal({ open, onOpenChange, onAddCustomDrink }: CaipiIceModalProps) {
   const cart = useCartOptional();
@@ -87,10 +83,12 @@ export function CaipiIceModal({ open, onOpenChange, onAddCustomDrink }: CaipiIce
     const load = async () => {
       setLoading(true);
       try {
-        const [bottlesRes, icesRes, longneckRes, configRes] = await Promise.all([
+        const [bottlesRes, availableIces, configRes] = await Promise.all([
           supabase.rpc('get_available_bottles_for_assembly'),
-          supabase.from('products').select('*').eq('category_id', ICES_CATEGORY_ID).eq('is_active', true).order('name'),
-          supabase.from('products').select('*').eq('category_id', CERVEJAS_CATEGORY_ID).eq('is_active', true).ilike('name', '%longneck%'),
+          loadAvailableIces().catch((err) => {
+            console.warn('[CaipiIce] falha ao carregar Ice', err);
+            return [] as Product[];
+          }),
           supabase.from('special_drink_configs').select('base_price, no_alcohol_price, allow_no_alcohol').eq('slug', 'caipi-ice').maybeSingle(),
         ]);
         if (bottlesRes.data) {
@@ -101,11 +99,7 @@ export function CaipiIceModal({ open, onOpenChange, onAddCustomDrink }: CaipiIce
           const { spiritIds, hasAny } = await fetchAllowedByType('caipi-ice');
           setBottles(hasAny ? filterByAllowedProducts(allBottles, spiritIds) : []);
         }
-        const standaloneIces = (icesRes.data || [])
-          .filter((p: Record<string, unknown>) => !PREMADE_PATTERN.test(String(p.name || '')))
-          .map(p => mapProduct(p as Record<string, unknown>));
-        const longneckMapped = (longneckRes.data || []).map((p: Record<string, unknown>) => mapProduct(p));
-        setIceProducts([...standaloneIces, ...longneckMapped]);
+        setIceProducts(availableIces);
         if (configRes.data) {
           setValorAgregado(Number(configRes.data.base_price ?? 10));
           setNoAlcoholPrice(Number((configRes.data as any).no_alcohol_price ?? 10));

@@ -75,8 +75,8 @@ const PDVCameraScanner = lazy(() => import('@/components/BarcodeScanner').then(m
 import { buildLooseCigaretteItemName, parseLooseCigarettePackId, buildCustomDrinkProductName, type LooseCigaretteSelection } from '@/components/pdv/loose-cigarette-utils';
 import { nanoid } from 'nanoid';
 import { explodeCopaoToOrderItems, isRecipeDrink } from '@/lib/copao-recipe';
-import { isCopaoProduct, freeGeloLine } from '@/lib/copao-product';
-import { CopaoGeloDialog } from '@/components/common/CopaoGeloDialog';
+import { extraKindFor, freeExtraLine, type ExtraKind } from '@/lib/copao-product';
+import { ExtraChoiceDialog } from '@/components/common/ExtraChoiceDialog';
 import { calculatePdvBeerDiscount } from '@/lib/beer-discount';
 import { calcPosCouponDiscount, redeemPosCoupon, validatePosCoupon, type PosCoupon } from '@/lib/pos-coupon';
 import { computeCartPromoDiscount, inferCustomDrinkTypeKey, useActivePromotions } from '@/lib/weekly-promotions';
@@ -644,21 +644,22 @@ export default function PDV() {
     });
   }, [isInfiniteStock, setCart]);
 
-  // Copão pronto: pergunta o gelo antes de lançar; o gelo escolhido entra como linha de R$ 0 (baixa estoque).
-  const [copaoGeloFor, setCopaoGeloFor] = useState<Product | null>(null);
+  // Copão / Caipi Ice pronto: pergunta o gelo (ou a Ice) antes de lançar; a escolha entra como linha de R$ 0 (baixa estoque).
+  const [extraChoice, setExtraChoice] = useState<{ product: Product; kind: ExtraKind } | null>(null);
   const handleProductClick = useCallback((product: Product) => {
     const categoryName = categories.find(c => c.id === product.categoryId)?.name;
-    if (isCopaoProduct(product, categoryName)) {
-      setCopaoGeloFor(product);
+    const kind = extraKindFor(product, categoryName);
+    if (kind) {
+      setExtraChoice({ product, kind });
       return;
     }
     addToCart(product);
   }, [categories, addToCart]);
-  const handleCopaoGeloConfirm = useCallback((gelo: Product | null) => {
-    if (!copaoGeloFor) return;
-    addToCart(copaoGeloFor);
-    if (gelo) addToCart(freeGeloLine(gelo));
-  }, [copaoGeloFor, addToCart]);
+  const handleExtraConfirm = useCallback((extra: Product | null) => {
+    if (!extraChoice) return;
+    addToCart(extraChoice.product);
+    if (extra) addToCart(freeExtraLine(extra));
+  }, [extraChoice, addToCart]);
 
   const updateQuantity = useCallback((productId: string, delta: number) => {
     setCart(prev => {
@@ -2015,12 +2016,12 @@ export default function PDV() {
         {copaoOpen && (
           <CopaoModal open={copaoOpen} onOpenChange={setCopaoOpen} onAddCustomDrink={handleAddCustomDrink} />
         )}
-        {copaoGeloFor && (
-          <CopaoGeloDialog
-            open
-            onOpenChange={(o) => { if (!o) setCopaoGeloFor(null); }}
-            copaoName={copaoGeloFor.name}
-            onConfirm={handleCopaoGeloConfirm}
+        {extraChoice && (
+          <ExtraChoiceDialog
+            kind={extraChoice.kind}
+            productName={extraChoice.product.name}
+            onOpenChange={(o) => { if (!o) setExtraChoice(null); }}
+            onConfirm={handleExtraConfirm}
           />
         )}
         {caipiIceOpen && (
