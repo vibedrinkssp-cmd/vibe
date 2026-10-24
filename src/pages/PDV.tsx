@@ -56,6 +56,7 @@ import type { PaymentSplit } from '@/components/pdv/CompositePaymentModal';
 import { StoreStatusToggle } from '@/components/StoreStatusToggle';
 import { DeliveryToggle } from '@/components/DeliveryToggle';
 import { SpecialDrinksCarousel } from '@/components/home/SpecialDrinksCarousel';
+import { OpenBottleDialog } from '@/components/bottles/OpenBottleDialog';
 
 // Lazy-loaded modals — only fetch chunks when actually opened (huge bundle reduction)
 const PixQRCodeModal = lazy(() => import('@/components/PixQRCodeModal').then(m => ({ default: m.PixQRCodeModal })));
@@ -1516,6 +1517,11 @@ export default function PDV() {
               onComboOpen={() => setComboOpen(true)}
               onSpecialDrinksOpen={() => setSpecialDrinksOpen(true)}
             />
+
+            {/* Garrafa fechada não aparece na lista de doses: abre aqui antes de lançar a dose */}
+            <div className="flex justify-end">
+              <OpenBottleDialog openedBy="PDV" />
+            </div>
           </div>
 
           <div className="flex-1 overflow-auto p-2 sm:p-3 pt-0">
