@@ -75,6 +75,8 @@ const PDVCameraScanner = lazy(() => import('@/components/BarcodeScanner').then(m
 import { buildLooseCigaretteItemName, parseLooseCigarettePackId, buildCustomDrinkProductName, type LooseCigaretteSelection } from '@/components/pdv/loose-cigarette-utils';
 import { nanoid } from 'nanoid';
 import { explodeCopaoToOrderItems, isRecipeDrink } from '@/lib/copao-recipe';
+import { isCopaoProduct, freeGeloLine } from '@/lib/copao-product';
+import { CopaoGeloDialog } from '@/components/common/CopaoGeloDialog';
 import { calculatePdvBeerDiscount } from '@/lib/beer-discount';
 import { calcPosCouponDiscount, redeemPosCoupon, validatePosCoupon, type PosCoupon } from '@/lib/pos-coupon';
 import { computeCartPromoDiscount, inferCustomDrinkTypeKey, useActivePromotions } from '@/lib/weekly-promotions';
@@ -618,18 +620,22 @@ export default function PDV() {
   const addToCart = useCallback((product: Product) => {
     const infinite = isInfiniteStock(product);
     
+    // Linhas de preço diferente (ex.: gelo grátis do copão) não se misturam com a venda normal do mesmo produto.
+    const sameLine = (item: { product: Product }) =>
+      item.product.id === product.id && item.product.salePrice === product.salePrice;
+
     setCart(prev => {
-      const existingItem = prev.find(item => item.product.id === product.id);
-      const currentQty = existingItem?.quantity ?? 0;
-      
+      const existingItem = prev.find(sameLine);
+      const currentQty = prev.filter(i => i.product.id === product.id).reduce((s, i) => s + i.quantity, 0);
+
       if (!infinite && (product.stock <= 0 || currentQty >= product.stock)) {
         setStockAlertProduct(product);
         return prev;
       }
-      
+
       if (existingItem) {
         return prev.map(item =>
-          item.product.id === product.id
+          sameLine(item)
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -637,6 +643,22 @@ export default function PDV() {
       return [...prev, { product, quantity: 1 }];
     });
   }, [isInfiniteStock, setCart]);
+
+  // Copão pronto: pergunta o gelo antes de lançar; o gelo escolhido entra como linha de R$ 0 (baixa estoque).
+  const [copaoGeloFor, setCopaoGeloFor] = useState<Product | null>(null);
+  const handleProductClick = useCallback((product: Product) => {
+    const categoryName = categories.find(c => c.id === product.categoryId)?.name;
+    if (isCopaoProduct(product, categoryName)) {
+      setCopaoGeloFor(product);
+      return;
+    }
+    addToCart(product);
+  }, [categories, addToCart]);
+  const handleCopaoGeloConfirm = useCallback((gelo: Product | null) => {
+    if (!copaoGeloFor) return;
+    addToCart(copaoGeloFor);
+    if (gelo) addToCart(freeGeloLine(gelo));
+  }, [copaoGeloFor, addToCart]);
 
   const updateQuantity = useCallback((productId: string, delta: number) => {
     setCart(prev => {
@@ -1502,7 +1524,7 @@ export default function PDV() {
                   <Card
                     key={product.id}
                     className={`cursor-pointer hover-elevate active-elevate-2 ${isOutOfStock ? 'opacity-50' : ''}`}
-                    onClick={() => !isOutOfStock && addToCart(product)}
+                    onClick={() => !isOutOfStock && handleProductClick(product)}
                     data-testid={`card-product-${product.id}`}
                   >
                     <CardContent className="p-2 sm:p-3">
@@ -1992,6 +2014,14 @@ export default function PDV() {
         )}
         {copaoOpen && (
           <CopaoModal open={copaoOpen} onOpenChange={setCopaoOpen} onAddCustomDrink={handleAddCustomDrink} />
+        )}
+        {copaoGeloFor && (
+          <CopaoGeloDialog
+            open
+            onOpenChange={(o) => { if (!o) setCopaoGeloFor(null); }}
+            copaoName={copaoGeloFor.name}
+            onConfirm={handleCopaoGeloConfirm}
+          />
         )}
         {caipiIceOpen && (
           <CaipiIceModal open={caipiIceOpen} onOpenChange={setCaipiIceOpen} onAddCustomDrink={handleAddCustomDrink} />

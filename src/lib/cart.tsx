@@ -104,14 +104,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [customDrinks]);
 
   const addItem = (product: Product, quantity = 1) => {
+    // Mesma linha só se o preço também for igual (gelo grátis do copão não se mistura com gelo comprado).
+    const sameLine = (item: CartItem) =>
+      item.productId === product.id && !item.isComboItem && item.product.salePrice === product.salePrice;
     setItems(prev => {
-      const existing = prev.find(item => item.productId === product.id && !item.isComboItem);
+      const existing = prev.find(sameLine);
       if (existing) {
-        return prev.map(item =>
-          item.productId === product.id && !item.isComboItem
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
+        return prev.map(item => (sameLine(item) ? { ...item, quantity: item.quantity + quantity } : item));
       }
       return [...prev, { productId: product.id, product, quantity }];
     });

@@ -11,6 +11,8 @@ import type { Product } from '@/shared/schema';
 import { isInfiniteStockProduct } from '@/shared/schema';
 import { BeerQuantityModal } from './BeerQuantityModal';
 import { CERVEJAS_CATEGORY_ID } from '@/lib/beer-discount';
+import { isCopaoProduct, freeGeloLine } from '@/lib/copao-product';
+import { CopaoGeloDialog } from '@/components/common/CopaoGeloDialog';
 
 interface ProductDetailDrawerProps {
   product: Product | null;
@@ -28,7 +30,8 @@ export function ProductDetailDrawer({
   const { items, addItem, updateQuantity } = useCart();
   const { toast } = useToast();
   const [showBeerModal, setShowBeerModal] = useState(false);
-  
+  const [showGeloDialog, setShowGeloDialog] = useState(false);
+
   if (!product) return null;
 
   const isBeerProduct = product.categoryId === CERVEJAS_CATEGORY_ID;
@@ -49,6 +52,14 @@ export function ProductDetailDrawer({
   const handleAddItem = () => {
     if (isBeerProduct) {
       setShowBeerModal(true);
+      return;
+    }
+    if (isCopaoProduct(product, categoryName)) {
+      if (!isPreparedProduct && (product.stock <= 0 || quantity >= product.stock)) {
+        toast({ title: 'Esgotado', description: 'Reposição em andamento.', variant: 'destructive' });
+        return;
+      }
+      setShowGeloDialog(true);
       return;
     }
     if (!isPreparedProduct) {
@@ -211,6 +222,18 @@ export function ProductDetailDrawer({
       open={showBeerModal}
       onOpenChange={setShowBeerModal}
     />
+
+    {showGeloDialog && (
+      <CopaoGeloDialog
+        open
+        onOpenChange={setShowGeloDialog}
+        copaoName={product.name}
+        onConfirm={(gelo) => {
+          addItem(product);
+          if (gelo) addItem(freeGeloLine(gelo));
+        }}
+      />
+    )}
     </>
   );
 }
