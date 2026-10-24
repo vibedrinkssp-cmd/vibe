@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /pdv
+Disallow: /cozinha
+Disallow: /motoboy
+Disallow: /checkout
+Disallow: /pedidos
+Disallow: /perfil
+
+Sitemap: https://vibedrinks-novo.vercel.app/sitemap.xml

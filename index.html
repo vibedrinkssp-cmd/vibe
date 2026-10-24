@@ -10,17 +10,24 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
     
     <!-- SEO Meta Tags -->
-    <title>Vibe Drinks - Delivery de Bebidas</title>
-    <meta name="description" content="Vibe Drinks - As melhores bebidas premium com entrega rápida para você. Cervejas, destilados, vinhos e mais.">
-    <meta name="keywords" content="delivery bebidas, adega, cerveja, vinho, destilados, whisky, vodka, entrega rápida, vibe drinks" />
+    <title>Adega de Madrugada na Vila Saúde | Vibe Drinks - Entrega das 14h às 5h</title>
+    <meta name="description" content="Adega e drinkeria na Vila Saúde, São Paulo. Entrega de bebidas, cervejas geladas, destilados e drinks todos os dias das 14h às 5h da manhã. Peça online no Vibe Drinks.">
+    <meta name="keywords" content="adega de madrugada, adega vila saúde, adega 24 horas zona sul, delivery de bebidas madrugada, cerveja gelada entrega, destilados, whisky, vodka, drinks, vibe drinks" />
     <meta name="author" content="Vibe Drinks" />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://vibedrinks-novo.vercel.app/" />
+    <meta name="geo.region" content="BR-SP" />
+    <meta name="geo.placename" content="Vila da Saúde, São Paulo" />
+    <meta name="geo.position" content="-23.6201441;-46.6069064" />
+    <meta name="ICBM" content="-23.6201441, -46.6069064" />
 
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:url" content="https://vibedrinks-novo.vercel.app/" />
 
 
-    <meta property="og:image" content="/og-image.png">
+    <meta property="og:image" content="https://vibedrinks-novo.vercel.app/og-image.png">
     <meta property="og:site_name" content="Vibe Drinks" />
 
     <!-- Twitter Card -->
@@ -28,9 +35,9 @@
 
 
 
-    <!-- PWA / Theme - Purple brand color (matches header glass-bar-purple top stop) -->
-    <meta name="theme-color" content="#5B21B6" />
-    <meta name="msapplication-TileColor" content="#5B21B6" />
+    <!-- PWA / Theme - Brand color (preto Vibe Drinks) -->
+    <meta name="theme-color" content="#0A0A0A" />
+    <meta name="msapplication-TileColor" content="#0A0A0A" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Vibe Drinks" />
@@ -45,14 +52,49 @@
     <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://msbbdwmygabidjngsanv.supabase.co" />
     <link rel="dns-prefetch" href="https://msbbdwmygabidjngsanv.supabase.co" />
-    <meta property="og:title" content="Vibe Drinks - Delivery de Bebidas">
-  <meta name="twitter:title" content="Vibe Drinks - Delivery de Bebidas">
-  <meta property="og:description" content="Vibe Drinks - As melhores bebidas premium com entrega rápida para você. Cervejas, destilados, vinhos e mais.">
-  <meta name="twitter:description" content="Vibe Drinks - As melhores bebidas premium com entrega rápida para você. Cervejas, destilados, vinhos e mais.">
-  <meta name="twitter:image" content="/og-image.png">
+    <meta property="og:title" content="Adega de Madrugada na Vila Saúde | Vibe Drinks">
+  <meta name="twitter:title" content="Adega de Madrugada na Vila Saúde | Vibe Drinks">
+  <meta property="og:description" content="Adega e drinkeria na Vila Saúde. Entrega de bebidas todos os dias das 14h às 5h da manhã.">
+  <meta name="twitter:description" content="Adega e drinkeria na Vila Saúde. Entrega de bebidas todos os dias das 14h às 5h da manhã.">
+  <meta name="twitter:image" content="https://vibedrinks-novo.vercel.app/og-image.png">
+
+    <!-- Dados estruturados: negócio local (Google Maps / busca local) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LiquorStore",
+      "name": "Vibe Drinks - Adega & Drinkeria",
+      "alternateName": "Adega Vibe Drinks",
+      "description": "Adega de madrugada na Vila Saúde, São Paulo, com entrega de cervejas, destilados e drinks das 14h às 5h.",
+      "url": "https://vibedrinks-novo.vercel.app/",
+      "image": "https://vibedrinks-novo.vercel.app/og-image.png",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "R. Abagiba, 687",
+        "addressLocality": "São Paulo",
+        "addressRegion": "SP",
+        "addressCountry": "BR"
+      },
+      "geo": { "@type": "GeoCoordinates", "latitude": -23.6201441, "longitude": -46.6069064 },
+      "areaServed": [
+        { "@type": "Place", "name": "Vila da Saúde" },
+        { "@type": "Place", "name": "Saúde, São Paulo" },
+        { "@type": "Place", "name": "Jabaquara, São Paulo" }
+      ],
+      "openingHoursSpecification": [
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], "opens": "14:00", "closes": "05:00" }
+      ],
+      "hasDeliveryMethod": "http://purl.org/goodrelations/v1#DeliveryModeOwnFleet",
+      "potentialAction": { "@type": "OrderAction", "target": "https://vibedrinks-novo.vercel.app/" }
+    }
+    </script>
 </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <h1>Vibe Drinks - Adega de Madrugada na Vila Saúde</h1>
+      <p>Adega e drinkeria com entrega de cervejas, destilados, vinhos e drinks na Vila Saúde, São Paulo. Atendemos todos os dias das 14h às 5h da manhã. R. Abagiba, 687.</p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
