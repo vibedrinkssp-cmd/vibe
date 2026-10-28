@@ -9,18 +9,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/format-utils';
 import { FEE_PLATFORMS } from '@/lib/platform-fees';
 
-type Channel = 'balcao' | 'delivery' | 'ifood' | '99food';
+type Channel = 'balcao' | 'delivery' | 'ifood' | '99food' | 'caderneta';
 const CHANNELS: { id: Channel; label: string }[] = [
   { id: 'balcao', label: 'Balcão' },
   { id: 'delivery', label: 'Delivery loja' },
   { id: 'ifood', label: 'iFood' },
   { id: '99food', label: '99Food' },
+  { id: 'caderneta', label: 'Caderneta (fiado)' },
 ];
 const channelLabel = (c: Channel) => CHANNELS.find((x) => x.id === c)?.label ?? c;
 
 /** Mesma regra do Relatório Diário: origem de plataforma > balcão > delivery da loja. */
 function orderChannel(o: { salesperson: string | null; order_type: string }): Channel {
   const sp = (o.salesperson ?? '').toLowerCase();
+  if (o.order_type === 'caderneta') return 'caderneta';
   if ((FEE_PLATFORMS as readonly string[]).includes(sp)) return sp as Channel;
   return o.order_type === 'counter' ? 'balcao' : 'delivery';
 }
@@ -40,6 +42,9 @@ interface OutflowOrder {
   total: number;
   order_items: OutflowItem[];
   order_platform_fees: { fee_percent: number; fee_amount: number } | null;
+  /** Só para lançamentos da caderneta: quem deve e se já pagou. */
+  customerName?: string;
+  isPaid?: boolean;
 }
 
 interface ProductRow {
@@ -54,12 +59,47 @@ interface ProductRow {
 const ORDER_SELECT =
   'id, created_at, salesperson, order_type, total, order_items(product_id, product_name, quantity, total_price), order_platform_fees(fee_percent, fee_amount)';
 
+interface CadernetaRow {
+  id: string;
+  created_at: string;
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  total_price: number;
+  is_paid: boolean | null;
+  caderneta_customers: { name: string } | null;
+}
+
+/** Cada item fiado vira uma saída de estoque (lançamentos antigos, sem produto, não entram). */
+async function fetchCadernetaOutflows(startIso: string, endIso: string): Promise<OutflowOrder[]> {
+  const { data, error } = await supabase
+    .from('caderneta_entries')
+    .select('id, created_at, product_id, product_name, quantity, total_price, is_paid, caderneta_customers(name)')
+    .not('product_id', 'is', null)
+    .gte('created_at', startIso)
+    .lt('created_at', endIso)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return ((data ?? []) as unknown as CadernetaRow[]).map((e) => ({
+    id: e.id,
+    created_at: e.created_at,
+    salesperson: null,
+    order_type: 'caderneta',
+    total: Number(e.total_price),
+    order_items: [{ product_id: e.product_id, product_name: e.product_name, quantity: e.quantity, total_price: e.total_price }],
+    order_platform_fees: null,
+    customerName: e.caderneta_customers?.name,
+    isPaid: !!e.is_paid,
+  }));
+}
+
 function useOutflowOrders(from: string, to: string) {
   return useQuery({
     queryKey: ['platform-outflow', from, to],
     queryFn: async () => {
       const start = new Date(`${from}T00:00:00`);
       const end = addDays(new Date(`${to}T00:00:00`), 1);
+      const caderneta = await fetchCadernetaOutflows(start.toISOString(), end.toISOString());
       const { data, error } = await supabase
         .from('orders')
         .select(ORDER_SELECT)
@@ -68,7 +108,7 @@ function useOutflowOrders(from: string, to: string) {
         .lt('created_at', end.toISOString())
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return (data ?? []) as unknown as OutflowOrder[];
+      return [...((data ?? []) as unknown as OutflowOrder[]), ...caderneta].sort((a, b) => b.created_at.localeCompare(a.created_at));
     },
   });
 }
@@ -130,7 +170,7 @@ export function PlatformOutflowTab() {
       <div>
         <h3 className="text-lg font-bold">Saídas por canal</h3>
         <p className="text-sm text-muted-foreground">
-          Tudo que saiu por Balcão, Delivery da loja, iFood e 99, como foi lançado no PDV. Nas plataformas aparece a taxa simulada.
+          Tudo que saiu por Balcão, Delivery da loja, iFood, 99 e Caderneta (fiado), como foi lançado. Nas plataformas aparece a taxa simulada.
         </p>
       </div>
 
@@ -191,6 +231,8 @@ export function PlatformOutflowTab() {
               <div className="flex justify-between gap-2">
                 <span className="font-medium">
                   {channelLabel(orderChannel(o))} · {format(new Date(o.created_at), 'dd/MM HH:mm')}
+                  {o.customerName && ` · ${o.customerName}`}
+                  {o.isPaid !== undefined && (o.isPaid ? ' · pago' : ' · em aberto')}
                 </span>
                 <span>
                   {formatCurrency(Number(o.total))}
