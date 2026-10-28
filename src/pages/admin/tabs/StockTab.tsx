@@ -509,7 +509,7 @@ export function StockTab({ readOnly = false }: { readOnly?: boolean }) {
             <TabsTrigger value="products" className="text-xs sm:text-sm">Produtos</TabsTrigger>
             <TabsTrigger value="lowstock" className="text-xs sm:text-sm">Baixo ({stockSummary.lowStockCount})</TabsTrigger>
             <TabsTrigger value="categories" className="text-xs sm:text-sm">Categoria</TabsTrigger>
-            <TabsTrigger value="platform" className="text-xs sm:text-sm">Saídas iFood/99</TabsTrigger>
+            <TabsTrigger value="platform" className="text-xs sm:text-sm">Saídas por canal</TabsTrigger>
           </TabsList>
         </div>
 
