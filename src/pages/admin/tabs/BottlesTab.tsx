@@ -307,6 +307,7 @@ function BottleCard({
             Aberta {openDays === 0 ? 'hoje' : `há ${openDays} dia${openDays > 1 ? 's' : ''}`}
             {bottle.opened_by ? ` · ${bottle.opened_by}` : ''}
           </p>
+          {bottle.notes && /estoque|sem baixa/i.test(bottle.notes) && <p>{bottle.notes}</p>}
         </div>
 
         {!readOnly && !bottle.is_empty && (

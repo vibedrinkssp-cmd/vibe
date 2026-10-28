@@ -82,6 +82,7 @@ interface OpenBottleInput {
   dosePrice: number;
   // Garrafa que já estava aberta no balcão e nunca esteve no estoque do sistema: não desconta estoque.
   alreadyOpen: boolean;
+  stockBefore: number;
 }
 
 function useOpenBottleMutation(openedBy: string, onDone: () => void) {
@@ -89,7 +90,7 @@ function useOpenBottleMutation(openedBy: string, onDone: () => void) {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ productId, productName, totalMl, mlPerDose, dosePrice, alreadyOpen }: OpenBottleInput) => {
+    mutationFn: async ({ productId, productName, totalMl, mlPerDose, dosePrice, alreadyOpen, stockBefore }: OpenBottleInput) => {
       let bottleId: string | null = null;
       if (alreadyOpen) {
         // Insere direto (staff tem permissão na tabela) para não passar pela baixa de estoque do open_bottle
@@ -120,6 +121,13 @@ function useOpenBottleMutation(openedBy: string, onDone: () => void) {
         });
         if (error) throw error;
         bottleId = data;
+        // Registra na garrafa que o estoque foi descontado (best-effort: a baixa já foi feita pela RPC)
+        if (bottleId) {
+          await supabase
+            .from('open_bottles')
+            .update({ notes: `Descontou 1 un do estoque (${stockBefore} → ${Math.max(stockBefore - 1, 0)})` })
+            .eq('id', bottleId);
+        }
       }
       if (!bottleId) throw new Error('Falha ao abrir garrafa: ID não retornado');
       if (dosePrice > 0) {
@@ -130,9 +138,14 @@ function useOpenBottleMutation(openedBy: string, onDone: () => void) {
         if (priceError) throw new Error(`Garrafa aberta, mas falha ao salvar preço: ${priceError.message}`);
       }
     },
-    onSuccess: () => {
+    onSuccess: (_data, { alreadyOpen, stockBefore }) => {
       BOTTLE_QUERY_KEYS.forEach((key) => queryClient.invalidateQueries({ queryKey: [key] }));
-      toast({ title: '🍾 Garrafa aberta!' });
+      toast({
+        title: '🍾 Garrafa aberta!',
+        description: alreadyOpen
+          ? 'Estoque não foi alterado.'
+          : `Estoque descontado: ${stockBefore} → ${Math.max(stockBefore - 1, 0)}`,
+      });
       onDone();
     },
     onError: (error: Error) => {
@@ -224,6 +237,7 @@ export function OpenBottleDialog({ openedBy, compact = false }: { openedBy: stri
       productId: selected.id,
       productName: selected.name,
       alreadyOpen,
+      stockBefore: selected.stock ?? 0,
       totalMl: totalMlNum,
       mlPerDose,
       dosePrice: parseFloat(dosePrice) || 0,
