@@ -11,6 +11,7 @@ import { FEE_PLATFORMS, type FeePlatform } from '@/lib/platform-fees';
 import { getPlatformLabel } from '@/lib/external-platforms';
 
 interface OutflowItem {
+  product_id: string | null;
   product_name: string;
   quantity: number;
   total_price: number;
@@ -26,6 +27,7 @@ interface OutflowOrder {
 }
 
 interface ProductRow {
+  productId: string | null;
   name: string;
   platform: string;
   quantity: number;
@@ -34,7 +36,7 @@ interface ProductRow {
 }
 
 const ORDER_SELECT =
-  'id, created_at, salesperson, total, order_items(product_name, quantity, total_price), order_platform_fees(fee_percent, fee_amount)';
+  'id, created_at, salesperson, total, order_items(product_id, product_name, quantity, total_price), order_platform_fees(fee_percent, fee_amount)';
 
 function usePlatformOutflow(from: string, to: string, platform: FeePlatform | 'all') {
   return useQuery({
@@ -63,7 +65,7 @@ function groupByProduct(orders: OutflowOrder[]): ProductRow[] {
     const percent = Number(order.order_platform_fees?.fee_percent ?? 0);
     for (const item of order.order_items) {
       const key = `${order.salesperson}|${item.product_name}`;
-      const row = rows.get(key) ?? { name: item.product_name, platform: order.salesperson, quantity: 0, revenue: 0, fee: 0 };
+      const row = rows.get(key) ?? { productId: item.product_id, name: item.product_name, platform: order.salesperson, quantity: 0, revenue: 0, fee: 0 };
       row.quantity += item.quantity;
       row.revenue += Number(item.total_price);
       row.fee += (Number(item.total_price) * percent) / 100;
@@ -71,6 +73,20 @@ function groupByProduct(orders: OutflowOrder[]): ProductRow[] {
     }
   }
   return [...rows.values()].sort((a, b) => b.quantity - a.quantity);
+}
+
+/** Estoque atual dos produtos listados, para conferir se a baixa bateu. */
+function useCurrentStock(productIds: string[]) {
+  const key = productIds.join(',');
+  return useQuery({
+    queryKey: ['platform-outflow-stock', key],
+    enabled: productIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('products').select('id, stock').in('id', productIds);
+      if (error) throw error;
+      return new Map((data ?? []).map((p) => [p.id, p.stock as number | null]));
+    },
+  });
 }
 
 export function PlatformOutflowTab() {
@@ -81,13 +97,18 @@ export function PlatformOutflowTab() {
   const { data: orders = [], isLoading, error } = usePlatformOutflow(from, to, platform);
 
   const products = useMemo(() => groupByProduct(orders), [orders]);
+  const productIds = useMemo(
+    () => [...new Set(products.map((p) => p.productId).filter((id): id is string => !!id))],
+    [products],
+  );
+  const { data: stockById } = useCurrentStock(productIds);
   const totalUnits = products.reduce((sum, p) => sum + p.quantity, 0);
   const totalFee = products.reduce((sum, p) => sum + p.fee, 0);
 
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-xl font-bold">Saídas iFood / 99</h2>
+        <h3 className="text-lg font-bold">Saídas iFood / 99</h3>
         <p className="text-sm text-muted-foreground">
           Produtos que saíram pelas plataformas, registrados no PDV, com a taxa simulada de cada pedido.
         </p>
@@ -120,7 +141,7 @@ export function PlatformOutflowTab() {
               <tr className="text-left text-xs text-muted-foreground">
                 <th className="pb-2">Produto</th><th className="pb-2">Plataforma</th>
                 <th className="pb-2 text-right">Qtd</th><th className="pb-2 text-right">Valor</th>
-                <th className="pb-2 text-right">Taxa</th>
+                <th className="pb-2 text-right">Taxa</th><th className="pb-2 text-right">Estoque atual</th>
               </tr>
             </thead>
             <tbody>
@@ -131,10 +152,11 @@ export function PlatformOutflowTab() {
                   <td className="py-2 text-right font-bold">{p.quantity}</td>
                   <td className="py-2 text-right">{formatCurrency(p.revenue)}</td>
                   <td className="py-2 text-right text-destructive">{formatCurrency(p.fee)}</td>
+                  <td className="py-2 text-right">{p.productId ? (stockById?.get(p.productId) ?? '-') : 'sem vínculo'}</td>
                 </tr>
               ))}
               {!isLoading && products.length === 0 && (
-                <tr><td colSpan={5} className="py-6 text-center text-muted-foreground">Nenhuma saída no período.</td></tr>
+                <tr><td colSpan={6} className="py-6 text-center text-muted-foreground">Nenhuma saída no período.</td></tr>
               )}
             </tbody>
           </table>

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { PlatformOutflowTab } from './PlatformOutflowTab';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -508,8 +509,13 @@ export function StockTab({ readOnly = false }: { readOnly?: boolean }) {
             <TabsTrigger value="products" className="text-xs sm:text-sm">Produtos</TabsTrigger>
             <TabsTrigger value="lowstock" className="text-xs sm:text-sm">Baixo ({stockSummary.lowStockCount})</TabsTrigger>
             <TabsTrigger value="categories" className="text-xs sm:text-sm">Categoria</TabsTrigger>
+            <TabsTrigger value="platform" className="text-xs sm:text-sm">Saídas iFood/99</TabsTrigger>
           </TabsList>
         </div>
+
+        <TabsContent value="platform">
+          <PlatformOutflowTab />
+        </TabsContent>
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
