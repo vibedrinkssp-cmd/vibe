@@ -60,6 +60,9 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
   const [packSize, setPackSize] = useState<string>('20');
   const [unitPrice, setUnitPrice] = useState<string>('');
   const [openedBy, setOpenedBy] = useState('');
+  // Maço que já estava aberto antes do sistema: informa quantos cigarros restam
+  const [alreadyOpen, setAlreadyOpen] = useState(false);
+  const [remainingUnits, setRemainingUnits] = useState('');
 
   // Edição inline de preço
   const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
@@ -107,6 +110,28 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
       const price = parseFloat(unitPrice.replace(',', '.'));
       if (!size || size < 1) throw new Error('Informe a quantidade de cigarros');
       if (!price || price <= 0) throw new Error('Preço por cigarro inválido — verifique o cadastro do produto');
+      if (alreadyOpen) {
+        const remaining = parseInt(remainingUnits, 10);
+        if (Number.isNaN(remaining) || remaining < 0 || remaining > size) {
+          throw new Error(`Informe quantos cigarros restam (de 0 a ${size})`);
+        }
+        const { data, error } = await supabase
+          .from('open_packs')
+          .insert({
+            product_id: selectedProductId,
+            product_name: selectedProduct?.name ?? '',
+            pack_size: size,
+            remaining_units: remaining,
+            unit_price: price,
+            opened_by: openedBy || null,
+            is_empty: remaining === 0,
+            notes: 'Já aberto antes do sistema (sem baixa de estoque)',
+          })
+          .select('id')
+          .single();
+        if (error) throw error;
+        return data?.id;
+      }
       const { data, error } = await supabase.rpc('open_cigarette_pack', {
         p_product_id: selectedProductId,
         p_pack_size: size,
@@ -125,6 +150,8 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
       setSelectedProductId('');
       setUnitPrice('');
       setOpenedBy('');
+      setAlreadyOpen(false);
+      setRemainingUnits('');
     },
     onError: (err: Error) => {
       toast({ title: 'Erro ao abrir maço', description: err.message, variant: 'destructive' });
@@ -224,6 +251,18 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
                 <DialogDescription>O preço unitário é calculado automaticamente a partir do cadastro do produto.</DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
+                <label className="flex items-start gap-2 p-2.5 border rounded-lg cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={alreadyOpen}
+                    onChange={(e) => setAlreadyOpen(e.target.checked)}
+                    className="mt-0.5 rounded border-primary"
+                  />
+                  <span className="text-sm">
+                    Maço que já estava aberto
+                    <span className="block text-xs text-muted-foreground">Informe quantos cigarros ainda restam nele.</span>
+                  </span>
+                </label>
                 <div>
                   <Label>Produto (Maço)</Label>
                   <Select value={selectedProductId} onValueChange={setSelectedProductId}>
@@ -265,6 +304,20 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
                     placeholder="Ex: 20"
                   />
                 </div>
+                {alreadyOpen && (
+                  <div>
+                    <Label>Quantos cigarros restam</Label>
+                    <Input
+                      type="number"
+                      inputMode="numeric"
+                      min={0}
+                      max={parseInt(packSize, 10) || 50}
+                      value={remainingUnits}
+                      onChange={(e) => setRemainingUnits(e.target.value)}
+                      placeholder="Ex: 12"
+                    />
+                  </div>
+                )}
                 <div>
                   <Label>Preço por cigarro solto (R$)</Label>
                   <Input
@@ -294,7 +347,7 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
               <DialogFooter>
                 <Button
                   onClick={() => openPackMutation.mutate()}
-                  disabled={!selectedProductId || openPackMutation.isPending}
+                  disabled={!selectedProductId || (alreadyOpen && remainingUnits === '') || openPackMutation.isPending}
                 >
                   {openPackMutation.isPending ? 'Abrindo...' : 'Abrir Maço'}
                 </Button>
