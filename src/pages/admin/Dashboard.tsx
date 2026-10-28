@@ -101,6 +101,7 @@ const CadernetaTab = lazy(() => import('./tabs/CadernetaTab').then(m => ({ defau
 const PosCouponsTab = lazy(() => import('./tabs/PosCouponsTab').then(m => ({ default: m.PosCouponsTab })));
 const WeeklyPromotionsTab = lazy(() => import('./tabs/WeeklyPromotionsTab').then(m => ({ default: m.WeeklyPromotionsTab })));
 const QrCodeTab = lazy(() => import('./tabs/QrCodeTab').then(m => ({ default: m.QrCodeTab })));
+const PlatformOutflowTab = lazy(() => import('./tabs/PlatformOutflowTab').then(m => ({ default: m.PlatformOutflowTab })));
 const DailyReportTab = lazy(() => import('./tabs/DailyReportTab').then(m => ({ default: m.DailyReportTab })));
 const ReportsTab = lazy(() => import('./tabs/ReportsTab').then(m => ({ default: m.ReportsTab })));
 const SettingsTab = lazy(() => import('./tabs/SettingsTab').then(m => ({ default: m.SettingsTab })));
@@ -136,6 +137,7 @@ const tabs = [
   { id: 'fechamento', label: 'Fechamento', icon: Calculator, group: 'Dinheiro' },
   { id: 'fechamento-boys', label: 'Fech. Boys', icon: ClipboardCheck, group: 'Dinheiro' },
   { id: 'caderneta', label: 'Caderneta', icon: BookOpen, group: 'Dinheiro' },
+  { id: 'saidas-plataforma', label: 'Saídas iFood/99', icon: Truck, group: 'Dinheiro' },
   { id: 'relatorio-dia', label: 'Relatório Diário', icon: ClipboardList, group: 'Dinheiro' },
   // Catálogo
   { id: 'produtos', label: 'Produtos', icon: ShoppingBag, group: 'Catálogo' },
@@ -384,6 +386,7 @@ export default function AdminDashboard() {
       case 'escala': return <ScheduleTab />;
       case 'ponto': return <TimeClockTab />;
       case 'caderneta': return <CadernetaTab />;
+      case 'saidas-plataforma': return <PlatformOutflowTab />;
       case 'relatorio-dia': return <DailyReportTab />;
       case 'produtos': return <ProductsTab />;
       case 'categorias': return <CategoriesTab />;
