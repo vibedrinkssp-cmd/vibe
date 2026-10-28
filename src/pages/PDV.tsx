@@ -300,6 +300,8 @@ export default function PDV() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   // Origem da venda: null = balcão; iFood/99 são pagas no app e têm taxa por pedido.
   const [salesChannel, setSalesChannel] = useState<FeePlatform | null>(null);
+  // O operador precisa escolher a origem (Balcão/iFood/99) a cada venda; sem isso não finaliza.
+  const [originConfirmed, setOriginConfirmed] = useState(false);
   const [platformFeePercent, setPlatformFeePercent] = useState('');
   const { data: platformFeeSettings = [] } = usePlatformFeeSettings();
   const [changeFor, setChangeFor] = useState('');
@@ -1029,8 +1031,13 @@ export default function PDV() {
     setIsPaymentDialogOpen(true);
   };
 
+  useEffect(() => {
+    if (isPaymentDialogOpen) setOriginConfirmed(false);
+  }, [isPaymentDialogOpen]);
+
   const handleSelectSalesChannel = (channel: FeePlatform | null) => {
     setSalesChannel(channel);
+    setOriginConfirmed(true);
     if (!channel) {
       setPlatformFeePercent('');
       setPaymentMethod(null);
@@ -1043,6 +1050,10 @@ export default function PDV() {
   };
 
   const handleConfirmPayment = async () => {
+    if (!originConfirmed) {
+      toast({ title: 'Escolha a Origem da Venda', description: 'Balcão, iFood ou 99Food.', variant: 'destructive' });
+      return;
+    }
     if (!paymentMethod) {
       toast({ title: 'Selecione um método de pagamento', variant: 'destructive' });
       return;
@@ -1742,10 +1753,13 @@ export default function PDV() {
 
 
             <div>
-              <Label className="mb-2 block text-sm">Origem da Venda</Label>
+              <Label className="mb-2 block text-sm">
+                Origem da Venda
+                {!originConfirmed && <span className="ml-2 text-xs font-semibold text-destructive">escolha uma opção</span>}
+              </Label>
               <div className="grid grid-cols-3 gap-2">
                 <Button
-                  variant={!salesChannel ? 'default' : 'outline'}
+                  variant={originConfirmed && !salesChannel ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => handleSelectSalesChannel(null)}
                   data-testid="button-channel-balcao"
@@ -1860,6 +1874,7 @@ export default function PDV() {
             <Button
               className="w-full py-5 text-base"
               disabled={
+                !originConfirmed ||
                 !paymentMethod ||
                 createOrderMutation.isPending ||
                 (paymentMethod === 'cash' && !!changeFor && parseFloat(changeFor) > 0 && parseFloat(changeFor) < total)
