@@ -485,6 +485,9 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
                         {pack.opened_by && (
                           <span className="text-[10px] text-muted-foreground block mt-1">por {pack.opened_by}</span>
                         )}
+                        {pack.notes && /sem baixa/i.test(pack.notes) && (
+                          <span className="text-[10px] text-muted-foreground block mt-1">{pack.notes}</span>
+                        )}
                       </CardContent>
                     </Card>
                   );
