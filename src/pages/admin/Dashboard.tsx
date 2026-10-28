@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { 
+  Menu,
   Package, 
   Truck, 
   HelpCircle,
@@ -43,7 +44,7 @@ import {
   Database,
   KeyRound,
 } from 'lucide-react';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -174,6 +175,46 @@ export default function AdminDashboard() {
   });
   const [showVisitors, setShowVisitors] = useState(() => localStorage.getItem('admin_showVisitors') === 'true');
   const [showTutorial, setShowTutorial] = useState(false);
+
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const activeTabInfo = tabs.find((t) => t.id === activeTab);
+
+  const renderNav = (onSelect: (id: string) => void, testPrefix: string) => (
+    <div className="flex flex-col p-2 gap-1">
+      {tabs.map((tab, index) => {
+        const Icon = tab.icon;
+        const isActive = activeTab === tab.id;
+        const showBadge = tab.id === 'macos' && emptyPacksCount > 0;
+        const startsGroup = tab.group !== tabs[index - 1]?.group;
+        return (
+          <Fragment key={tab.id}>
+            {startsGroup && (
+              <p className="px-2 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70 first:pt-0">
+                {tab.group}
+              </p>
+            )}
+            <Button
+              variant={isActive ? "default" : "ghost"}
+              size="sm"
+              className={`flex items-center justify-start gap-2 whitespace-nowrap ${
+                isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+              }`}
+              onClick={() => onSelect(tab.id)}
+              data-testid={`${testPrefix}-${tab.id}`}
+            >
+              <Icon className="h-4 w-4 flex-shrink-0" />
+              <span className="truncate">{tab.label}</span>
+              {showBadge && (
+                <Badge variant="destructive" className="ml-auto h-4 px-1 text-[10px]">
+                  {emptyPacksCount}
+                </Badge>
+              )}
+            </Button>
+          </Fragment>
+        );
+      })}
+    </div>
+  );
   const { playOnce } = useNotificationSound({ screen: 'admin' });
   const { alertOrder, ackOrder, ackAll, syncPendingOrders, isAlertActive, pendingCount: unseenOrdersCount } = useOrderAlert('admin');
   const { toast } = useToast();
@@ -453,80 +494,29 @@ export default function AdminDashboard() {
       <div className="flex-1 flex min-h-0 overflow-hidden">
         {/* Sidebar Navigation (desktop) */}
         <aside className="hidden md:flex md:flex-col w-56 flex-shrink-0 border-r border-primary/20 bg-card/50 overflow-y-auto">
-          <div className="flex flex-col p-2 gap-1">
-            {tabs.map((tab, index) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              const showBadge = tab.id === 'macos' && emptyPacksCount > 0;
-              const startsGroup = tab.group !== tabs[index - 1]?.group;
-              return (
-                <Fragment key={tab.id}>
-                {startsGroup && (
-                  <p className="px-2 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70 first:pt-0">
-                    {tab.group}
-                  </p>
-                )}
-                <Button
-                  variant={isActive ? "default" : "ghost"}
-                  size="sm"
-                  className={`flex items-center justify-start gap-2 whitespace-nowrap ${
-                    isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                  onClick={() => setActiveTab(tab.id)}
-                  data-testid={`tab-${tab.id}`}
-                >
-                  <Icon className="h-4 w-4 flex-shrink-0" />
-                  <span className="truncate">{tab.label}</span>
-                  {showBadge && (
-                    <Badge variant="destructive" className="ml-auto h-4 px-1 text-[10px]">
-                      {emptyPacksCount}
-                    </Badge>
-                  )}
-                </Button>
-                </Fragment>
-              );
-            })}
-          </div>
+          {renderNav(setActiveTab, 'tab')}
         </aside>
 
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Tabs Navigation (mobile) */}
-          <div className="md:hidden border-b border-primary/20 bg-card/50 flex-shrink-0">
-            <ScrollArea className="w-full">
-              <div className="flex p-2 gap-1 min-w-max">
-                {tabs.map((tab) => {
-                  const Icon = tab.icon;
-                  const isActive = activeTab === tab.id;
-                  const showBadge = tab.id === 'macos' && emptyPacksCount > 0;
-                  const labelClass = (tab as any).alwaysShowLabel ? 'inline' : 'hidden sm:inline';
-                  return (
-                    <Button
-                      key={tab.id}
-                      variant={isActive ? "default" : "ghost"}
-                      size="sm"
-                      className={`flex items-center gap-2 whitespace-nowrap ${
-                        isActive
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                      onClick={() => setActiveTab(tab.id)}
-                      data-testid={`tab-mobile-${tab.id}`}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span className={labelClass}>{tab.label}</span>
-                      {showBadge && (
-                        <Badge variant="destructive" className="ml-1 h-4 px-1 text-[10px]">
-                          {emptyPacksCount}
-                        </Badge>
-                      )}
-                    </Button>
-                  );
-                })}
-              </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
+          <div className="md:hidden border-b border-primary/20 bg-card/50 flex-shrink-0 p-2">
+            <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="w-full justify-between" data-testid="button-mobile-menu">
+                  <span className="flex items-center gap-2">
+                    {activeTabInfo && <activeTabInfo.icon className="h-4 w-4" />}
+                    {activeTabInfo?.label}
+                  </span>
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-72 p-0 overflow-y-auto">
+                <SheetHeader className="p-4 pb-0">
+                  <SheetTitle>Menu</SheetTitle>
+                </SheetHeader>
+                {renderNav((id) => { setActiveTab(id); setMobileNavOpen(false); }, 'tab-mobile')}
+              </SheetContent>
+            </Sheet>
           </div>
 
           {/* Tab Content */}
