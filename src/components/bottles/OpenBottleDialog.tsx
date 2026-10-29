@@ -59,7 +59,7 @@ const DOSE_SIZES_ML = [50, 100, 400] as const;
 const SEARCH_RESULTS_LIMIT = 200;
 
 // Telas que mostram garrafas abertas precisam recarregar quando uma nova é aberta
-const BOTTLE_QUERY_KEYS = ['open-bottles', 'open-bottles-kitchen', 'open-bottles-prep', 'assembly-bottles', 'admin-products', 'allowed-bottle-candidates-admin'];
+const BOTTLE_QUERY_KEYS = ['open-bottles', 'open-bottles-kitchen', 'open-bottles-prep', 'assembly-bottles', 'copao-available', 'admin-products', 'allowed-bottle-candidates-admin'];
 
 interface BottleProduct {
   id: string;

@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { ProductCard } from './ProductCard';
 import type { Product, Category } from '@/shared/schema';
 import { isInfiniteStockProduct } from '@/shared/schema';
+import { isCopaoProduct } from '@/lib/copao-product';
+import { useCopaoAvailable } from '@/hooks/use-copao-available';
 
 type GridColumns = 1 | 2 | 3;
 
@@ -39,6 +41,7 @@ export function ScrollableProductGrid({
     }
   };
 
+  const copaoAvailable = useCopaoAvailable();
   const filteredProducts = useMemo(() => products.filter(product => {
     if (product.isActive === false) return false;
 
@@ -46,12 +49,14 @@ export function ScrollableProductGrid({
     // Made-to-order drinks (COPÃO, DOSES, etc.) stay visible even at stock 0.
     const category = categories.find(c => c.id === product.categoryId);
     if (!isInfiniteStockProduct(product, category?.name) && (product.stock ?? 0) <= 0) return false;
+    // Copão pronto só aparece com garrafa disponível
+    if (!copaoAvailable && isCopaoProduct(product, category?.name)) return false;
 
     const matchesCategory = !selectedCategory || product.categoryId === selectedCategory;
     if (!matchesSearch(product, searchQuery, categories)) return false;
     
     return matchesCategory;
-  }), [products, selectedCategory, searchQuery, categories]);
+  }), [products, selectedCategory, searchQuery, categories, copaoAvailable]);
 
   function matchesSearch(product: Product, query: string, cats: Category[]): boolean {
     if (!query) return true;

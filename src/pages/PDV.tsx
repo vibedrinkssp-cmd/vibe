@@ -81,7 +81,8 @@ const PDVCameraScanner = lazy(() => import('@/components/BarcodeScanner').then(m
 import { buildLooseCigaretteItemName, parseLooseCigarettePackId, buildCustomDrinkProductName, type LooseCigaretteSelection } from '@/components/pdv/loose-cigarette-utils';
 import { nanoid } from 'nanoid';
 import { explodeCopaoToOrderItems, isRecipeDrink } from '@/lib/copao-recipe';
-import { extraKindFor, freeExtraLine, type ExtraKind } from '@/lib/copao-product';
+import { extraKindFor, freeExtraLine, isCopaoProduct, type ExtraKind } from '@/lib/copao-product';
+import { useCopaoAvailable } from '@/hooks/use-copao-available';
 import { ExtraChoiceDialog } from '@/components/common/ExtraChoiceDialog';
 import { calculatePdvBeerDiscount } from '@/lib/beer-discount';
 import { calcPosCouponDiscount, redeemPosCoupon, validatePosCoupon, type PosCoupon } from '@/lib/pos-coupon';
@@ -809,7 +810,9 @@ export default function PDV() {
 
   // (duplicate redirect removed - handled by useEffect at line 84)
 
+  const copaoAvailable = useCopaoAvailable();
   const filteredProducts = products.filter(p => {
+    if (!copaoAvailable && isCopaoProduct(p, categories.find(c => c.id === p.categoryId)?.name)) return false;
     const searchNorm = normalizeSearch(searchTerm.trim());
     const matchesName = normalizeSearch(p.name).includes(searchNorm);
     const matchesBarcode = p.barcode && p.barcode.includes(searchTerm.trim());

@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { Flame, Sparkles } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client-safe';
+import { useCopaoAvailable } from '@/hooks/use-copao-available';
 
 interface SpecialDrinkType {
   id: string;
@@ -32,6 +33,7 @@ interface SpecialDrinksCarouselProps {
 
 export function SpecialDrinksCarousel({ onSelectType, onComboOpen, onSpecialDrinksOpen }: SpecialDrinksCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const copaoAvailable = useCopaoAvailable();
 
   const { data: drinkTypes = [] } = useQuery({
     queryKey: ['special-drink-configs-carousel'],
@@ -107,7 +109,7 @@ export function SpecialDrinksCarousel({ onSelectType, onComboOpen, onSpecialDrin
           </button>
         )}
 
-        {drinkTypes.map((type) => (
+        {drinkTypes.filter((type) => type.id !== 'copao' || copaoAvailable).map((type) => (
           <button
             key={type.id}
             onClick={() => onSelectType?.(type.id)}

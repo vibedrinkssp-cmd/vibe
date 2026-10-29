@@ -8,6 +8,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { motion } from 'framer-motion';
 import type { Product, Category } from '@/shared/schema';
 import { isPreparedCategoryName, isInfiniteStockProduct } from '@/shared/schema';
+import { isCopaoProduct } from '@/lib/copao-product';
+import { useCopaoAvailable } from '@/hooks/use-copao-available';
 
 type GridColumns = 1 | 2 | 4;
 
@@ -33,6 +35,7 @@ export function ProductGrid({ products, categories = [], isLoading, selectedCate
     }
   };
 
+  const copaoAvailable = useCopaoAvailable();
   const filteredProducts = products.filter(product => {
     if (!product.isActive) return false;
 
@@ -40,6 +43,8 @@ export function ProductGrid({ products, categories = [], isLoading, selectedCate
     // Salgados/lanches are physical stock so they disappear when out of stock.
     const category = categories.find(c => c.id === product.categoryId);
     if (!isInfiniteStockProduct(product, category?.name) && product.stock <= 0) return false;
+    // Copão pronto só aparece com garrafa disponível
+    if (!copaoAvailable && isCopaoProduct(product, category?.name)) return false;
     
     const matchesCategory = !selectedCategory || product.categoryId === selectedCategory;
     const matchesSearch = !searchQuery || 

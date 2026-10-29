@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { isPreparedCategoryName } from '@/shared/schema';
+import { isCopaoProduct } from '@/lib/copao-product';
 import { normalizeSearch } from '@/lib/text-utils';
 import { useAdminProducts, useAdminCategories } from '../use-admin-data';
 
@@ -87,8 +88,9 @@ export function ShoppingListTab() {
 
   const items = useMemo<ShoppingItem[]>(() => {
     const prepared = new Set(categories.filter((c) => isPreparedCategoryName(c.name)).map((c) => c.id));
+    const categoryName = (id: string | null) => categories.find((c) => c.id === id)?.name ?? null;
     return products
-      .filter((p) => p.isActive && !prepared.has(p.categoryId || '') && (p.stock ?? 0) <= limit)
+      .filter((p) => p.isActive && !prepared.has(p.categoryId || '') && !isCopaoProduct(p, categoryName(p.categoryId)) && (p.stock ?? 0) <= limit)
       .map((p) => ({
         id: p.id,
         name: p.name,
