@@ -41,6 +41,10 @@ import { queryClient } from '@/lib/queryClient';
 import { supabase } from '@/integrations/supabase/client-safe';
 import { FEE_PLATFORMS, computePlatformFee, usePlatformFeeSettings, type FeePlatform } from '@/lib/platform-fees';
 import { getPlatformLabel } from '@/lib/external-platforms';
+import logoVibe from '@/assets/logo-vibedrinks.gif';
+import logoIfood from '@/assets/icon-ifood.jpg';
+import logo99 from '@/assets/icon-99food.jpg';
+
 import type { Product, Category, CustomDrink } from '@/shared/schema';
 import { type PaymentMethod, isInfiniteStockProduct } from '@/shared/schema';
 import { CartContent } from '@/components/pdv-cart';
@@ -86,6 +90,12 @@ import { returnBottleDoses, returnManyBottleDoses } from '@/lib/deduct-bottle-do
 import { PanelSwitcher } from '@/components/admin/PanelSwitcher';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useVisualViewportHeight } from '@/hooks/use-visual-viewport-height';
+
+const ORIGIN_OPTIONS: { channel: FeePlatform | null; label: string; logo: string }[] = [
+  { channel: null, label: 'Balcão', logo: logoVibe },
+  { channel: 'ifood', label: 'iFood', logo: logoIfood },
+  { channel: '99food', label: '99Food', logo: logo99 },
+];
 interface CartItem {
   product: Product;
   quantity: number;
@@ -1758,25 +1768,21 @@ export default function PDV() {
                 {!originConfirmed && <span className="ml-2 text-xs font-semibold text-destructive">escolha uma opção</span>}
               </Label>
               <div className="grid grid-cols-3 gap-2">
-                <Button
-                  variant={originConfirmed && !salesChannel ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handleSelectSalesChannel(null)}
-                  data-testid="button-channel-balcao"
-                >
-                  Balcão
-                </Button>
-                {FEE_PLATFORMS.map((platform) => (
-                  <Button
-                    key={platform}
-                    variant={salesChannel === platform ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => handleSelectSalesChannel(platform)}
-                    data-testid={`button-channel-${platform}`}
-                  >
-                    {getPlatformLabel(platform)}
-                  </Button>
-                ))}
+                {ORIGIN_OPTIONS.map(({ channel, label, logo }) => {
+                  const active = originConfirmed && salesChannel === channel;
+                  return (
+                    <Button
+                      key={label}
+                      variant={active ? 'default' : 'outline'}
+                      className="h-20 flex-col gap-1 px-1"
+                      onClick={() => handleSelectSalesChannel(channel)}
+                      data-testid={`button-channel-${channel ?? 'balcao'}`}
+                    >
+                      <img src={logo} alt="" className="h-10 w-10 rounded-md object-cover" />
+                      <span className="text-xs">{label}</span>
+                    </Button>
+                  );
+                })}
               </div>
             </div>
 
