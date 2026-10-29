@@ -36,6 +36,12 @@ import { computeCartPromoDiscount, mapCartItemsForPromotions, useActivePromotion
 import type { Settings, PaymentMethod } from '@/shared/schema';
 import { PAYMENT_METHOD_LABELS } from '@/shared/schema';
 
+// Cartão pago na maquininha (entrega/retirada): o cliente já escolhe crédito ou débito.
+const POS_CARD_OPTIONS: { value: PaymentMethod; label: string }[] = [
+  { value: 'card_credit', label: 'Cartão de crédito' },
+  { value: 'card_debit', label: 'Cartão de débito' },
+];
+
 export default function Checkout() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -959,19 +965,22 @@ export default function Checkout() {
                     </Label>
                   </div>
 
-                  <div 
-                    className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
-                      paymentMethod === 'card_pos' ? 'border-primary bg-primary/10' : 'border-primary/20 bg-secondary/30'
-                    }`}
-                    onClick={() => setPaymentMethod('card_pos')}
-                  >
-                    <RadioGroupItem value="card_pos" id="card_pos" className="border-primary" />
-                    <CreditCard className="h-5 w-5 text-primary" />
-                    <Label htmlFor="card_pos" className="flex-1 cursor-pointer text-foreground">
-                      Cartao (Maquininha)
-                      <span className="block text-xs text-muted-foreground">Credito ou debito {isPickup ? 'na retirada' : 'na entrega'}</span>
-                    </Label>
-                  </div>
+                  {POS_CARD_OPTIONS.map(({ value, label }) => (
+                    <div
+                      key={value}
+                      className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
+                        paymentMethod === value ? 'border-primary bg-primary/10' : 'border-primary/20 bg-secondary/30'
+                      }`}
+                      onClick={() => setPaymentMethod(value)}
+                    >
+                      <RadioGroupItem value={value} id={value} className="border-primary" />
+                      <CreditCard className="h-5 w-5 text-primary" />
+                      <Label htmlFor={value} className="flex-1 cursor-pointer text-foreground">
+                        {label}
+                        <span className="block text-xs text-muted-foreground">Maquininha {isPickup ? 'na retirada' : 'na entrega'}</span>
+                      </Label>
+                    </div>
+                  ))}
                 </RadioGroup>
 
                 {paymentMethod === 'cash' && (
