@@ -164,7 +164,8 @@ export function CopaoModal({ open, onOpenChange, onAddCustomDrink }: CopaoModalP
         if (hasAny) {
           filteredDestilados = filterByAllowedProducts(allBottles, spiritIds);
         } else {
-          filteredDestilados = [];
+          // Sem lista liberada no admin: qualquer garrafa aberta que não seja energético.
+          filteredDestilados = allBottles.filter(b => typeMap.get(b.product_id) !== 'energetico');
         }
 
         let enerBottles: EnergeticoOption[];

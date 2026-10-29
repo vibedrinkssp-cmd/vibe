@@ -51,7 +51,7 @@ export function DeliveryToggle() {
           : 'bg-red-500/20 text-red-200 border-red-500/30'}
       >
         <Bike className="h-3 w-3 mr-1" />
-        <span className="hidden sm:inline">{deliveryEnabled ? 'Entregas ON' : 'Entregas OFF'}</span>
+        <span>{deliveryEnabled ? 'Entregas ON' : 'Entregas OFF'}</span>
       </Badge>
     </div>
   );

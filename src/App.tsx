@@ -38,6 +38,7 @@ const Log = lazy(() => import("@/pages/Log"));
 const MotoboyDelivery = lazy(() => import("@/pages/MotoboyDelivery"));
 const Pager = lazy(() => import("@/pages/Pager"));
 const Ponto = lazy(() => import("@/pages/Ponto"));
+const Compras = lazy(() => import("@/pages/Compras"));
 
 const SPLASH_SESSION_KEY = '__vm_splash_shown';
 
@@ -83,6 +84,7 @@ function AppRoutes() {
         <Route path="/log" element={<Log />} />
         <Route path="/pager" element={<Pager />} />
         <Route path="/ponto" element={<Ponto />} />
+        <Route path="/compras" element={<Compras />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>

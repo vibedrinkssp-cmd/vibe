@@ -18,7 +18,7 @@ export function StoreStatusToggle() {
       title={`Horário: ${STORE_OPEN_HOUR}h às ${STORE_CLOSE_HOUR}h (fechada às terças)`}
     >
       <Store className="h-3 w-3 mr-1" />
-      <span className="hidden sm:inline">{open ? 'Aberta' : 'Fechada'}</span>
+      <span>{open ? 'Loja aberta' : 'Loja fechada'}</span>
     </Badge>
   );
 }

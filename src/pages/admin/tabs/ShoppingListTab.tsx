@@ -10,6 +10,27 @@ import { isCopaoProduct } from '@/lib/copao-product';
 import { normalizeSearch } from '@/lib/text-utils';
 import { useAdminProducts, useAdminCategories } from '../use-admin-data';
 
+export interface ShoppingProduct {
+  id: string;
+  name: string;
+  stock: number | null;
+  isActive?: boolean;
+  categoryId: string | null;
+}
+
+export interface ShoppingCategory {
+  id: string;
+  name: string;
+}
+
+interface ShoppingListViewProps {
+  products: ShoppingProduct[];
+  categories: ShoppingCategory[];
+  isLoading: boolean;
+  /** Quem usa a lista fora do admin (Nelson em /compras) não vê o título interno. */
+  header?: React.ReactNode;
+}
+
 const CHECKED_STORAGE_KEY = 'admin_shopping_checked';
 const LIMIT_OPTIONS = [0, 5, 10, 15, 20] as const;
 const DEFAULT_LIMIT = 10;
@@ -80,9 +101,13 @@ function ItemRow({ item, done, onToggle }: { item: ShoppingItem; done: boolean; 
 }
 
 export function ShoppingListTab() {
-  const { toast } = useToast();
   const { data: products = [], isLoading } = useAdminProducts();
   const { data: categories = [] } = useAdminCategories();
+  return <ShoppingListView products={products} categories={categories} isLoading={isLoading} />;
+}
+
+export function ShoppingListView({ products, categories, isLoading, header }: ShoppingListViewProps) {
+  const { toast } = useToast();
   const [limit, setLimit] = useState<number>(DEFAULT_LIMIT);
   const [search, setSearch] = useState('');
 
@@ -126,10 +151,12 @@ export function ShoppingListTab() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <ShoppingCart className="h-5 w-5 text-primary" />
-        <h3 className="text-lg font-bold">Lista de Compras</h3>
-      </div>
+      {header ?? (
+        <div className="flex items-center gap-2">
+          <ShoppingCart className="h-5 w-5 text-primary" />
+          <h3 className="text-lg font-bold">Lista de Compras</h3>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-2">
         {LIMIT_OPTIONS.map((n) => (
