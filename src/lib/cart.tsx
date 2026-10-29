@@ -158,9 +158,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCustomDrinks(prev => [...prev, drink]);
   };
 
-  // Doses são debitadas da garrafa aberta ao MONTAR o drink (dentro do wizard),
-  // não ao finalizar o pedido — então remover do carrinho antes de comprar
-  // precisa estornar, senão o controle de garrafa fica descontado sem venda.
+  // As doses dos destilados só são baixadas quando o pedido é criado (settleDrinkDoses);
+  // ao montar o drink só o energético em garrafa é debitado, então remover do carrinho
+  // estorna só ele.
   // Best-effort: não bloqueia a remoção do carrinho se o estorno falhar.
   const removeCustomDrink = (drinkId: string) => {
     setCustomDrinks(prev => {

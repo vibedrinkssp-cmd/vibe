@@ -12,7 +12,6 @@ import { nanoid } from 'nanoid';
 import { loadAvailableIces } from '@/lib/ice-products';
 import { TierBottleCarousel, type AvailableBottleWithTier, type SelectedBottleEntry } from './TierBottleCarousel';
 import { fetchAllowedByType, filterByAllowedProducts } from '@/lib/allowed-bottles';
-import { deductBottleDoses } from '@/lib/deduct-bottle-doses';
 import { DrinkRecipeReview } from './DrinkRecipeReview';
 
 type AvailableBottle = AvailableBottleWithTier;
@@ -162,15 +161,6 @@ export function CaipiIceModal({ open, onOpenChange, onAddCustomDrink }: CaipiIce
   const persistAndAddToCart = async (): Promise<boolean> => {
     if (!selectedIce) return false;
     if (!noAlcohol && selectedBottles.length === 0) return false;
-    if (!noAlcohol) {
-      const ok = await deductBottleDoses(selectedBottles, (name) =>
-        toast({ title: `Erro ao deduzir doses de ${name}`, variant: 'destructive' }), quantity
-      );
-      if (!ok) return false;
-      queryClient.invalidateQueries({ queryKey: ['open-bottles-kitchen'] });
-      queryClient.invalidateQueries({ queryKey: ['open-bottles-prep'] });
-      queryClient.invalidateQueries({ queryKey: ['assembly-bottles'] });
-    }
 
     const destDescription = noAlcohol
       ? 'Sem Álcool'

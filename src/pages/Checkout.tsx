@@ -1,3 +1,4 @@
+import { settleDrinkDoses } from '@/lib/deduct-bottle-doses';
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { explodeCopaoToOrderItems } from '@/lib/copao-recipe';
 import { useNavigate } from 'react-router-dom';
@@ -424,6 +425,9 @@ export default function Checkout() {
     }
 
     if (!orderId) throw new Error('Pedido não foi criado. Tente novamente.');
+
+    // Pedido criado: agora sim baixa as doses dos drinks da garrafa aberta (falha só vai pro log).
+    void settleDrinkDoses(customDrinks);
 
     // Mark coupon as used
     if (selectedCoupon) {

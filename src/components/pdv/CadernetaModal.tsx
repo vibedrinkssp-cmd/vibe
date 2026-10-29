@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { settleDrinkDoses } from '@/lib/deduct-bottle-doses';
 import { queryClient } from '@/lib/queryClient';
 import { supabase } from '@/integrations/supabase/client-safe';
 import { registerCadernetaLegacyEntry } from '@/lib/caderneta';
@@ -108,6 +109,11 @@ export function CadernetaModal({ open, onOpenChange, cart, customDrinks = [], to
         p_salesperson: null,
       } as any);
       if (error) throw new Error(error.message);
+
+      const failedDoses = await settleDrinkDoses(customDrinks);
+      if (failedDoses.length > 0) {
+        toast({ title: 'Lançado, mas faltou baixar dose', description: `Confira o controle de doses: ${[...new Set(failedDoses)].join(', ')}`, variant: 'destructive' });
+      }
 
       // Decrement open_packs for each loose cigarette item (no order_id in caderneta flow)
       for (const lc of looseCigConsumptions) {

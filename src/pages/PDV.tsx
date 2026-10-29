@@ -87,7 +87,7 @@ import { ExtraChoiceDialog } from '@/components/common/ExtraChoiceDialog';
 import { calculatePdvBeerDiscount } from '@/lib/beer-discount';
 import { calcPosCouponDiscount, redeemPosCoupon, validatePosCoupon, type PosCoupon } from '@/lib/pos-coupon';
 import { computeCartPromoDiscount, inferCustomDrinkTypeKey, useActivePromotions } from '@/lib/weekly-promotions';
-import { returnBottleDoses, returnManyBottleDoses } from '@/lib/deduct-bottle-doses';
+import { returnBottleDoses, returnManyBottleDoses, settleDrinkDoses } from '@/lib/deduct-bottle-doses';
 import { PanelSwitcher } from '@/components/admin/PanelSwitcher';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useVisualViewportHeight } from '@/hooks/use-visual-viewport-height';
@@ -274,8 +274,9 @@ export default function PDV() {
   }, []);
 
   const handleRemoveDraft = useCallback((id: string) => {
-    // Doses já debitadas pros drinks desse rascunho nunca são vendidas se o
-    // rascunho é descartado — estorna antes de apagar (best-effort).
+    // Só o energético em garrafa é baixado ao montar o drink; se o rascunho é
+    // descartado, estorna antes de apagar (best-effort). Doses de destilado só
+    // baixam quando o pedido é criado.
     const removedDrinks = drafts[id]?.pdvCustomDrinks;
     if (removedDrinks?.length) void returnManyBottleDoses(removedDrinks);
     setDraftOrder(prev => {
@@ -458,6 +459,14 @@ export default function PDV() {
     };
   }, [buildSafeOrderTotals]);
 
+  // Pedido já criado: baixa as doses dos drinks vendidos (falha avisa, não desfaz a venda).
+  const settlePdvDoses = async (drinks: CustomDrink[]) => {
+    const failed = await settleDrinkDoses(drinks);
+    if (failed.length > 0) {
+      toast({ title: 'Venda salva, mas faltou baixar dose', description: `Confira o controle de doses: ${[...new Set(failed)].join(', ')}`, variant: 'destructive' });
+    }
+  };
+
   const createOrderMutation = useMutation({
     mutationFn: async (orderData: PdvOrderPayload) => {
       console.log('PDV createOrder payload:', JSON.stringify(orderData.order));
@@ -500,6 +509,8 @@ export default function PDV() {
           toast({ title: 'Venda salva, mas a taxa não foi gravada', description: 'O relatório usará a taxa padrão da plataforma.', variant: 'destructive' });
         }
       }
+
+      await settlePdvDoses(pdvCustomDrinks);
 
       return { id: orderId as string, items: orderData.items };
     },
@@ -1244,6 +1255,7 @@ export default function PDV() {
       }
 
       const createdOrderId = orderId as string;
+      await settlePdvDoses(pdvCustomDrinks);
       // Marca o mp_payment_id no pedido recém-criado
       if (mpPaymentId) {
         await supabase

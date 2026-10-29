@@ -12,7 +12,6 @@ import { useDrinkFruits } from '@/hooks/use-drink-fruits';
 import type { CustomDrink } from '@/shared/schema';
 import { nanoid } from 'nanoid';
 import { fetchAllowedByType, filterByAllowedProducts } from '@/lib/allowed-bottles';
-import { deductBottleDoses } from '@/lib/deduct-bottle-doses';
 
 type AvailableBottle = AvailableBottleWithTier;
 type SelectedBottle = SelectedBottleEntry;
@@ -162,15 +161,6 @@ export function CaipirinhaModal({ open, onOpenChange, onAddCustomDrink }: Caipir
   const persistAndAddToCart = async (): Promise<boolean> => {
     if (!selectedFruit) return false;
     if (!noAlcohol && selectedBottles.length === 0) return false;
-    if (!noAlcohol) {
-      const ok = await deductBottleDoses(selectedBottles, (name) =>
-        toast({ title: `Erro ao deduzir doses de ${name}`, variant: 'destructive' }), quantity
-      );
-      if (!ok) return false;
-      queryClient.invalidateQueries({ queryKey: ['open-bottles-kitchen'] });
-      queryClient.invalidateQueries({ queryKey: ['open-bottles-prep'] });
-      queryClient.invalidateQueries({ queryKey: ['assembly-bottles'] });
-    }
     const fruitNames = [selectedFruit.name, ...extraFruits.map(f => f.name)].join(', ');
     const parts = [
       ...(noAlcohol ? ['Sem Álcool'] : selectedBottles.map(sb => `${sb.doses}x ${sb.bottle.product_name}`)),

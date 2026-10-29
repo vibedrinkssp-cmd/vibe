@@ -29,10 +29,6 @@ import { listAvailableIceFlavors } from '@/lib/ice-flavor-icons';
  * já que a receita salva não guarda o bottleId do energético.
  */
 async function deductRecentDrinkBottles(drink: CustomDrink): Promise<{ ok: true } | { ok: false; itemName: string }> {
-  for (const d of drink.doses ?? []) {
-    const err = await deductBottleDose(d.bottleId, d.doseCount);
-    if (err) return { ok: false, itemName: d.bottleName };
-  }
   if (drink.energetico?.type === 'garrafa') {
     const { data: bottle } = await supabase
       .from('open_bottles')

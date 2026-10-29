@@ -40,8 +40,8 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
   };
 
   // Esvaziar o carrinho aqui é desistência do cliente (diferente do clearCart
-  // pós-compra no Checkout) — precisa estornar as doses já debitadas ao montar
-  // os drinks, senão o controle de garrafa fica descontado sem venda nenhuma.
+  // pós-compra no Checkout) — precisa estornar o energético em garrafa já debitado
+  // ao montar os drinks (as doses de destilado só baixam no pedido criado).
   const handleClearCart = () => {
     if (customDrinks.length > 0) void returnManyBottleDoses(customDrinks);
     clearCart();

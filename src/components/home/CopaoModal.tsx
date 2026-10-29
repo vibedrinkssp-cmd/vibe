@@ -12,7 +12,6 @@ import { nanoid } from 'nanoid';
 import type { CustomDrink } from '@/shared/schema';
 import { fetchAllowedByType, filterByAllowedProducts } from '@/lib/allowed-bottles';
 import { isExcludedEnergetico, isFreeEnergeticoBrand } from '@/lib/copao-energetico';
-import { deductBottleDoses } from '@/lib/deduct-bottle-doses';
 import { TierBottleCarousel, type AvailableBottleWithTier, type SelectedBottleEntry } from './TierBottleCarousel';
 
 interface AvailableBottle extends AvailableBottleWithTier {}
@@ -280,12 +279,6 @@ export function CopaoModal({ open, onOpenChange, onAddCustomDrink }: CopaoModalP
 
   const persistAndAddToCart = async (): Promise<boolean> => {
     if (!selectedEnergetico || !selectedGelo || !hasDestilado) return false;
-    if (!noAlcohol) {
-      const ok = await deductBottleDoses(selectedBottles, (name) =>
-        toast({ title: `Erro ao deduzir doses de ${name}`, variant: 'destructive' }), quantity
-      );
-      if (!ok) return false;
-    }
     // Energético em garrafa (BALY / BIG BOSS): consome 1 dose de 400ml por copão,
     // auto-abrindo nova garrafa do estoque se a atual esvaziar.
     if (selectedEnergetico.type === 'garrafa' && selectedEnergetico.productId !== '__none__') {
