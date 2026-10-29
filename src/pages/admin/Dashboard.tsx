@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { 
+  ShoppingCart,
   Menu,
   Package, 
   Truck, 
@@ -75,6 +76,7 @@ const OrdersTab = lazy(() => import('./tabs/OrdersTab').then(m => ({ default: m.
 const DeliveryTab = lazy(() => import('./tabs/DeliveryTab').then(m => ({ default: m.DeliveryTab })));
 const CategoriesTab = lazy(() => import('./tabs/CategoriesTab').then(m => ({ default: m.CategoriesTab })));
 const MotoboysTab = lazy(() => import('./tabs/MotoboysTab').then(m => ({ default: m.MotoboysTab })));
+const ShoppingListTab = lazy(() => import('./tabs/ShoppingListTab').then(m => ({ default: m.ShoppingListTab })));
 const StockTab = lazy(() => import('./tabs/StockTab').then(m => ({ default: m.StockTab })));
 const CashClosureTab = lazy(() => import('./tabs/CashClosureTab').then(m => ({ default: m.CashClosureTab })));
 const TrackingTab = lazy(() => import('./tabs/TrackingTab').then(m => ({ default: m.TrackingTab })));
@@ -130,6 +132,7 @@ const tabs = [
   { id: 'caixa', label: 'Caixa', icon: Wallet, group: 'Dia a dia' },
   { id: 'garrafas', label: 'Garrafas', icon: Wine, alwaysShowLabel: true, group: 'Dia a dia' },
   { id: 'estoque', label: 'Estoque', icon: Warehouse, group: 'Dia a dia' },
+  { id: 'compras', label: 'Compras', icon: ShoppingCart, alwaysShowLabel: true, group: 'Dia a dia' },
   // Dinheiro
   { id: 'saqdep', label: 'Saques', icon: ArrowUpFromLine, group: 'Dinheiro' },
   { id: 'sangrias', label: 'Sangrias', icon: Receipt, group: 'Dinheiro' },
@@ -374,6 +377,7 @@ export default function AdminDashboard() {
       case 'fechamento': return <CashClosureTab />;
       case 'fechamento-boys': return <MotoboyClosureTab />;
       case 'estoque': return <StockTab />;
+      case 'compras': return <ShoppingListTab />;
       case 'barcodes': return <BarcodesTab />;
       // caderneta removed from admin
       case 'clientes': return <ClientsTab />;
