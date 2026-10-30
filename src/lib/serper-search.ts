@@ -2,6 +2,8 @@ import { supabase } from "@/integrations/supabase/client-safe";
 
 export interface SerperImageResult {
   imageUrl: string;
+  /** Miniatura hospedada pelo Google: sempre carrega no navegador, ao contrário da imagem original (hotlink/CORS bloqueado). */
+  thumbnailUrl?: string;
   title: string;
   source: string;
 }
@@ -24,6 +26,7 @@ export async function searchProductImages(
 
     return (data.images || []).map((img: any) => ({
       imageUrl: img.imageUrl || img.thumbnailUrl,
+      thumbnailUrl: img.thumbnailUrl || undefined,
       title: img.title,
       source: img.source,
     }));

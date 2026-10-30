@@ -19,6 +19,7 @@ interface ProductImageUploaderProps {
 
 interface SearchResult {
   imageUrl: string;
+  thumbnailUrl?: string;
   title: string;
   source: string;
 }
@@ -329,7 +330,7 @@ export function ProductImageUploader({
                     data-testid={`button-select-image-${index}`}
                   >
                     <img
-                      src={result.imageUrl}
+                      src={result.thumbnailUrl || result.imageUrl}
                       alt={result.title}
                       className="w-full h-40 object-cover group-hover:opacity-75 transition-opacity"
                       onError={(e) => {

@@ -338,12 +338,20 @@ export function BulkImageSearch({ products }: BulkImageSearchProps) {
                           >
                             <div className="w-full aspect-square relative">
                               <img
-                                src={result.imageUrl}
+                                src={result.thumbnailUrl || result.imageUrl}
                                 alt={result.title}
                                 className="w-full h-full object-cover"
                                 loading="eager"
-                                crossOrigin="anonymous"
-                                onError={() => handleImageError(result.imageUrl)}
+                                onError={(e) => {
+                                  // Miniatura falhou: tenta a original uma vez antes de esconder
+                                  const img = e.currentTarget;
+                                  if (result.thumbnailUrl && img.src !== result.imageUrl && !img.dataset.triedOriginal) {
+                                    img.dataset.triedOriginal = '1';
+                                    img.src = result.imageUrl;
+                                    return;
+                                  }
+                                  handleImageError(result.imageUrl);
+                                }}
                               />
                             </div>
                             <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/20 transition-colors flex items-center justify-center">
