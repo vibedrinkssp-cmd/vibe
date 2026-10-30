@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAdminProducts } from '../use-admin-data';
+import { useAdminProducts, useAdminCategories } from '../use-admin-data';
 import { supabase } from '@/integrations/supabase/client-safe';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
@@ -42,6 +42,11 @@ function useOpenPacks() {
   });
 }
 
+const TOBACCO_CATEGORY_RE = /TABAC|CIGARR/i;
+const PACK_NAME_RE = /(^|[^A-Z])(MA[CÇ]O|MASSO)([^A-Z]|$)/;
+// Itens da tabacaria que não são maço de cigarro
+const NOT_A_PACK_RE = /ISQUEIRO|SEDA|PITEIRA|CARV[AÃ]O|ESS[EÊ]NCIA|ALUMINIO|FILTRO|DICHAVADOR|TABACO|TABAQUIN|AMSTERDAM|SOLTO|SOLTA|PALHEIRO|PALHA|MA[CÇ]ARICO|NARGUILE/;
+
 /** Calcula o preço unitário sugerido a partir do produto MAÇO. */
 function suggestUnitPrice(productSalePrice: number | null | undefined, packSize: number): number {
   const sp = parseNumeric(productSalePrice);
@@ -65,6 +70,7 @@ async function createHiddenPackProduct(name: string): Promise<string> {
 
 export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
   const { data: products = [] } = useAdminProducts();
+  const { data: categories = [] } = useAdminCategories();
   const { data: packs = [], isLoading } = useOpenPacks();
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -85,11 +91,16 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
   const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
   const [editingPriceValue, setEditingPriceValue] = useState('');
 
-  // Maços = produtos terminados em "MACO" ou "MAÇO"
-  const cigaretteProducts = useMemo(
-    () => products.filter(p => /\b(MACO|MAÇO)\b/.test(p.name.toUpperCase().trim())),
-    [products],
-  );
+  // Maços = produtos da tabacaria que são cigarro (o cadastro não usa "MAÇO" no nome),
+  // ou qualquer produto com MAÇO/MACO/MASSO no nome.
+  const cigaretteProducts = useMemo(() => {
+    const tobaccoCategories = new Set(categories.filter(c => TOBACCO_CATEGORY_RE.test(c.name)).map(c => c.id));
+    return products.filter(p => {
+      const name = p.name.toUpperCase();
+      if (PACK_NAME_RE.test(name)) return true;
+      return tobaccoCategories.has(p.categoryId || '') && !NOT_A_PACK_RE.test(name);
+    });
+  }, [products, categories]);
 
   // Realtime: invalida ao mudar qualquer pack
   useEffect(() => {
