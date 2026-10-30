@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client-safe';
 import { parseNumeric } from '@/lib/format-utils';
+import { OpenPackDialog } from '@/components/packs/OpenPackDialog';
 import { type LooseCigaretteSelection } from './loose-cigarette-utils';
 
 interface OpenPack {
@@ -100,6 +101,7 @@ export function LooseCigaretteSelector({ open, onOpenChange, onConfirm }: Props)
           <DialogDescription>
             Selecione a quantidade de cada marca a partir dos maços abertos.
           </DialogDescription>
+          <OpenPackDialog triggerClassName="gap-1.5 w-full sm:w-auto" triggerSize="sm" />
         </DialogHeader>
 
         <ScrollArea className="max-h-[55vh] pr-2">
@@ -107,7 +109,7 @@ export function LooseCigaretteSelector({ open, onOpenChange, onConfirm }: Props)
             <div className="text-center text-sm text-muted-foreground py-8">Carregando…</div>
           ) : packs.length === 0 ? (
             <div className="text-center text-sm text-muted-foreground py-8">
-              Nenhum maço aberto disponível. Abra um maço no painel de Maços.
+              Nenhum maço aberto disponível. Toque em "Abrir Maço" acima.
             </div>
           ) : (
             <div className="space-y-2">
