@@ -49,6 +49,20 @@ function suggestUnitPrice(productSalePrice: number | null | undefined, packSize:
   return Math.round((sp / packSize) * 100) / 100;
 }
 
+/** Produto só para dar nome ao maço: inativo (fora da loja) e sem estoque, nada é baixado. */
+async function createHiddenPackProduct(name: string): Promise<string> {
+  const { data, error } = await supabase.rpc('create_product', {
+    p_name: name,
+    p_cost_price: 0,
+    p_profit_margin: 0,
+    p_sale_price: 0,
+    p_stock: 0,
+    p_is_active: false,
+  });
+  if (error || !data) throw new Error(error?.message ?? 'Não foi possível criar o produto do maço');
+  return data as string;
+}
+
 export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
   const { data: products = [] } = useAdminProducts();
   const { data: packs = [], isLoading } = useOpenPacks();
@@ -63,6 +77,9 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
   // Maço que já estava aberto antes do sistema: informa quantos cigarros restam
   const [alreadyOpen, setAlreadyOpen] = useState(false);
   const [remainingUnits, setRemainingUnits] = useState('');
+  // Maço de uma marca que não existe no cadastro: digita o nome e o sistema cria o produto (inativo, sem estoque)
+  const [unregistered, setUnregistered] = useState(false);
+  const [newProductName, setNewProductName] = useState('');
 
   // Edição inline de preço
   const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
@@ -111,15 +128,18 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
       if (!size || size < 1) throw new Error('Informe a quantidade de cigarros');
       if (!price || price <= 0) throw new Error('Preço por cigarro inválido — verifique o cadastro do produto');
       if (alreadyOpen) {
+        const productName = newProductName.trim().toUpperCase();
+        if (unregistered && !productName) throw new Error('Digite o nome do maço');
         const remaining = parseInt(remainingUnits, 10);
         if (Number.isNaN(remaining) || remaining < 0 || remaining > size) {
           throw new Error(`Informe quantos cigarros restam (de 0 a ${size})`);
         }
+        const productId = unregistered ? await createHiddenPackProduct(productName) : selectedProductId;
         const { data, error } = await supabase
           .from('open_packs')
           .insert({
-            product_id: selectedProductId,
-            product_name: selectedProduct?.name ?? '',
+            product_id: productId,
+            product_name: unregistered ? productName : selectedProduct?.name ?? '',
             pack_size: size,
             remaining_units: remaining,
             unit_price: price,
@@ -152,6 +172,8 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
       setOpenedBy('');
       setAlreadyOpen(false);
       setRemainingUnits('');
+      setUnregistered(false);
+      setNewProductName('');
     },
     onError: (err: Error) => {
       toast({ title: 'Erro ao abrir maço', description: err.message, variant: 'destructive' });
@@ -263,6 +285,26 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
                     <span className="block text-xs text-muted-foreground">Informe quantos cigarros ainda restam nele.</span>
                   </span>
                 </label>
+                {alreadyOpen && (
+                  <label className="flex items-start gap-2 p-2.5 border rounded-lg cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={unregistered}
+                      onChange={(e) => setUnregistered(e.target.checked)}
+                      className="mt-0.5 rounded border-primary"
+                    />
+                    <span className="text-sm">
+                      Maço que não está cadastrado
+                      <span className="block text-xs text-muted-foreground">Digite o nome. Fica só no controle de cigarro solto, sem estoque e fora da loja.</span>
+                    </span>
+                  </label>
+                )}
+                {alreadyOpen && unregistered ? (
+                <div>
+                  <Label>Nome do maço</Label>
+                  <Input value={newProductName} onChange={(e) => setNewProductName(e.target.value)} placeholder="Ex: MARLBORO RED MAÇO" />
+                </div>
+                ) : (
                 <div>
                   <Label>Produto (Maço)</Label>
                   <Select value={selectedProductId} onValueChange={setSelectedProductId}>
@@ -292,6 +334,7 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
                     </p>
                   )}
                 </div>
+                )}
                 <div>
                   <Label>Quantidade de cigarros no maço</Label>
                   <Input
@@ -347,7 +390,7 @@ export function PacksTab({ readOnly = false }: { readOnly?: boolean }) {
               <DialogFooter>
                 <Button
                   onClick={() => openPackMutation.mutate()}
-                  disabled={!selectedProductId || (alreadyOpen && remainingUnits === '') || openPackMutation.isPending}
+                  disabled={(alreadyOpen && unregistered ? !newProductName.trim() : !selectedProductId) || (alreadyOpen && remainingUnits === '') || openPackMutation.isPending}
                 >
                   {openPackMutation.isPending ? 'Abrindo...' : 'Abrir Maço'}
                 </Button>
