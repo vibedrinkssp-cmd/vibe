@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { confirmDialog } from '@/lib/dialogs';
-import { Wine, Droplets, AlertCircle, Package, Trash2, Check, Pencil, X } from 'lucide-react';
+import { Wine, Droplets, AlertCircle, Package, Trash2, Check, Pencil, X, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '../shared';
 import { Progress } from '@/components/ui/progress';
+import { parseNumeric } from '@/lib/format-utils';
+import { projectBottleProfit, sumBottleProfit, type BottleProfit } from '@/lib/bottle-profit';
 
 
 interface OpenBottle {
@@ -164,6 +166,26 @@ function BottleLevel({ remaining, total, isEmpty }: { remaining: number; total: 
   );
 }
 
+// Quanto as doses que restam rendem quando vendidas
+function BottleProfitLine({ projection }: { projection: BottleProfit }) {
+  if (!projection.hasDosePrice) {
+    return <p className="text-xs text-amber-500">Sem preço de dose: não entra na projeção.</p>;
+  }
+  return (
+    <div className="rounded-lg bg-emerald-500/10 p-2 text-xs space-y-0.5" data-testid="bottle-profit-line">
+      <div className="flex justify-between"><span className="text-muted-foreground">Rende vendendo tudo:</span><span className="font-bold">{formatCurrency(projection.revenue)}</span></div>
+      {projection.hasCost ? (
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Lucro{projection.marginPercent !== null ? ` (${projection.marginPercent.toFixed(0)}%)` : ''}:</span>
+          <span className={`font-bold ${projection.profit >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>{formatCurrency(projection.profit)}</span>
+        </div>
+      ) : (
+        <p className="text-amber-500">Produto sem custo cadastrado: lucro não calculado.</p>
+      )}
+    </div>
+  );
+}
+
 // Card de garrafa individual
 function BottleCard({ 
   bottle, 
@@ -171,6 +193,7 @@ function BottleCard({
   onDelete,
   onUpdatePrice,
   onEditStock,
+  projection,
   isLoading,
   readOnly = false,
 }: { 
@@ -179,6 +202,7 @@ function BottleCard({
   onDelete: () => void;
   onUpdatePrice: (price: number) => void;
   onEditStock?: (remainingDoses: number, totalMl: number, mlPerDose: number) => void;
+  projection?: BottleProfit;
   isLoading: boolean;
   readOnly?: boolean;
 }) {
@@ -300,6 +324,8 @@ function BottleCard({
             )}
           </div>
         </div>
+
+        {projection && !bottle.is_empty && <BottleProfitLine projection={projection} />}
 
         <div className="text-xs text-muted-foreground space-y-1">
           <p>Volume: {bottle.total_ml}ml ({bottle.ml_per_dose}ml/dose)</p>
@@ -451,6 +477,10 @@ export function BottlesTab({ readOnly = false }: { readOnly?: boolean } = {}) {
     .sort((a, b) => a.remaining_doses / a.total_doses - b.remaining_doses / b.total_doses);
   const emptyBottles = bottles.filter(b => b.is_empty);
 
+  const costById = new Map(products.map((p) => [p.id, parseNumeric(p.costPrice)]));
+  const projectionFor = (b: OpenBottle) => projectBottleProfit(b, costById.get(b.product_id) ?? 0);
+  const profitTotals = sumBottleProfit(activeBottles.map(projectionFor));
+
   const totalDosesAvailable = activeBottles.reduce((sum, b) => sum + b.remaining_doses, 0);
   const totalMlAvailable = activeBottles.reduce((sum, b) => sum + (b.remaining_doses * b.ml_per_dose), 0);
 
@@ -513,6 +543,38 @@ export function BottlesTab({ readOnly = false }: { readOnly?: boolean } = {}) {
         </Card>
       </div>
 
+      {/* Quanto as garrafas abertas rendem quando as doses restantes forem vendidas */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4" data-testid="bottles-profit-summary">
+        <Card>
+          <CardContent className="p-4 text-center">
+            <p className="text-2xl font-bold">{formatCurrency(profitTotals.revenue)}</p>
+            <p className="text-xs text-muted-foreground">Receita se vender todas as doses</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <p className="text-2xl font-bold">{formatCurrency(profitTotals.cost)}</p>
+            <p className="text-xs text-muted-foreground">Custo dessas doses</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <TrendingUp className="h-5 w-5 mx-auto mb-1 text-emerald-500" />
+            <p className={`text-2xl font-bold ${profitTotals.profit >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>{formatCurrency(profitTotals.profit)}</p>
+            <p className="text-xs text-muted-foreground">
+              Lucro previsto{profitTotals.marginPercent !== null ? ` (${profitTotals.marginPercent.toFixed(0)}%)` : ''}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+      {(profitTotals.withoutCost > 0 || profitTotals.withoutDosePrice > 0) && (
+        <p className="text-xs text-amber-500">
+          Fora da conta:{profitTotals.withoutCost > 0 ? ` ${profitTotals.withoutCost} garrafa(s) com produto sem custo cadastrado` : ''}
+          {profitTotals.withoutCost > 0 && profitTotals.withoutDosePrice > 0 ? ' e' : ''}
+          {profitTotals.withoutDosePrice > 0 ? ` ${profitTotals.withoutDosePrice} sem preço de dose` : ''}.
+        </p>
+      )}
+
       {/* Active Bottles */}
       {activeBottles.length > 0 && (
         <div className="space-y-3">
@@ -536,6 +598,7 @@ export function BottlesTab({ readOnly = false }: { readOnly?: boolean } = {}) {
                 }}
                 onUpdatePrice={(price) => updateDosePriceMutation.mutate({ bottleId: bottle.id, price })}
                 onEditStock={!readOnly ? (doses, totalMl, mlPerDose) => handleEditStock(bottle.id, doses, totalMl, mlPerDose) : undefined}
+                projection={projectionFor(bottle)}
                 isLoading={useDoseMutation.isPending || deleteBottleMutation.isPending}
                 readOnly={readOnly}
               />
