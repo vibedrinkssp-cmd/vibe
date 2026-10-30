@@ -11,7 +11,7 @@ import { listAvailableIceFlavors, getIceFlavorPhotoUrl, iceAgua } from '@/lib/ic
 import { nanoid } from 'nanoid';
 import type { CustomDrink } from '@/shared/schema';
 import { fetchAllowedByType, filterByAllowedProducts } from '@/lib/allowed-bottles';
-import { isExcludedEnergetico, isFreeEnergeticoBrand } from '@/lib/copao-energetico';
+import { ENERGETICO_OR_FILTER, isEnergeticoProduct, isExcludedEnergetico, isFreeEnergeticoBrand } from '@/lib/copao-energetico';
 import { TierBottleCarousel, type AvailableBottleWithTier, type SelectedBottleEntry } from './TierBottleCarousel';
 
 interface AvailableBottle extends AvailableBottleWithTier {}
@@ -160,7 +160,7 @@ export function CopaoModal({ open, onOpenChange, onAddCustomDrink }: CopaoModalP
           filteredDestilados = filterByAllowedProducts(allBottles, spiritIds);
         } else {
           // Sem lista liberada no admin: qualquer garrafa aberta que não seja energético.
-          filteredDestilados = allBottles.filter(b => typeMap.get(b.product_id) !== 'energetico');
+          filteredDestilados = allBottles.filter(b => !isEnergeticoProduct({ product_type: typeMap.get(b.product_id), name: b.product_name }));
         }
 
         let enerBottles: EnergeticoOption[];
@@ -170,7 +170,7 @@ export function CopaoModal({ open, onOpenChange, onAddCustomDrink }: CopaoModalP
         } else if (hasAny) {
           enerBottles = [];
         } else {
-          enerBottles = allBottles.filter(b => typeMap.get(b.product_id) === 'energetico')
+          enerBottles = allBottles.filter(b => isEnergeticoProduct({ product_type: typeMap.get(b.product_id), name: b.product_name }))
             .map(b => ({ type: 'garrafa' as const, id: b.bottle_id, name: b.product_name, price: 0, productId: b.product_id }));
         }
         setBottles(filteredDestilados);
@@ -178,7 +178,7 @@ export function CopaoModal({ open, onOpenChange, onAddCustomDrink }: CopaoModalP
         // IDs de produto já cobertos por garrafas abertas (evita duplicação Big Boss / Baly)
         const openedProductIds = new Set(enerBottles.map(b => b.productId));
 
-        const { data: enerProducts } = await supabase.from('products_public').select('id, name, sale_price, stock').eq('product_type', 'energetico').eq('is_active', true).order('name');
+        const { data: enerProducts } = await supabase.from('products_public').select('id, name, sale_price, stock').or(ENERGETICO_OR_FILTER).eq('is_active', true).order('name');
         // Demais energéticos (latas/individuais) viram opções pagas
         const cannedOpts: EnergeticoOption[] = (enerProducts || [])
           .filter(p => !openedProductIds.has(p.id!) && !isExcludedEnergetico(p.name || '') && Number(p.stock ?? 0) > 0 && !isFreeEnergeticoBrand(p.name || ''))

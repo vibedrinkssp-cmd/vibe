@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client-safe';
 import { fetchAllowedByType } from '@/lib/allowed-bottles';
-import { isExcludedEnergetico, isFreeEnergeticoBrand } from '@/lib/copao-energetico';
+import { ENERGETICO_OR_FILTER, isEnergeticoProduct, isExcludedEnergetico, isFreeEnergeticoBrand } from '@/lib/copao-energetico';
 
 const REFETCH_MS = 30_000;
 
@@ -11,6 +11,7 @@ interface OpenBottleRow {
 
 interface ProductTypeRow {
   id: string;
+  name: string | null;
   product_type: string | null;
 }
 
@@ -19,16 +20,16 @@ async function hasSpirit(bottleProductIds: string[], types: ProductTypeRow[]): P
   const { spiritIds, hasAny } = await fetchAllowedByType('copao');
   if (hasAny) return bottleProductIds.some((id) => spiritIds.has(id));
   // Sem lista liberada no admin, vale qualquer garrafa aberta que não seja energético.
-  return types.some((p) => p.product_type !== 'energetico');
+  return types.some((p) => !isEnergeticoProduct(p));
 }
 
 /** Há energético para o Copão: garrafa aberta (Baly/Big Boss) ou lata com estoque? */
 async function hasEnergetico(types: ProductTypeRow[]): Promise<boolean> {
-  if (types.some((p) => p.product_type === 'energetico')) return true;
+  if (types.some(isEnergeticoProduct)) return true;
   const { data } = await supabase
     .from('products_public')
     .select('name, stock')
-    .eq('product_type', 'energetico')
+    .or(ENERGETICO_OR_FILTER)
     .eq('is_active', true);
   return (data ?? []).some(
     (p) => Number(p.stock ?? 0) > 0 && !isExcludedEnergetico(p.name ?? '') && !isFreeEnergeticoBrand(p.name ?? ''),
@@ -41,7 +42,7 @@ async function fetchCopaoAvailable(): Promise<boolean> {
   if (error) throw error;
   const bottleProductIds = ((data ?? []) as OpenBottleRow[]).map((b) => b.product_id);
   if (bottleProductIds.length === 0) return false;
-  const { data: types } = await supabase.from('products').select('id, product_type').in('id', bottleProductIds);
+  const { data: types } = await supabase.from('products').select('id, name, product_type').in('id', bottleProductIds);
   const rows = (types ?? []) as ProductTypeRow[];
   return (await hasSpirit(bottleProductIds, rows)) && (await hasEnergetico(rows));
 }
