@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Phone, User, MapPin, ArrowRight, Loader2, Lock, ArrowLeft, CheckCircle2, CreditCard, Info, AlertTriangle } from 'lucide-react';
+import { Phone, User, MapPin, ArrowRight, Loader2, Lock, ArrowLeft, CheckCircle2, CreditCard, Info, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { AdminLoginModal } from '@/components/auth/AdminLoginModal';
+import { MotoboySelectModal } from '@/components/auth/MotoboySelectModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -94,6 +96,8 @@ export default function Login() {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   };
 
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [showMotoboyModal, setShowMotoboyModal] = useState(false);
   const [showForgotPasswordDialog, setShowForgotPasswordDialog] = useState(false);
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
   
@@ -406,6 +410,18 @@ export default function Login() {
     }
   };
 
+  const alreadyRegisteredButton = (position: 'top' | 'bottom') => (
+    <Button
+      variant="outline"
+      className="w-full h-12 border-primary/40 text-primary hover:bg-primary/10 font-semibold"
+      onClick={() => setStep('phone')}
+      data-testid={`button-already-registered-${position}`}
+    >
+      <User className="h-4 w-4 mr-2" />
+      Já tem cadastro? Acesse
+    </Button>
+  );
+
   const stepIndicators = step === 'register' ? [
     { step: 'register', label: 'Cadastro' },
   ] : [
@@ -671,7 +687,9 @@ export default function Login() {
                   transition={{ duration: 0.15 }}
                   className="space-y-4"
                 >
-                  <motion.div 
+                  {alreadyRegisteredButton('top')}
+
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1, duration: 0.4, ease: "easeOut" }}
@@ -968,12 +986,31 @@ export default function Login() {
                       )}
                     </Button>
                   </div>
+
+                  {alreadyRegisteredButton('bottom')}
                 </motion.div>
               )}
             </AnimatePresence>
           </CardContent>
         </Card>
+
+        <Button
+          variant="ghost"
+          className="w-full mt-4 text-muted-foreground hover:text-primary"
+          onClick={() => setShowAdminModal(true)}
+          data-testid="button-company-access"
+        >
+          <ShieldCheck className="h-4 w-4 mr-2" />
+          Acesso da empresa (painel)
+        </Button>
       </motion.div>
+
+      <AdminLoginModal
+        open={showAdminModal}
+        onOpenChange={setShowAdminModal}
+        onMotoboySelect={() => setShowMotoboyModal(true)}
+      />
+      <MotoboySelectModal open={showMotoboyModal} onOpenChange={setShowMotoboyModal} />
 
       <Dialog open={showForgotPasswordDialog} onOpenChange={setShowForgotPasswordDialog}>
         <DialogContent className="sm:max-w-md">
