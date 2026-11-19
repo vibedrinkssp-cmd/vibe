@@ -5,6 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/lib/cart';
 import { useAuth } from '@/lib/auth';
+import { useDeliveryEnabled } from '@/hooks/use-delivery-enabled';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ensureImageUrl } from '@/lib/supabase';
@@ -19,6 +20,7 @@ interface CartSheetProps {
 export function CartSheet({ open, onOpenChange }: CartSheetProps) {
   const { items, combos, customDrinks, customDrinksTotal, subtotal, comboDiscount, beerDiscount, beerDiscountPercent, promotionDiscount, promotionMatches, total, updateQuantity, removeItem, removeCombo, removeCustomDrink, clearCart, itemCount } = useCart();
   const { isAuthenticated, role } = useAuth();
+  const { deliveryEnabled } = useDeliveryEnabled();
   const navigate = useNavigate();
 
   const formatPrice = (price: number) => {
@@ -374,9 +376,15 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
                 </div>
               </div>
               
-              <p className="text-xs text-muted-foreground">
-                ⓘ Frete será calculado e somado na finalização do pedido
-              </p>
+              {deliveryEnabled ? (
+                <p className="text-xs text-muted-foreground">
+                  ⓘ Frete será calculado e somado na finalização do pedido
+                </p>
+              ) : (
+                <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm font-semibold text-amber-600 dark:text-amber-400" data-testid="cart-sem-entrega">
+                  🚫 Sem entrega no momento — somente RETIRADA na loja.
+                </div>
+              )}
 
               <div className="flex gap-3">
                 <Button

@@ -178,9 +178,9 @@ export default function Home() {
           </div>
         )}
         {isDeliveryUnavailable && (
-          <div className="bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 px-4 py-3 flex items-center gap-2 justify-center text-sm font-medium text-center" data-testid="banner-sem-motoboy">
+          <div className="bg-amber-500 text-black px-4 py-3 flex items-center gap-2 justify-center text-sm font-bold text-center" data-testid="banner-sem-motoboy">
             <Store className="h-4 w-4 shrink-0" />
-            Sem motoboy para entrega no momento — você pode retirar na loja
+            SEM ENTREGA NO MOMENTO — somente retirada na loja
           </div>
         )}
         {/* Monte seu Drink + Combo + Drinks Especiais, tudo em uma linha só */}
