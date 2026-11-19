@@ -1,6 +1,7 @@
 // Weekly promotions engine — recurring discounts by weekday.
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client-safe';
+import { AUTO_DISCOUNTS_ENABLED } from '@/lib/auto-discounts';
 import type { CartItem, CustomDrink, Product } from '@/shared/schema';
 
 export type WeeklyPromotion = {
@@ -62,6 +63,7 @@ export function useActivePromotions() {
   });
 
   const now = new Date();
+  if (!AUTO_DISCOUNTS_ENABLED) return [];
   return data.filter((p) => isWithinWindow(p, now));
 }
 

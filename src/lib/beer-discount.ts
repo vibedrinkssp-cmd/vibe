@@ -8,6 +8,8 @@
  * Discount applies to ALL units of qualifying products once the fardo threshold is met.
  */
 
+import { AUTO_DISCOUNTS_ENABLED } from '@/lib/auto-discounts';
+
 export const FARDO_SIZE = 12;
 export const CERVEJAS_CATEGORY_ID = '910004ea-3a2c-4f2e-85a5-e94d00ebd3ab';
 
@@ -63,6 +65,7 @@ export interface BeerCartItem {
  * - All other cervejas: 12+ total regular beer units → 20%
  */
 export function calculateBeerDiscount(items: BeerCartItem[]): BeerDiscountResult {
+  if (!AUTO_DISCOUNTS_ENABLED) return { totalDiscount: 0, lines: [] };
   const beerItems = items.filter(i => i.categoryId === CERVEJAS_CATEGORY_ID && isBeerDiscountEligible(i.productName));
   if (beerItems.length === 0) return { totalDiscount: 0, lines: [] };
 
@@ -97,12 +100,12 @@ export function calculateBeerDiscount(items: BeerCartItem[]): BeerDiscountResult
 /* ─── Legacy helpers (used by BeerQuantityModal UI) ─── */
 
 export function getBeerDiscountPercent(totalUnits: number): number {
-  if (totalUnits < REGULAR_FARDO_SIZE) return 0;
+  if (!AUTO_DISCOUNTS_ENABLED || totalUnits < REGULAR_FARDO_SIZE) return 0;
   return REGULAR_DISCOUNT;
 }
 
 export function getSmallFardoDiscountPercent(totalUnits: number): number {
-  if (totalUnits < SMALL_FARDO_SIZE) return 0;
+  if (!AUTO_DISCOUNTS_ENABLED || totalUnits < SMALL_FARDO_SIZE) return 0;
   return SMALL_FARDO_DISCOUNT;
 }
 

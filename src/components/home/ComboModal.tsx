@@ -24,6 +24,7 @@ import { getFruitEmoji } from '@/lib/emoji-icons';
 import { useDrinkFruits } from '@/hooks/use-drink-fruits';
 import { listAvailableIceFlavors, getIceFlavorPhotoUrl, iceAgua, isWaterIceName } from '@/lib/ice-flavor-icons';
 import type { Product, ComboGelo } from '@/shared/schema';
+import { AUTO_DISCOUNTS_ENABLED } from '@/lib/auto-discounts';
 
 interface ComboModalProps {
   open: boolean;
@@ -51,7 +52,7 @@ const ENERGETICO_KEYWORDS = ['energetico', 'energético'];
 const GELO_KEYWORDS = ['gelo'];
 const CAN_COUNT = 4;
 const FLAVOR_ICE_COUNT = 4;
-const COMBO_DISCOUNT = 0.10;
+const COMBO_DISCOUNT = AUTO_DISCOUNTS_ENABLED ? 0.10 : 0;
 // Fallback: o gelo de água do combo deve usar o produto real GELO COMUM 5KG.
 const WATER_ICE_FALLBACK_PRICE = 15;
 
@@ -298,7 +299,7 @@ export function ComboModal({ open, onOpenChange, onAddItem, onAddComboComponents
       const comboProduct: Product = {
         id: comboId, name: comboLabel,
         salePrice: String(totals.discounted), costPrice: '0', categoryId: selectedSpirit.categoryId,
-        isActive: true, isPrepared: false, stock: 999, description: 'Combo 10% OFF',
+        isActive: true, isPrepared: false, stock: 999, description: 'Combo',
         imageUrl: selectedSpirit.imageUrl, comboEligible: false, sortOrder: 0, productType: 'combo',
         profitMargin: '0', createdAt: new Date().toISOString(),
       };
@@ -312,7 +313,7 @@ export function ComboModal({ open, onOpenChange, onAddItem, onAddComboComponents
       });
     }
 
-    toast({ title: 'Combo adicionado!', description: 'Combo montado com 10% OFF' });
+    toast({ title: 'Combo adicionado!', description: 'Combo montado' });
     resetAll();
     onOpenChange(false);
   };
@@ -463,7 +464,7 @@ export function ComboModal({ open, onOpenChange, onAddItem, onAddComboComponents
           <div className="bg-gradient-to-r from-orange-600 to-amber-600 px-4 py-3 flex items-center justify-between">
             <div>
               <h2 className="text-base font-bold text-white">{STEP_TITLES[step]}</h2>
-              <p className="text-[11px] text-white/80">Etapa {stepIndex + 1} de {STEPS.length} • 5% OFF no combo</p>
+              <p className="text-[11px] text-white/80">Etapa {stepIndex + 1} de {STEPS.length}</p>
             </div>
             <button onClick={() => onOpenChange(false)} className="p-1.5 hover:bg-white/20 rounded-full">
               <X className="h-5 w-5 text-white" />
@@ -633,10 +634,12 @@ export function ComboModal({ open, onOpenChange, onAddItem, onAddComboComponents
                         <span className="text-muted-foreground">Subtotal</span>
                         <span className="line-through text-muted-foreground">{fmt(totals.original)}</span>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Desconto 10%</span>
-                        <span className="text-green-600 font-medium">-{fmt(totals.original - totals.discounted)}</span>
-                      </div>
+                      {totals.original > totals.discounted && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Desconto 10%</span>
+                          <span className="text-green-600 font-medium">-{fmt(totals.original - totals.discounted)}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between font-bold text-base">
                         <span>Total</span>
                         <span className="text-primary">{fmt(totals.discounted)}</span>

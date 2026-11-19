@@ -41,10 +41,12 @@ export function ComboWizardShell({
                 {title}
               </DialogTitle>
 
+              {discountPercent > 0 && (
               <Badge className="shrink-0 rounded-full border border-border bg-secondary px-2 py-1 text-[10px] font-semibold text-secondary-foreground">
                 <Percent className="mr-1 h-3 w-3" />
                 {discountPercent}% OFF
               </Badge>
+              )}
             </div>
 
             {description ? (
