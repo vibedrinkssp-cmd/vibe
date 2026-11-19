@@ -97,7 +97,7 @@ export function HeroSection() {
             >
               <span className="relative z-10 flex items-center gap-2">
                 <Gift className="h-5 w-5" />
-                MONTE SEU COMBO 5% OFF
+                MONTE SEU COMBO
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full" />
             </Button>

@@ -108,7 +108,7 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
                     <div className="flex items-center justify-between mb-3">
                       <Badge variant="secondary" className="gap-2 rounded-full border-primary/20 bg-primary/10 text-primary">
                         <Gift className="h-4 w-4" />
-                        Combo 5% OFF
+                        Combo
                       </Badge>
                       <Button
                         variant="ghost"

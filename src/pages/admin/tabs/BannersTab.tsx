@@ -22,7 +22,7 @@ const FEATURE_BANNERS = [
   {
     id: 'combo',
     title: 'Monte Seu Combo',
-    description: '5% OFF em combos personalizados',
+    description: 'Combos personalizados',
     icon: Gift,
     defaultImage: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=200&fit=crop&q=80',
   },
