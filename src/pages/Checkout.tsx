@@ -22,6 +22,7 @@ import { supabase } from '@/integrations/supabase/client-safe';
 import { startCardCheckout } from '@/lib/mp-checkout';
 // mapSettings no longer needed - using get_store_info RPC
 import { STORE_INFO } from '@/lib/business-hours';
+import { PickupOnlyNotice } from '@/components/PickupOnlyNotice';
 import { DeliveryMap } from '@/components/location/DeliveryMap';
 import { DeliveryEstimate } from '@/components/location/DeliveryEstimate';
 import { PixQRCodeModal } from '@/components/PixQRCodeModal';
@@ -697,19 +698,9 @@ export default function Checkout() {
         </Button>
 
         {deliveryUnavailable && (
-          <Card className="mb-6 border-amber-500/30 bg-amber-500/5" data-testid="banner-sem-motoboy">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3 text-amber-400">
-                <Clock className="h-5 w-5 flex-shrink-0" />
-                <div>
-                  <p className="font-semibold">{STORE_INFO.STORE_NAME} - Sem motoboy para entrega</p>
-                  <p className="text-sm">No momento não estamos fazendo entregas. Você pode finalizar o pedido escolhendo "Retirar na loja".</p>
-                  <p className="text-xs mt-1 text-muted-foreground">{STORE_INFO.ADDRESS}</p>
-                  <p className="text-xs mt-2">Entre em contato: <a href={STORE_INFO.WHATSAPP_LINK} className="text-green-400 hover:underline" target="_blank" rel="noopener noreferrer">WhatsApp {STORE_INFO.WHATSAPP}</a></p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="mb-6 overflow-hidden rounded-xl">
+            <PickupOnlyNotice />
+          </div>
         )}
 
         <h1 className="font-serif text-3xl text-primary mb-8">Finalizar Pedido</h1>
@@ -724,8 +715,8 @@ export default function Checkout() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  {([false, true] as const).map((pickup) => (
+                <div className={`grid gap-3 ${deliveryUnavailable ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                  {([false, true] as const).filter((pickup) => pickup || !deliveryUnavailable).map((pickup) => (
                     <button
                       key={String(pickup)}
                       type="button"

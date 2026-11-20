@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/lib/cart';
 import { useAuth } from '@/lib/auth';
 import { useDeliveryEnabled } from '@/hooks/use-delivery-enabled';
+import { PickupOnlyNotice } from '@/components/PickupOnlyNotice';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ensureImageUrl } from '@/lib/supabase';
@@ -381,9 +382,7 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
                   ⓘ Frete será calculado e somado na finalização do pedido
                 </p>
               ) : (
-                <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm font-semibold text-amber-600 dark:text-amber-400" data-testid="cart-sem-entrega">
-                  🚫 Sem entrega no momento — somente RETIRADA na loja.
-                </div>
+                <PickupOnlyNotice variant="compact" />
               )}
 
               <div className="flex gap-3">

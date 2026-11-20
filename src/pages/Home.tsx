@@ -22,6 +22,7 @@ import { useSettingsRealtime, useProductsRealtime } from '@/hooks/use-realtime-s
 import { useProducts, useCategories } from '@/hooks/use-supabase-data';
 import { useDeliveryEnabled } from '@/hooks/use-delivery-enabled';
 import { Store } from 'lucide-react';
+import { PickupOnlyNotice } from '@/components/PickupOnlyNotice';
 import { LetterFilter } from '@/components/common/LetterFilter';
 import { availableLetters, initialLetter } from '@/lib/initial-letter';
 
@@ -177,12 +178,7 @@ export default function Home() {
             Loja fechada no momento — abrimos das 14h às 05h (fechado às terças)
           </div>
         )}
-        {isDeliveryUnavailable && (
-          <div className="bg-amber-500 text-black px-4 py-3 flex items-center gap-2 justify-center text-sm font-bold text-center" data-testid="banner-sem-motoboy">
-            <Store className="h-4 w-4 shrink-0" />
-            SEM ENTREGA NO MOMENTO — somente retirada na loja
-          </div>
-        )}
+        {isDeliveryUnavailable && <PickupOnlyNotice />}
         {/* Monte seu Drink + Combo + Drinks Especiais, tudo em uma linha só */}
         <div className="py-2 mt-2 md:mt-1">
           <SpecialDrinksCarousel
